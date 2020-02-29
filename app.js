@@ -5,6 +5,8 @@ import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import indexRouter from './routes/index';
 
+require('dotenv').config();
+
 const app = express();
 
 // view engine setup
@@ -16,6 +18,7 @@ app.use(json());
 app.use(urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(join(__dirname, 'public')));
+app.use(express.static(join(__dirname, 'assets')));
 
 indexRouter(app);
 
@@ -36,4 +39,4 @@ app.use((err, req, res) => {
   res.render('error');
 });
 
-module.exports = app;
+export default app;

@@ -7,6 +7,7 @@
     "update": "sequelize db:drop && sequelize db:create --charset utf8mb4 && sequelize db:migrate --debug && sequelize db:seed:all --debug"
   },
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "cookie-parser": "~1.4.4",
     "cors": "^2.8.5",
     "debug": "~2.6.9",

@@ -8,10 +8,12 @@ module.exports = {
       type: Sequelize.INTEGER,
     },
     uid: {
-      type: Sequelize.STRING,
+      type: Sequelize.STRING(32),
+      unique: true,
     },
     rfid: {
-      type: Sequelize.STRING,
+      type: Sequelize.STRING(32),
+      unique: true,
     },
     name: {
       type: Sequelize.STRING,
@@ -19,13 +21,18 @@ module.exports = {
     password: {
       type: Sequelize.STRING,
     },
+    image: {
+      type: Sequelize.STRING,
+    },
     createdAt: {
       allowNull: false,
       type: Sequelize.DATE,
+      defaultValue: Sequelize.fn('now'),
     },
     updatedAt: {
       allowNull: false,
       type: Sequelize.DATE,
+      defaultValue: Sequelize.fn('now'),
     },
   }),
   down: (queryInterface) => queryInterface.dropTable('Students'),

@@ -5,6 +5,7 @@ module.exports = (sequelize, DataTypes) => {
     rfid: DataTypes.STRING,
     name: DataTypes.STRING,
     password: DataTypes.STRING,
+    image: DataTypes.STRING,
   }, {});
   Professor.associate = (models) => {
     Professor.hasMany(models.Section, { as: 'sections' });
