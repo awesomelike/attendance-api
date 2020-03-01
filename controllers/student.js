@@ -1,6 +1,8 @@
 import { Op } from 'sequelize';
 import models from '../models';
 
+const { Student } = models;
+
 const include = [
   {
     model: models.Record,
@@ -17,7 +19,7 @@ const include = [
 ];
 
 function find(where, res, next) {
-  models.Student.findAll({
+  Student.findAll({
     where,
     include,
     exclude: ['password'],
@@ -29,7 +31,7 @@ function find(where, res, next) {
 function findWithPagination({ page = 1, size = Number.MAX_SAFE_INTEGER }, where, res, next) {
   const limit = size;
   const offset = (page - 1) * size;
-  models.Student.findAll({
+  Student.findAll({
     where,
     include,
     limit,
@@ -54,7 +56,7 @@ export default {
     }
   },
   get(req, res) {
-    models.Student.findByPk(req.params.id, { include })
+    Student.findByPk(req.params.id, { include })
       .then((student) => res.status(200).json(student))
       .catch((error) => res.status(502).json(error));
   },
@@ -76,7 +78,18 @@ export default {
         }, where, res, (students) => {
           res.status(200).json(students);
         });
-      } else res.status(200).json(await models.Student.findAll({ where }));
+      } else res.status(200).json(await Student.findAll({ where }));
     } else res.status(400).json({ message: 'Please provide some search filters' });
+  },
+  handleRfid(req, res) {
+    const { rfid } = req;
+    Student.findOne({
+      where: { rfid },
+    })
+      .then(async (student) => {
+        // const sections = await student.getSections();
+        res.status(200).json(student);
+      })
+      .catch((error) => res.status(502).json(error));
   },
 };

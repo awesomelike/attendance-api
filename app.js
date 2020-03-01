@@ -2,6 +2,7 @@ import createError from 'http-errors';
 import express, { json, urlencoded } from 'express';
 import { join } from 'path';
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
 import logger from 'morgan';
 import indexRouter from './routes/index';
 
@@ -17,8 +18,9 @@ app.use(logger('dev'));
 app.use(json());
 app.use(urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(cors());
 app.use(express.static(join(__dirname, 'public')));
-app.use(express.static(join(__dirname, 'assets')));
+app.use('/assets', express.static(join(__dirname, 'assets')));
 
 indexRouter(app);
 
