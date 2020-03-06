@@ -21,8 +21,16 @@ module.exports = {
         key: 'id',
       },
     },
+    isAttended: {
+      type: Sequelize.INTEGER,
+      defaultValue: 0,
+    },
+    rfid: {
+      type: Sequelize.STRING,
+    },
     isAdditional: {
       type: Sequelize.INTEGER,
+      defaultValue: 0,
     },
     createdAt: {
       allowNull: false,

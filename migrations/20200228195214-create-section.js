@@ -8,7 +8,7 @@ module.exports = {
       type: Sequelize.INTEGER,
     },
     sectionNumber: {
-      type: Sequelize.INTEGER,
+      type: Sequelize.STRING,
     },
     professorId: {
       type: Sequelize.INTEGER,

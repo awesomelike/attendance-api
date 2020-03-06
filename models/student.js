@@ -4,7 +4,6 @@ module.exports = (sequelize, DataTypes) => {
     uid: DataTypes.STRING,
     rfid: DataTypes.STRING,
     name: DataTypes.STRING,
-    password: DataTypes.STRING,
     image: DataTypes.STRING,
   }, {});
   Student.associate = (models) => {

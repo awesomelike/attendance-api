@@ -10,6 +10,9 @@ module.exports = {
     startTime: {
       type: Sequelize.STRING,
     },
+    endTime: {
+      type: Sequelize.STRING,
+    },
     createdAt: {
       allowNull: false,
       type: Sequelize.DATE,

@@ -1,5 +1,4 @@
 require('dotenv').config();
-const { hashSync } = require('bcryptjs');
 
 module.exports = {
   up: (queryInterface) => queryInterface.bulkInsert('Professors', [
@@ -9,7 +8,6 @@ module.exports = {
       name: 'Davlatov Zafar',
       uid: 'U171040',
       image: `${process.env.BASE_URL}/assets/staff.png`,
-      password: hashSync('zafar', 10),
     },
   ]),
   down: (queryInterface) => queryInterface.bulkDelete('Professors', null, {}),

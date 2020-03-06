@@ -1,7 +1,7 @@
 
 module.exports = (sequelize, DataTypes) => {
   const Section = sequelize.define('Section', {
-    sectionNumber: DataTypes.INTEGER,
+    sectionNumber: DataTypes.STRING,
     professorId: DataTypes.INTEGER,
     courseId: DataTypes.INTEGER,
     semesterId: DataTypes.INTEGER,

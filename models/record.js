@@ -3,6 +3,8 @@ module.exports = (sequelize, DataTypes) => {
   const Record = sequelize.define('Record', {
     classId: DataTypes.INTEGER,
     studentId: DataTypes.INTEGER,
+    isAttended: DataTypes.INTEGER,
+    rfid: DataTypes.STRING,
     isAdditional: DataTypes.INTEGER,
   }, {});
   Record.associate = (models) => {

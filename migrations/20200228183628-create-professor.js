@@ -8,15 +8,14 @@ module.exports = {
       type: Sequelize.INTEGER,
     },
     uid: {
-      type: Sequelize.STRING,
+      type: Sequelize.STRING(32),
+      unique: true,
     },
     rfid: {
-      type: Sequelize.STRING,
+      type: Sequelize.STRING(32),
+      unique: true,
     },
     name: {
-      type: Sequelize.STRING,
-    },
-    password: {
       type: Sequelize.STRING,
     },
     image: {
