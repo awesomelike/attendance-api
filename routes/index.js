@@ -4,6 +4,7 @@ import timeslots from './timeslots';
 import professors from './professors';
 import semesters from './semesters';
 import timetable from './timetable';
+import test from './test';
 
 export default (app) => {
   app.use('/api/students', students);
@@ -12,4 +13,5 @@ export default (app) => {
   app.use('/api/timeslots', timeslots);
   app.use('/api/semesters', semesters);
   app.use('/api/timetable', timetable);
+  app.use('/api/test', test);
 };

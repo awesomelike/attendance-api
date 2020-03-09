@@ -5,7 +5,11 @@ module.exports = (sequelize, DataTypes) => {
     endTime: DataTypes.STRING,
   }, {});
   TimeSlot.associate = (models) => {
-    TimeSlot.hasMany(models.Class, { as: 'classes' });
+    TimeSlot.belongsToMany(models.Class, {
+      as: 'classes',
+      through: models.ClassTimeSlot,
+      foreignKey: 'timeSlotId',
+    });
   };
   return TimeSlot;
 };

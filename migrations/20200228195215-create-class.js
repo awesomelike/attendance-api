@@ -17,15 +17,11 @@ module.exports = {
     week: {
       type: Sequelize.INTEGER,
     },
+    weekDay: {
+      type: Sequelize.STRING,
+    },
     date: {
       type: Sequelize.DATE,
-    },
-    timeSlotId: {
-      type: Sequelize.INTEGER,
-      references: {
-        model: 'TimeSlots',
-        key: 'id',
-      },
     },
     createdAt: {
       allowNull: false,

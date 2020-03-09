@@ -1,4 +1,3 @@
-import { writeFileSync } from 'fs';
 import models from '../models';
 import timetable from '../data/timetable.json';
 import studentsTimetable from '../data/students.json';
@@ -57,13 +56,46 @@ const storeTimetable = (req, res) => {
             professorId: professorsFromDB
               .find((professor) => professor.uid === particularSections[j].professorId).id,
             semesterId: 2,
-            // classes: particularClasses,
+            classes: particularClasses,
           });
         }
       }
-      models.sequelize.getQueryInterface().bulkInsert('Sections',
-        unique(sections, ['sectionNumber', 'courseId', 'semesterId']), {})
-        .then(() => res.send(200))
+      const uniqueSections = unique(sections, ['sectionNumber', 'courseId', 'semesterId']);
+
+      const sectionsToInsert = uniqueSections.map(({
+        courseId, sectionNumber, professorId, semesterId,
+      }) => ({
+        courseId, sectionNumber, professorId, semesterId,
+      }));
+
+      models.sequelize.getQueryInterface().bulkInsert('Sections', sectionsToInsert, {})
+        .then(async () => {
+          const allSections = await models.Section.findAll({
+            include: [
+              {
+                model: models.Course,
+                as: 'course',
+              },
+            ],
+          });
+          const tasks = [];
+          for (let i = 0; i < uniqueSections.length; i += 1) {
+            const { classes } = uniqueSections[i];
+            const uniqueClasses = unique(classes, ['courseNumber', 'sectionNumber', 'weekDay']);
+            for (let j = 0; j < uniqueClasses.length; j += 1) {
+              tasks.push(models.Class.create({
+                sectionId: allSections
+                  .find((section) => section.sectionNumber === uniqueClasses[j].sectionNumber
+                && section.course.courseNumber === uniqueClasses[j].courseNumber).id,
+                weekDay: uniqueClasses[j].weekDay,
+                week: 1,
+              }));
+            }
+          }
+          Promise.all(tasks)
+            .then((result) => res.status(200).json(result))
+            .catch((error) => res.status(502).json(error));
+        })
         .catch((error) => res.status(502).json({ error }));
     })
     .catch((error) => res.status(502).json(error));
