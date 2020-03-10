@@ -3,11 +3,11 @@ module.exports = {
   up: (queryInterface) => queryInterface.bulkInsert('TimeSlots', [
     {
       id: 1,
-      startTime: '09:00',
-      endTime: '09:30',
+      startTime: '9:00',
+      endTime: '9:30',
     }, {
       id: 2,
-      startTime: '09:30',
+      startTime: '9:30',
       endTime: '10:00',
     }, {
       id: 3,

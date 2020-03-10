@@ -1,30 +1,33 @@
-'use strict';
 module.exports = {
-  up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('ClassTimeSlots', {
-      id: {
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
-        type: Sequelize.INTEGER
+  up: (queryInterface, Sequelize) => queryInterface.createTable('ClassTimeSlots', {
+    id: {
+      allowNull: false,
+      autoIncrement: true,
+      primaryKey: true,
+      type: Sequelize.INTEGER,
+    },
+    timeSlotId: {
+      type: Sequelize.INTEGER,
+      references: {
+        model: 'TimeSlots',
+        key: 'id',
       },
-      timeSlotId: {
-        type: Sequelize.INTEGER
+    },
+    classId: {
+      type: Sequelize.INTEGER,
+      references: {
+        model: 'Classes',
+        key: 'id',
       },
-      classId: {
-        type: Sequelize.INTEGER
-      },
-      createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE
-      },
-      updatedAt: {
-        allowNull: false,
-        type: Sequelize.DATE
-      }
-    });
-  },
-  down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('ClassTimeSlots');
-  }
+    },
+    createdAt: {
+      allowNull: false,
+      type: Sequelize.DATE,
+    },
+    updatedAt: {
+      allowNull: false,
+      type: Sequelize.DATE,
+    },
+  }),
+  down: (queryInterface) => queryInterface.dropTable('ClassTimeSlots'),
 };

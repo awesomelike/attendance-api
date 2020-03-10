@@ -78,30 +78,65 @@ const storeTimetable = (req, res) => {
               },
             ],
           });
-          const tasks = [];
+          const classesToInsert = [];
           for (let i = 0; i < uniqueSections.length; i += 1) {
             const { classes } = uniqueSections[i];
             const uniqueClasses = unique(classes, ['courseNumber', 'sectionNumber', 'weekDay']);
             for (let j = 0; j < uniqueClasses.length; j += 1) {
-              tasks.push(models.Class.create({
+              classesToInsert.push({
                 sectionId: allSections
                   .find((section) => section.sectionNumber === uniqueClasses[j].sectionNumber
                 && section.course.courseNumber === uniqueClasses[j].courseNumber).id,
                 weekDay: uniqueClasses[j].weekDay,
                 week: 1,
-              }));
+              });
             }
           }
-          Promise.all(tasks)
-            .then((result) => res.status(200).json(result))
-            .catch((error) => res.status(502).json(error));
+          models.sequelize.getQueryInterface().bulkInsert('Classes', classesToInsert)
+            .then(async () => {
+              const dbClasses = await models.Class.findAll({
+                include: [
+                  {
+                    model: models.Section,
+                    as: 'section',
+                    include: [
+                      {
+                        model: models.Professor,
+                        as: 'professor',
+                      },
+                      {
+                        model: models.Course,
+                        as: 'course',
+                      },
+                    ],
+                  },
+                ],
+              });
+              const timeSlots = await models.TimeSlot.findAll({ raw: true });
+              const classTimeSlots = [];
+              for (let i = 0; i < uniqueSections.length; i += 1) {
+                const { classes } = uniqueSections[i];
+                // const uniqueClasses = unique(classes, ['courseNumber', 'sectionNumber', 'weekDay']);
+                classes.forEach((inclass) => {
+                  const classId = dbClasses
+                    .find((obj) => obj.weekDay === inclass.weekDay
+                    && obj.section.course.courseNumber === inclass.courseNumber
+                    && obj.section.sectionNumber === inclass.sectionNumber).id;
+                  const timeSlotId = timeSlots
+                    .find((timeslot) => timeslot.startTime === inclass.timeslot).id;
+                  classTimeSlots.push({ timeSlotId, classId });
+                });
+              }
+              models.sequelize.getQueryInterface().bulkInsert('ClassTimeSlots', classTimeSlots, {})
+                .then(() => res.sendStatus(200))
+                .catch((error) => res.status(502).json(error));
+            });
         })
         .catch((error) => res.status(502).json({ error }));
-    })
-    .catch((error) => res.status(502).json(error));
+    });
 };
 
-const storeStudents = (req, res) => {
+const storeStudents = () => {
   const students = [];
   studentsTimetable.forEach((obj) => {
     students.push({
