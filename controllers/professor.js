@@ -6,8 +6,21 @@ function find(where, res, next) {
     include: [{
       model: models.Section,
       as: 'sections',
+      include: [
+        {
+          model: models.Class,
+          as: 'classes',
+          attributes: { exclude: ['createdAt', 'updatedAt'] },
+          include: [
+            {
+              model: models.ClassItem,
+              as: 'classItems',
+              attributes: { exclude: ['createdAt', 'updatedAt'] },
+            },
+          ],
+        },
+      ],
     }],
-    exclude: ['password'],
   })
     .then((items) => next(items))
     .catch((error) => res.status(502).json(error));

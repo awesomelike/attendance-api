@@ -22,7 +22,6 @@ function find(where, res, next) {
   Student.findAll({
     where,
     include,
-    exclude: ['password'],
   })
     .then((items) => next(items))
     .catch((error) => res.status(502).json(error));
@@ -36,7 +35,6 @@ function findWithPagination({ page = 1, size = Number.MAX_SAFE_INTEGER }, where,
     include,
     limit,
     offset,
-    exclude: ['password'],
     subQuery: false,
   })
     .then((students) => next(students))

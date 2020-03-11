@@ -78,16 +78,22 @@ const storeTimetable = (req, res) => {
               },
             ],
           });
+          const weekDays = await models.WeekDay.findAll({ raw: true });
           const classesToInsert = [];
           for (let i = 0; i < uniqueSections.length; i += 1) {
             const { classes } = uniqueSections[i];
             const uniqueClasses = unique(classes, ['courseNumber', 'sectionNumber', 'weekDay']);
             for (let j = 0; j < uniqueClasses.length; j += 1) {
+              if (weekDays
+                .find((weekDay) => weekDay.key === uniqueClasses[j].weekDay) === undefined) {
+                console.log(uniqueClasses[j].weekDay);
+              }
               classesToInsert.push({
                 sectionId: allSections
                   .find((section) => section.sectionNumber === uniqueClasses[j].sectionNumber
                 && section.course.courseNumber === uniqueClasses[j].courseNumber).id,
-                weekDay: uniqueClasses[j].weekDay,
+                weekDayId: weekDays
+                  .find((weekDay) => weekDay.key === uniqueClasses[j].weekDay).id,
                 room: uniqueClasses[j].room,
               });
             }
@@ -116,10 +122,10 @@ const storeTimetable = (req, res) => {
               const classTimeSlots = [];
               for (let i = 0; i < uniqueSections.length; i += 1) {
                 const { classes } = uniqueSections[i];
-                // const uniqueClasses = unique(classes, ['courseNumber', 'sectionNumber', 'weekDay']);
                 classes.forEach((inclass) => {
                   const classId = dbClasses
-                    .find((obj) => obj.weekDay === inclass.weekDay
+                    .find((obj) => obj.weekDayId === weekDays
+                      .find((wd) => wd.key === inclass.weekDay).id
                     && obj.section.course.courseNumber === inclass.courseNumber
                     && obj.section.sectionNumber === inclass.sectionNumber).id;
                   const timeSlotId = timeSlots

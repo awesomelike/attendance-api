@@ -17,8 +17,12 @@ module.exports = {
     room: {
       type: Sequelize.STRING,
     },
-    weekDay: {
-      type: Sequelize.STRING,
+    weekDayId: {
+      type: Sequelize.INTEGER,
+      references: {
+        model: 'WeekDays',
+        key: 'id',
+      },
     },
     createdAt: {
       allowNull: false,
