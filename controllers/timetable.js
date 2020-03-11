@@ -84,10 +84,6 @@ const storeTimetable = (req, res) => {
             const { classes } = uniqueSections[i];
             const uniqueClasses = unique(classes, ['courseNumber', 'sectionNumber', 'weekDay']);
             for (let j = 0; j < uniqueClasses.length; j += 1) {
-              if (weekDays
-                .find((weekDay) => weekDay.key === uniqueClasses[j].weekDay) === undefined) {
-                console.log(uniqueClasses[j].weekDay);
-              }
               classesToInsert.push({
                 sectionId: allSections
                   .find((section) => section.sectionNumber === uniqueClasses[j].sectionNumber
