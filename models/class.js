@@ -3,13 +3,11 @@ module.exports = (sequelize, DataTypes) => {
   const Class = sequelize.define('Class', {
     sectionId: DataTypes.INTEGER,
     weekDay: DataTypes.STRING,
-    week: DataTypes.INTEGER,
     room: DataTypes.STRING,
-    date: DataTypes.DATE,
   }, {});
   Class.associate = (models) => {
     Class.belongsTo(models.Section, { as: 'section', foreignKey: 'sectionId' });
-    Class.hasMany(models.Record, { as: 'records' });
+    Class.hasMany(models.ClassItem, { as: 'classItems' });
     Class.belongsToMany(models.TimeSlot, {
       as: 'timeSlots',
       through: models.ClassTimeSlot,

@@ -89,7 +89,6 @@ const storeTimetable = (req, res) => {
                 && section.course.courseNumber === uniqueClasses[j].courseNumber).id,
                 weekDay: uniqueClasses[j].weekDay,
                 room: uniqueClasses[j].room,
-                week: 1,
               });
             }
           }
@@ -129,7 +128,21 @@ const storeTimetable = (req, res) => {
                 });
               }
               models.sequelize.getQueryInterface().bulkInsert('ClassTimeSlots', classTimeSlots, {})
-                .then(() => res.sendStatus(200))
+                .then(() => {
+                  const classItems = [];
+                  dbClasses.forEach((dbClass) => {
+                    for (let i = 1; i <= 16; i += 1) {
+                      if (i !== 8 && i !== 16) {
+                        classItems.push({
+                          classId: dbClass.id,
+                          week: i,
+                        });
+                      }
+                    }
+                  });
+                  models.sequelize.getQueryInterface().bulkInsert('ClassItems', classItems, {})
+                    .then(() => res.sendStatus(200));
+                })
                 .catch((error) => res.status(502).json(error));
             });
         })
