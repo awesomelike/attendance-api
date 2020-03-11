@@ -14,6 +14,9 @@ module.exports = {
         key: 'id',
       },
     },
+    room: {
+      type: Sequelize.STRING,
+    },
     week: {
       type: Sequelize.INTEGER,
     },

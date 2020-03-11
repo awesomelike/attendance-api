@@ -88,6 +88,7 @@ const storeTimetable = (req, res) => {
                   .find((section) => section.sectionNumber === uniqueClasses[j].sectionNumber
                 && section.course.courseNumber === uniqueClasses[j].courseNumber).id,
                 weekDay: uniqueClasses[j].weekDay,
+                room: uniqueClasses[j].room,
                 week: 1,
               });
             }
@@ -132,7 +133,7 @@ const storeTimetable = (req, res) => {
                 .catch((error) => res.status(502).json(error));
             });
         })
-        .catch((error) => res.status(502).json({ error }));
+        .catch((error) => res.status(502).json(error));
     });
 };
 

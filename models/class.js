@@ -4,6 +4,7 @@ module.exports = (sequelize, DataTypes) => {
     sectionId: DataTypes.INTEGER,
     weekDay: DataTypes.STRING,
     week: DataTypes.INTEGER,
+    room: DataTypes.STRING,
     date: DataTypes.DATE,
   }, {});
   Class.associate = (models) => {
