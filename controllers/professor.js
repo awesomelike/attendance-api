@@ -31,6 +31,23 @@ function find(where, res, next) {
     .catch((error) => res.status(502).json(error));
 }
 
+function insertDefaultRecords(classItemId, students) {
+  const records = [];
+  for (let i = 0; i < students.length; i += 1) {
+    records.push({
+      classItemId,
+      studentId: students[i].id,
+      isAttended: 0,
+      isAdditional: 0,
+    });
+  }
+  return new Promise((resolve, reject) => {
+    models.Record.bulkCreate(records, { returning: true })
+      .then((results) => resolve(results))
+      .catch((error) => reject(error));
+  });
+}
+
 export default {
   getAll(req, res) {
     find(null, res, (professors) => res.status(200).json(professors));
@@ -40,25 +57,49 @@ export default {
       .then((professor) => res.status(200).json(professor));
   },
   async handleRfid(req, res) {
-    const { rfid } = req.body;
-    const timeSlotId = time.getCurrentTimeSlotId();
-    if (!timeSlotId) return res.status(404).json({ message: 'You have no classes right now!' });
+    const { rfid } = req;
 
     const professor = await Professor.findOne({ where: { rfid }, include });
-    if (!professor) return res.status(404).json({ message: 'No such professor!' });
+    if (!professor) return res.status(404).json({ error: 'No such professor!' });
+
+    const timeSlotId = time.getCurrentTimeSlotId();
+    if (!timeSlotId) return res.status(404).json({ error: 'You have no classes right now!' });
+
     const timeSlot = await models.TimeSlot.findByPk(timeSlotId);
     const professorSections = (await professor.getSections());
     const currentClasses = (await timeSlot.getClasses({
       where: {
-        weekDayId: (new Date()).getDay(),
+        weekDayId: (new Date(2020, 2, 13, 10, 35, 0)).getDay(),
       },
     }));
+
+    if (!currentClasses.length) return res.status(404).json({ error: 'No classes today!' });
+
     const classNow = currentClasses
       .find((currentClass) => professorSections.map((section) => section.id)
         .includes(currentClass.sectionId));
     const [currentClassItem] = await classNow.getClassItems({
       where: { week: await time.getCurrentWeek() },
     });
-    res.status(200).json(currentClassItem);
+    const currentSection = await classNow.getSection({
+      include: [
+        {
+          model: models.Student,
+          as: 'students',
+          through: {
+            attributes: [],
+          },
+        },
+      ],
+    });
+    try {
+      const records = await insertDefaultRecords(currentClassItem.id, currentSection.students);
+      res.status(200).json({
+        class: currentClassItem,
+        students: records,
+      });
+    } catch (error) {
+      res.status(502).json(error);
+    }
   },
 };

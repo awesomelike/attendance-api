@@ -9,6 +9,9 @@ const find = (where, res, next) => {
       {
         model: models.Class,
         as: 'classes',
+        through: {
+          attributes: [],
+        },
         include: [
           {
             model: models.Section,

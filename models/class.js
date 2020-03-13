@@ -1,7 +1,7 @@
 
 module.exports = (sequelize, DataTypes) => {
   const Class = sequelize.define('Class', {
-    sectionId: DataTypes.INTEGER,
+    // sectionId: DataTypes.INTEGER,
     weekDayId: DataTypes.INTEGER,
     room: DataTypes.STRING,
   }, {});

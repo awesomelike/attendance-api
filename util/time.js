@@ -6,7 +6,8 @@ const dynamicGenerator = () => {
     hour: parseInt(time.split(':')[0], 10),
     minute: parseInt(time.split(':')[1], 10),
   });
-  const timeNow = new Date();
+  // const timeNow = new Date();
+  const timeNow = (new Date(2019, 8, 27, 10, 35, 0));
   return timeSlots.map(({ id, startTime, endTime }) => ({
     id,
     startTime: new Date(timeNow.getFullYear(),
@@ -23,7 +24,8 @@ const dynamicGenerator = () => {
 
 export default {
   getCurrentTimeSlotId() {
-    const timeNow = (new Date()).getTime();
+    // const timeNow = (new Date()).getTime();
+    const timeNow = (new Date(2019, 8, 27, 10, 35, 0)).getTime();
     try {
       const { id } = dynamicGenerator(timeSlots)
         .find((timeSlot) => timeNow >= timeSlot.startTime && timeNow < timeSlot.endTime);
@@ -42,6 +44,7 @@ export default {
       return weekNo;
     };
     const semesterStartDate = (await Semester.findByPk(2)).startDate;
+    // return getWeekNumber(new Date()) - getWeekNumber(semesterStartDate) + 1;
     return getWeekNumber(new Date(2019, 8, 27)) - getWeekNumber(semesterStartDate) + 1;
   },
 };

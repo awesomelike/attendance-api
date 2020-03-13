@@ -165,42 +165,43 @@ const storeTimetable = (req, res) => {
                       console.log(studentSections);
                       models.sequelize.getQueryInterface().bulkInsert('StudentSections', studentSections, {})
                         .then(async () => {
-                          const dbClassItems = await models.ClassItem.findAll({
-                            include: [
-                              {
-                                model: models.Class,
-                                as: 'class',
-                                include: [
-                                  {
-                                    model: models.Section,
-                                    as: 'section',
-                                    include: [
-                                      {
-                                        model: models.Student,
-                                        as: 'students',
-                                      },
-                                    ],
-                                  },
-                                ],
-                              },
-                            ],
-                          });
-                          const records = [];
-                          for (let i = 0; i < dbClassItems.length; i += 1) {
-                            const { students } = dbClassItems[i].class.section;
-                            students.forEach((student) => {
-                              records.push({
-                                classItemId: dbClassItems[i].id,
-                                studentId: student.id,
-                                isAttended: 0,
-                                isAdditional: 0,
-                              });
-                            });
-                          }
-                          console.log(records.length);
-                          models.sequelize.getQueryInterface().bulkInsert('Records', records, {})
-                            .then(() => res.sendStatus(200))
-                            .catch((error) => res.status(502).json(error));
+                          res.sendStatus(200);
+                          // const dbClassItems = await models.ClassItem.findAll({
+                          //   include: [
+                          //     {
+                          //       model: models.Class,
+                          //       as: 'class',
+                          //       include: [
+                          //         {
+                          //           model: models.Section,
+                          //           as: 'section',
+                          //           include: [
+                          //             {
+                          //               model: models.Student,
+                          //               as: 'students',
+                          //             },
+                          //           ],
+                          //         },
+                          //       ],
+                          //     },
+                          //   ],
+                          // });
+                          // const records = [];
+                          // for (let i = 0; i < dbClassItems.length; i += 1) {
+                          //   const { students } = dbClassItems[i].class.section;
+                          //   students.forEach((student) => {
+                          //     records.push({
+                          //       classItemId: dbClassItems[i].id,
+                          //       studentId: student.id,
+                          //       isAttended: 0,
+                          //       isAdditional: 0,
+                          //     });
+                          //   });
+                          // }
+                          // console.log(records.length);
+                          // models.sequelize.getQueryInterface().bulkInsert('Records', records, {})
+                          //   .then(() => res.sendStatus(200))
+                          //   .catch((error) => res.status(502).json(error));
                         });
                     });
                 })

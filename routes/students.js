@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import student from '../controllers/student';
-import { checkRfid, validateRfid } from '../util/validation/student';
+import { checkRfid, validateRfid } from '../util/validation/rfid';
 
 const router = Router();
 
