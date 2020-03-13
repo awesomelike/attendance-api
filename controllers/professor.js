@@ -56,7 +56,7 @@ export default {
     const classNow = currentClasses
       .find((currentClass) => professorSections.map((section) => section.id)
         .includes(currentClass.sectionId));
-    const currentClassItem = await classNow.getClassItems({
+    const [currentClassItem] = await classNow.getClassItems({
       where: { week: await time.getCurrentWeek() },
     });
     res.status(200).json(currentClassItem);

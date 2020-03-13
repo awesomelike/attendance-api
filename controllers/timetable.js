@@ -144,7 +144,65 @@ const storeTimetable = (req, res) => {
                     }
                   });
                   models.sequelize.getQueryInterface().bulkInsert('ClassItems', classItems, {})
-                    .then(() => res.sendStatus(200));
+                    .then(async () => {
+                      const students = await models.Student.findAll();
+                      const dbSections = await models.Section.findAll();
+                      const dbCourses = await models.Course.findAll();
+                      const studentSections = [];
+                      for (let i = 0; i < students.length; i += 1) {
+                        const particularStudents = studentsTimetable
+                          .filter((st) => st['Student ID'] === students[i].uid);
+                        for (let j = 0; j < particularStudents.length; j += 1) {
+                          studentSections.push({
+                            studentId: students.find((student) => particularStudents[j]['Student ID'] === student.uid).id,
+                            sectionId: dbSections
+                              .find((section) => section.courseId === dbCourses
+                                .find((course) => course.courseNumber === particularStudents[j]['Course No']).id
+                              && section.sectionNumber === particularStudents[j]['Class No']).id,
+                          });
+                        }
+                      }
+                      console.log(studentSections);
+                      models.sequelize.getQueryInterface().bulkInsert('StudentSections', studentSections, {})
+                        .then(async () => {
+                          const dbClassItems = await models.ClassItem.findAll({
+                            include: [
+                              {
+                                model: models.Class,
+                                as: 'class',
+                                include: [
+                                  {
+                                    model: models.Section,
+                                    as: 'section',
+                                    include: [
+                                      {
+                                        model: models.Student,
+                                        as: 'students',
+                                      },
+                                    ],
+                                  },
+                                ],
+                              },
+                            ],
+                          });
+                          const records = [];
+                          for (let i = 0; i < dbClassItems.length; i += 1) {
+                            const { students } = dbClassItems[i].class.section;
+                            students.forEach((student) => {
+                              records.push({
+                                classItemId: dbClassItems[i].id,
+                                studentId: student.id,
+                                isAttended: 0,
+                                isAdditional: 0,
+                              });
+                            });
+                          }
+                          console.log(records.length);
+                          models.sequelize.getQueryInterface().bulkInsert('Records', records, {})
+                            .then(() => res.sendStatus(200))
+                            .catch((error) => res.status(502).json(error));
+                        });
+                    });
                 })
                 .catch((error) => res.status(502).json(error));
             });
@@ -172,7 +230,7 @@ const storeStudents = () => {
 
 export default {
   handlePost(req, res) {
-    storeTimetable(req, res);
     storeStudents(req, res);
+    storeTimetable(req, res);
   },
 };
