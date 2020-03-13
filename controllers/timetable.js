@@ -25,6 +25,7 @@ const storeTimetable = (req, res) => {
     professors.push({
       uid: obj.professorId,
       name: obj.professorName,
+      rfid: obj.rfid,
     });
   });
 

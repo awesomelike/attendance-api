@@ -8,6 +8,7 @@ module.exports = {
       id: 2,
       year: 2019,
       season: 'Fall',
+      startDate: new Date(2019, 8, 9),
     }, {
       id: 3,
       year: 2020,

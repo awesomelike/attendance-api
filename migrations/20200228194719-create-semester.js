@@ -13,6 +13,9 @@ module.exports = {
     season: {
       type: Sequelize.STRING,
     },
+    startDate: {
+      type: Sequelize.DATE,
+    },
     createdAt: {
       allowNull: false,
       type: Sequelize.DATE,

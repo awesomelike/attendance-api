@@ -6,6 +6,6 @@ const router = Router();
 
 router.get('/', student.getAll);
 router.get('/search', student.getSome);
-router.post('/rfidService', checkRfid, validateRfid, student.handleRfid);
+router.post('/rfid', checkRfid, validateRfid, student.handleRfid);
 
 export default router;
