@@ -1,8 +1,20 @@
 import { checkSchema, validationResult } from 'express-validator';
 
-export const checkRfid = checkSchema({
+export const checkProfessorRfid = checkSchema({
   rfid: {
     isString: true,
+  },
+});
+
+export const checkStudentRfid = checkSchema({
+  rfid: {
+    isString: true,
+  },
+  classItemId: {
+    isInt: true,
+  },
+  sectionId: {
+    isInt: true,
   },
 });
 

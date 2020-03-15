@@ -95,11 +95,17 @@ export default {
     try {
       const records = await insertDefaultRecords(currentClassItem.id, currentSection.students);
       res.status(200).json({
-        class: currentClassItem,
-        students: records,
+        sectionId: currentSection.id,
+        classItem: currentClassItem,
+        records,
       });
     } catch (error) {
       res.status(502).json(error);
     }
+  },
+  getByRfid(req, res) {
+    const { rfid } = req.params;
+    Professor.findOne({ where: { rfid } })
+      .then((professor) => res.status(200).json(professor));
   },
 };

@@ -162,7 +162,6 @@ const storeTimetable = (req, res) => {
                           });
                         }
                       }
-                      console.log(studentSections);
                       models.sequelize.getQueryInterface().bulkInsert('StudentSections', studentSections, {})
                         .then(async () => {
                           res.sendStatus(200);
@@ -182,6 +181,7 @@ const storeStudents = () => {
     students.push({
       uid: obj['Student ID'],
       name: obj.Name,
+      rfid: obj.rfid,
     });
   });
 

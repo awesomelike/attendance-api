@@ -11,6 +11,18 @@ const include = [
   {
     model: models.Section,
     as: 'sections',
+    include: [
+      {
+        model: models.Class,
+        as: 'classes',
+        include: [
+          {
+            model: models.ClassItem,
+            as: 'classItems',
+          },
+        ],
+      },
+    ],
     through: {
       model: models.StudentSection,
       as: 'studentSections',
@@ -79,15 +91,49 @@ export default {
       } else res.status(200).json(await Student.findAll({ where }));
     } else res.status(400).json({ message: 'Please provide some search filters' });
   },
-  handleRfid(req, res) {
+  async handleRfid(req, res) {
     const { rfid } = req;
-    Student.findOne({
-      where: { rfid },
-    })
-      .then(async (student) => {
-        // const sections = await student.getSections();
-        res.status(200).json(student);
-      })
-      .catch((error) => res.status(502).json(error));
+    const { classItemId } = req.body;
+    const { sectionId } = req.body;
+
+    const student = await Student.findOne({ where: { rfid }, include });
+    if (!student) return res.status(404).json({ error: 'No student found' });
+
+    const record = {
+      isAttended: 1,
+      isAdditional: student.sections.map(({ id }) => id).indexOf(sectionId) > -1 ? 0 : 1,
+      rfid,
+    };
+    try {
+      const [isUpdated] = await models.Record.update(record, {
+        where: {
+          classItemId,
+          studentId: student.id,
+        },
+      });
+      if (isUpdated) {
+        return res.status(200).json(await models.Record.findOne({
+          where: {
+            studentId: student.id,
+            classItemId,
+          },
+        }));
+      }
+
+      /* This part is reached, means: no record is updated,
+      then this student does not belong to this section, and we
+      add this student as additional */
+
+      const newRecord = await models.Record.create({
+        classItemId,
+        rfid,
+        studentId: student.id,
+        isAdditional: 1,
+        isAttended: 1,
+      });
+      res.status(200).json(newRecord);
+    } catch (error) {
+      res.status(502).json(error);
+    }
   },
 };

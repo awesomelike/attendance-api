@@ -15397,6 +15397,7 @@
     "School Year": 3,
     "Course No": "CSE2090",
     "Class No": "001",
+    "rfid": "24120de0",
     "Classroom": "A-202"
   },
   {
@@ -15405,6 +15406,7 @@
     "Student ID": "U1710008",
     "Name": "ABDULLAEV AZAMAT",
     "School Year": 3,
+    "rfid": "24120de0",
     "Course No": "NTS3032",
     "Class No": "002",
     "Classroom": "B-202"
@@ -15415,6 +15417,7 @@
     "Student ID": "U1710008",
     "Name": "ABDULLAEV AZAMAT",
     "School Year": 3,
+    "rfid": "24120de0",
     "Course No": "NTS3040",
     "Class No": "001",
     "Classroom": "B-101"
@@ -15424,6 +15427,7 @@
     "Major": "Computer Science and Software Engineering",
     "Student ID": "U1710008",
     "Name": "ABDULLAEV AZAMAT",
+    "rfid": "24120de0",
     "School Year": 3,
     "Course No": "SOC3010",
     "Class No": "002",
@@ -15434,6 +15438,7 @@
     "Major": "Computer Science and Software Engineering",
     "Student ID": "U1710008",
     "Name": "ABDULLAEV AZAMAT",
+    "rfid": "24120de0",
     "School Year": 3,
     "Course No": "SOC3020",
     "Class No": "001",
@@ -15444,6 +15449,7 @@
     "Major": "Computer Science and Software Engineering",
     "Student ID": "U1710008",
     "Name": "ABDULLAEV AZAMAT",
+    "rfid": "24120de0",
     "School Year": 3,
     "Course No": "SOC3030",
     "Class No": "001",
@@ -15454,6 +15460,7 @@
     "Major": "Computer Science and Software Engineering",
     "Student ID": "U1710008",
     "Name": "ABDULLAEV AZAMAT",
+    "rfid": "24120de0",
     "School Year": 3,
     "Course No": "SOC3070",
     "Class No": "002",
@@ -64525,6 +64532,7 @@
     "Student ID": "U1910003",
     "Name": "KHVASTUNOV RUSLAN",
     "School Year": 1,
+    "rfid": "c001bc5c",
     "Course No": "GEN1020",
     "Class No": "003",
     "Classroom": "A-308"
@@ -64535,6 +64543,7 @@
     "Student ID": "U1910003",
     "Name": "KHVASTUNOV RUSLAN",
     "School Year": 1,
+    "rfid": "c001bc5c",
     "Course No": "GEN1021",
     "Class No": "003",
     "Classroom": "B-208"
@@ -64545,6 +64554,7 @@
     "Student ID": "U1910003",
     "Name": "KHVASTUNOV RUSLAN",
     "School Year": 1,
+    "rfid": "c001bc5c",
     "Course No": "MSC1010",
     "Class No": "001",
     "Classroom": "B-209"
@@ -64555,6 +64565,7 @@
     "Student ID": "U1910003",
     "Name": "KHVASTUNOV RUSLAN",
     "School Year": 1,
+    "rfid": "c001bc5c",
     "Course No": "MSC1021",
     "Class No": "001",
     "Classroom": "B-201"
@@ -64565,6 +64576,7 @@
     "Student ID": "U1910003",
     "Name": "KHVASTUNOV RUSLAN",
     "School Year": 1,
+    "rfid": "c001bc5c",
     "Course No": "MSC1031",
     "Class No": "001",
     "Classroom": "201-504(LA"
@@ -64575,6 +64587,7 @@
     "Student ID": "U1910003",
     "Name": "KHVASTUNOV RUSLAN",
     "School Year": 1,
+    "rfid": "c001bc5c",
     "Course No": "MSC1051",
     "Class No": "002",
     "Classroom": "B-202"
@@ -64585,6 +64598,7 @@
     "Student ID": "U1910003",
     "Name": "KHVASTUNOV RUSLAN",
     "School Year": 1,
+    "rfid": "c001bc5c",
     "Course No": "SOC1010",
     "Class No": "001",
     "Classroom": "B-304"
