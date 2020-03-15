@@ -2,6 +2,9 @@
   "name": "attendance-api",
   "version": "0.0.0",
   "private": true,
+  "engines": {
+    "node": "12.14.1"
+  },
   "scripts": {
     "start": "nodemon ./bin/www --exec babel-node --presets babel-preset-env",
     "update": "sequelize db:drop && sequelize db:create --charset utf8mb4 && sequelize db:migrate --debug && sequelize db:seed:all --debug"
