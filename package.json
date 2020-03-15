@@ -7,7 +7,8 @@
   },
   "scripts": {
     "start": "nodemon ./bin/www --exec babel-node --presets babel-preset-env",
-    "update": "sequelize db:drop && sequelize db:create --charset utf8mb4 && sequelize db:migrate --debug && sequelize db:seed:all --debug"
+    "update": "sequelize db:drop && sequelize db:create --charset utf8mb4 && sequelize db:migrate --debug && sequelize db:seed:all --debug",
+    "deploy": "babel-node ./bin/www --presets babel-preset-env"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
