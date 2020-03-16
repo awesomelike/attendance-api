@@ -4,6 +4,7 @@ import { checkStudentRfid, validateRfid } from '../util/validation/rfid';
 
 const router = Router();
 
+router.get('/:id', student.get);
 router.get('/', student.getAll);
 router.get('/search', student.getSome);
 router.post('/rfid', checkStudentRfid, validateRfid, student.handleRfid);

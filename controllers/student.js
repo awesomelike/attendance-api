@@ -7,6 +7,12 @@ const include = [
   {
     model: models.Record,
     as: 'records',
+    include: [
+      {
+        model: models.ClassItem,
+        as: 'classItem',
+      },
+    ],
   },
   {
     model: models.Section,
@@ -15,17 +21,12 @@ const include = [
       {
         model: models.Class,
         as: 'classes',
-        include: [
-          {
-            model: models.ClassItem,
-            as: 'classItems',
-          },
-        ],
       },
     ],
     through: {
       model: models.StudentSection,
       as: 'studentSections',
+      attributes: [],
     },
   },
 ];
@@ -47,7 +48,6 @@ function findWithPagination({ page = 1, size = Number.MAX_SAFE_INTEGER }, where,
     include,
     limit,
     offset,
-    subQuery: false,
   })
     .then((students) => next(students))
     .catch((error) => res.status(502).json(error));
@@ -75,13 +75,18 @@ export default {
     if (Object.keys(req.query).length > 0) {
       Object.keys(req.query).forEach((key) => {
         if (key !== 'page' && key !== 'size') {
-          where[key] = {
-            [Op.like]: `%${req.query[key]}%`,
-          };
+          if (['name', 'uid', 'rfid'].includes(key)) {
+            where[key] = {
+              [Op.like]: `%${req.query[key]}%`,
+            };
+          } else {
+            where[key] = Number(req.query.key);
+          }
         }
       });
       if (Object.keys(req.query).indexOf('page') > -1
       && Object.keys(req.query).indexOf('size') > -1) {
+        console.log(where);
         findWithPagination({
           page: Number(req.query.page),
           size: Number(req.query.size),
@@ -120,7 +125,7 @@ export default {
         }));
       }
 
-      /* This part is reached, means: no record is updated,
+      /* If the code below is reached, it means: no record is updated,
       then this student does not belong to this section, and we
       add this student as additional */
 
