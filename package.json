@@ -8,8 +8,7 @@
   "scripts": {
     "start": "nodemon ./bin/www --exec babel-node --presets babel-preset-env",
     "update": "sequelize db:drop && sequelize db:create --charset utf8mb4 && sequelize db:migrate --debug && sequelize db:seed:all --debug",
-    "deploy": "babel-node ./bin/www --presets babel-preset-env",
-    "heroku-prebuild": "heroku config:set NPM_CONFIG_PRODUCTION=false YARN_PRODUCTION=false"
+    "deploy": "babel-node ./bin/www --presets babel-preset-env"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
