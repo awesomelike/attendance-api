@@ -1,4 +1,4 @@
-import timeSlots from '../data/timeslots';
+import timeSlots from '../data/timeslots.json';
 import { Semester } from '../models';
 
 const dynamicGenerator = () => {

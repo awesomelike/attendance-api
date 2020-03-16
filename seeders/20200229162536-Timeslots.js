@@ -1,4 +1,4 @@
-const timeSlots = require('../data/timeslots');
+const timeSlots = require('../data/timeslots.json');
 
 module.exports = {
   up: (queryInterface) => queryInterface.bulkInsert('TimeSlots', timeSlots),
