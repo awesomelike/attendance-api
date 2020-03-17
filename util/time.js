@@ -1,11 +1,12 @@
 import timeSlots from '../data/timeslots.json';
 import { Semester } from '../models';
 
+export const parseTime = (time) => ({
+  hour: parseInt(time.split(':')[0], 10),
+  minute: parseInt(time.split(':')[1], 10),
+});
+
 const dynamicGenerator = () => {
-  const parseTime = (time) => ({
-    hour: parseInt(time.split(':')[0], 10),
-    minute: parseInt(time.split(':')[1], 10),
-  });
   // const timeNow = new Date();
   const timeNow = (new Date(2019, 8, 27, 10, 35, 0));
   return timeSlots.map(({ id, startTime, endTime }) => ({

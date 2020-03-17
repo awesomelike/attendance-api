@@ -1,6 +1,10 @@
+import moment from 'moment';
+import { Op } from 'sequelize';
 import models from '../models';
 import timetable from '../data/timetable.json';
 import studentsTimetable from '../data/students.json';
+import random from '../util/random';
+import { parseTime } from '../util/time';
 
 function unique(arr, keyProps) {
   const kvArray = arr.map((entry) => {
@@ -11,7 +15,7 @@ function unique(arr, keyProps) {
   return Array.from(map.values());
 }
 
-const storeTimetable = (req, res) => {
+const storeTimetable = (req, res) => new Promise((resolve, reject) => {
   const courses = [];
   const professors = [];
   const sections = [];
@@ -25,7 +29,7 @@ const storeTimetable = (req, res) => {
     professors.push({
       uid: obj.professorId,
       name: obj.professorName,
-      rfid: obj.rfid,
+      rfid: obj.rfid || random(8),
     });
   });
 
@@ -88,7 +92,7 @@ const storeTimetable = (req, res) => {
               classesToInsert.push({
                 sectionId: allSections
                   .find((section) => section.sectionNumber === uniqueClasses[j].sectionNumber
-                && section.course.courseNumber === uniqueClasses[j].courseNumber).id,
+                  && section.course.courseNumber === uniqueClasses[j].courseNumber).id,
                 weekDayId: weekDays
                   .find((weekDay) => weekDay.key === uniqueClasses[j].weekDay).id,
                 room: uniqueClasses[j].room,
@@ -123,8 +127,8 @@ const storeTimetable = (req, res) => {
                   const classId = dbClasses
                     .find((obj) => obj.weekDayId === weekDays
                       .find((wd) => wd.key === inclass.weekDay).id
-                    && obj.section.course.courseNumber === inclass.courseNumber
-                    && obj.section.sectionNumber === inclass.sectionNumber).id;
+                      && obj.section.course.courseNumber === inclass.courseNumber
+                      && obj.section.sectionNumber === inclass.sectionNumber).id;
                   const timeSlotId = timeSlots
                     .find((timeslot) => timeslot.startTime === inclass.timeslot).id;
                   classTimeSlots.push({ timeSlotId, classId });
@@ -158,13 +162,13 @@ const storeTimetable = (req, res) => {
                             sectionId: dbSections
                               .find((section) => section.courseId === dbCourses
                                 .find((course) => course.courseNumber === particularStudents[j]['Course No']).id
-                              && section.sectionNumber === particularStudents[j]['Class No']).id,
+                                && section.sectionNumber === particularStudents[j]['Class No']).id,
                           });
                         }
                       }
                       models.sequelize.getQueryInterface().bulkInsert('StudentSections', studentSections, {})
                         .then(async () => {
-                          res.sendStatus(200);
+                          resolve('success');
                         });
                     });
                 })
@@ -173,7 +177,7 @@ const storeTimetable = (req, res) => {
         })
         .catch((error) => res.status(502).json(error));
     });
-};
+});
 
 const storeStudents = () => {
   const students = [];
@@ -181,7 +185,7 @@ const storeStudents = () => {
     students.push({
       uid: obj['Student ID'],
       name: obj.Name,
-      rfid: obj.rfid,
+      rfid: obj.rfid || random(8),
     });
   });
 
@@ -193,9 +197,80 @@ const storeStudents = () => {
     });
 };
 
+const insertDummyRecords = async (req, res) => {
+  const semester = await models.Semester.findByPk(2);
+  const classes = await models.Class.findAll({
+    include: [
+      {
+        model: models.ClassItem,
+        as: 'classItems',
+        where: {
+          week: { [Op.lt]: 8 },
+        },
+      },
+      {
+        model: models.Section,
+        as: 'section',
+        include: [
+          {
+            model: models.Student,
+            as: 'students',
+          },
+        ],
+      },
+      {
+        model: models.TimeSlot,
+        as: 'timeSlots',
+      },
+    ],
+  }, { raw: true });
+  console.log(classes);
+  const tasks = [];
+  for (let i = 0; i < parseInt(classes.length / 15, 10); i += 1) {
+    const { classItems } = classes[i];
+    for (let j = 0; j < classItems.length; j += 1) {
+      tasks.push(models.ClassItem.update({
+        date: moment(semester.startDate)
+          .add(classes[i].weekDayId - 1, 'days')
+          .add(parseTime(classes[i].timeSlots[0].startTime).hour, 'hours')
+          .add(parseTime(classes[i].timeSlots[0].startTime).minute, 'minutes')
+          .add(classItems[j].week - 1, 'weeks'),
+      }, { where: { id: classItems[j].id } }));
+    }
+  }
+  Promise.all(tasks)
+    .then(() => {
+      // const newTasks = [];
+      const records = [];
+      for (let i = 0; i < parseInt(classes.length / 15, 10); i += 1) {
+        const { classItems } = classes[i];
+        for (let j = 0; j < classItems.length; j += 1) {
+          const { students } = classes[i].section;
+          for (let k = 0; k < students.length; k += 1) {
+            records.push({
+              classItemId: classItems[j].id,
+              studentId: students[k].id,
+              rfid: students[k].rfid,
+              isAttended: Math.random() < 0.9 ? 1 : 0,
+              isAdditional: 0,
+            });
+          }
+        }
+      }
+      models.sequelize.getQueryInterface().bulkInsert('Records', records, {})
+        .then(() => res.sendStatus(200))
+        .catch((error) => res.status(502).json(error));
+      // Promise.all(newTasks)
+      //   .then(() => res.sendStatus(200))
+      //   .catch((error) => res.status(502).json(error));
+    })
+    .catch((error) => res.status(502).json(error));
+};
+
 export default {
-  handlePost(req, res) {
-    storeStudents(req, res);
-    storeTimetable(req, res);
+  async handlePost(req, res) {
+    await storeStudents(req, res);
+    await storeTimetable(req, res);
+    await insertDummyRecords(req, res);
   },
 };

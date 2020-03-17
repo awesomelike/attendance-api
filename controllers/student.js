@@ -1,7 +1,9 @@
 import { Op } from 'sequelize';
 import models from '../models';
+import findWithPagination from '../util/pagination';
 
 const { Student } = models;
+
 
 const include = [
   {
@@ -11,6 +13,23 @@ const include = [
       {
         model: models.ClassItem,
         as: 'classItem',
+        include: [
+          {
+            model: models.Class,
+            as: 'class',
+            include: [
+              {
+                model: models.WeekDay,
+                as: 'weekDay',
+              },
+              {
+                model: models.TimeSlot,
+                as: 'timeSlots',
+              },
+
+            ],
+          },
+        ],
       },
     ],
   },
@@ -19,8 +38,12 @@ const include = [
     as: 'sections',
     include: [
       {
-        model: models.Class,
-        as: 'classes',
+        model: models.Course,
+        as: 'course',
+      },
+      {
+        model: models.Professor,
+        as: 'professor',
       },
     ],
     through: {
@@ -37,19 +60,6 @@ function find(where, res, next) {
     include,
   })
     .then((items) => next(items))
-    .catch((error) => res.status(502).json(error));
-}
-
-function findWithPagination({ page = 1, size = Number.MAX_SAFE_INTEGER }, where, res, next) {
-  const limit = size;
-  const offset = (page - 1) * size;
-  Student.findAll({
-    where,
-    include,
-    limit,
-    offset,
-  })
-    .then((students) => next(students))
     .catch((error) => res.status(502).json(error));
 }
 
@@ -75,8 +85,7 @@ export default {
       });
       if (Object.keys(req.query).indexOf('page') > -1
       && Object.keys(req.query).indexOf('size') > -1) {
-        console.log(where);
-        findWithPagination({
+        findWithPagination(Student, include, {
           page: Number(req.query.page),
           size: Number(req.query.size),
         }, where, res, (students) => {
