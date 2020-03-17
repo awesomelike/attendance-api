@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
     timestamps: false,
   });
   WeekDay.associate = (models) => {
-    WeekDay.hasMany(models.Class, { as: 'classes' });
+    WeekDay.hasMany(models.Class, { as: 'classes', foreignKey: 'weekDayId' });
   };
   return WeekDay;
 };

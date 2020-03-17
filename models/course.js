@@ -5,7 +5,7 @@ module.exports = (sequelize, DataTypes) => {
     courseNumber: DataTypes.STRING,
   }, {});
   Course.associate = (models) => {
-    Course.hasMany(models.Section, { as: 'sections' });
+    Course.hasMany(models.Section, { as: 'sections', foreignKey: 'courseId' });
   };
   return Course;
 };

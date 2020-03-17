@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
     image: DataTypes.STRING,
   }, {});
   Student.associate = (models) => {
-    Student.hasMany(models.Record, { as: 'records' });
+    Student.hasMany(models.Record, { as: 'records', foreignKey: 'studentId' });
     Student.belongsToMany(models.Section, {
       as: 'sections',
       through: models.StudentSection,

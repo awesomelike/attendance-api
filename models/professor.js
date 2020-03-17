@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
     image: DataTypes.STRING,
   }, {});
   Professor.associate = (models) => {
-    Professor.hasMany(models.Section, { as: 'sections' });
+    Professor.hasMany(models.Section, { as: 'sections', foreignKey: 'professorId' });
   };
   return Professor;
 };
