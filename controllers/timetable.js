@@ -169,7 +169,8 @@ const storeTimetable = (req, res) => new Promise((resolve, reject) => {
                       models.sequelize.getQueryInterface().bulkInsert('StudentSections', studentSections, {})
                         .then(async () => {
                           resolve('success');
-                        });
+                        })
+                        .catch((error) => reject(error));
                     });
                 })
                 .catch((error) => res.status(502).json(error));
@@ -240,7 +241,6 @@ const insertDummyRecords = async (req, res) => {
   }
   Promise.all(tasks)
     .then(() => {
-      // const newTasks = [];
       const records = [];
       for (let i = 0; i < parseInt(classes.length / 15, 10); i += 1) {
         const { classItems } = classes[i];
@@ -260,9 +260,6 @@ const insertDummyRecords = async (req, res) => {
       models.sequelize.getQueryInterface().bulkInsert('Records', records, {})
         .then(() => res.sendStatus(200))
         .catch((error) => res.status(502).json(error));
-      // Promise.all(newTasks)
-      //   .then(() => res.sendStatus(200))
-      //   .catch((error) => res.status(502).json(error));
     })
     .catch((error) => res.status(502).json(error));
 };
