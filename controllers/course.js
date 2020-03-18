@@ -27,4 +27,21 @@ export default {
       .then((course) => res.status(200).json(course))
       .catch((error) => res.status(502).json(error));
   },
+  async getSections(req, res) {
+    try {
+      const course = await Course.findByPk(req.params.id);
+      const sections = await course.getSections({
+        include: [
+          {
+            model: models.Professor,
+            as: 'professor',
+          },
+        ],
+      });
+      if (sections.length) res.status(200).json(sections);
+      else res.sendStatus(404);
+    } catch (error) {
+      res.status(502).json(error);
+    }
+  },
 };
