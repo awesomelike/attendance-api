@@ -1,6 +1,6 @@
 import { Op } from 'sequelize';
 import models from '../models';
-import findWithPagination from '../util/pagination';
+import findWithPagination, { needsPagination } from '../util/pagination';
 
 const { Student } = models;
 
@@ -83,8 +83,7 @@ export default {
           }
         }
       });
-      if (Object.keys(req.query).indexOf('page') > -1
-      && Object.keys(req.query).indexOf('size') > -1) {
+      if (needsPagination(req)) {
         findWithPagination(Student, include, {
           page: Number(req.query.page),
           size: Number(req.query.size),

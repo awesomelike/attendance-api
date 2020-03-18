@@ -1,5 +1,6 @@
 import models from '../models';
 import time from '../util/time';
+import findWithPagination, { needsPagination } from '../util/pagination';
 
 const { Professor } = models;
 
@@ -7,6 +8,10 @@ const include = [{
   model: models.Section,
   as: 'sections',
   include: [
+    {
+      model: models.Course,
+      as: 'course',
+    },
     {
       model: models.Class,
       as: 'classes',
@@ -50,11 +55,26 @@ function insertDefaultRecords(classItemId, students) {
 
 export default {
   getAll(req, res) {
-    find(null, res, (professors) => res.status(200).json(professors));
+    if (needsPagination(req)) {
+      findWithPagination(Professor, include, {
+        page: Number(req.query.page),
+        size: Number(req.query.size),
+      }, null, res, (professors) => res.status(200).json(professors));
+    } else find(null, res, (professors) => res.status(200).json(professors));
   },
   get(req, res) {
     Professor.findByPk(req.params.id, { include })
       .then((professor) => res.status(200).json(professor));
+  },
+  async getSections(req, res) {
+    try {
+      const professor = await Professor.findByPk(req.params.id);
+      const sections = await professor.getSections({ include: [{ model: models.Course, as: 'course' }] });
+      if (sections) res.status(200).json(sections);
+      else res.sendStatus(404);
+    } catch (error) {
+      res.status(502).json(error);
+    }
   },
   async handleRfid(req, res) {
     const { rfid } = req;
