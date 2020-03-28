@@ -138,4 +138,49 @@ export default {
       res.status(502).json(error);
     }
   },
+  getTimetable(req, res) {
+    const timetableInclude = [
+      {
+        model: models.Section,
+        as: 'sections',
+        through: {
+          model: models.StudentSection,
+          as: 'studentSections',
+          attributes: [],
+        },
+        include: [
+          {
+            model: models.Professor,
+            as: 'professor',
+          },
+          {
+            model: models.Course,
+            as: 'course',
+          },
+          {
+            model: models.Class,
+            as: 'classes',
+            include: [
+              {
+                model: models.WeekDay,
+                as: 'weekDay',
+              },
+              {
+                model: models.TimeSlot,
+                as: 'timeSlots',
+                through: {
+                  model: models.ClassTimeSlot,
+                  as: 'classTimeSlots',
+                  attributes: [],
+                },
+              },
+            ],
+          },
+        ],
+      },
+    ];
+    Student.findByPk(req.params.id, { include: timetableInclude })
+      .then((student) => res.status(200).json(student))
+      .catch((error) => res.status(502).json(error));
+  },
 };

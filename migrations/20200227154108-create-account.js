@@ -1,43 +1,38 @@
-
 module.exports = {
-  up: (queryInterface, Sequelize) => queryInterface.createTable('Professors', {
+  up: (queryInterface, Sequelize) => queryInterface.createTable('Accounts', {
     id: {
       allowNull: false,
       autoIncrement: true,
       primaryKey: true,
       type: Sequelize.INTEGER,
     },
-    uid: {
-      type: Sequelize.STRING(32),
-      unique: true,
+    username: {
+      type: Sequelize.STRING,
     },
-    rfid: {
-      type: Sequelize.STRING(32),
-      unique: true,
+    password: {
+      type: Sequelize.STRING,
     },
     name: {
       type: Sequelize.STRING,
     },
-    image: {
+    email: {
       type: Sequelize.STRING,
     },
-    accountId: {
+    roleId: {
       type: Sequelize.INTEGER,
       references: {
-        model: 'Accounts',
+        model: 'Roles',
         key: 'id',
       },
     },
     createdAt: {
       allowNull: false,
       type: Sequelize.DATE,
-      defaultValue: Sequelize.fn('now'),
     },
     updatedAt: {
       allowNull: false,
       type: Sequelize.DATE,
-      defaultValue: Sequelize.fn('now'),
     },
   }),
-  down: (queryInterface) => queryInterface.dropTable('Professors'),
+  down: (queryInterface) => queryInterface.dropTable('Accounts'),
 };

@@ -5,5 +5,4 @@ const router = Router();
 
 router.get('/', classItem.getAll);
 router.get('/:id', classItem.get);
-
 export default router;

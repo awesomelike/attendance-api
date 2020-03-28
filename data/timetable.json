@@ -7,7 +7,8 @@
     "professorName": "Chongkoo An",
     "weekDay": "Mon",
     "timeslot": "10:30",
-    "room": "A-202"
+    "room": "A-202",
+    "accountId": 2
   },
   {
     "courseNumber": "CSE2090",
@@ -17,7 +18,8 @@
     "professorName": "Chongkoo An",
     "weekDay": "Mon",
     "timeslot": "11:00",
-    "room": "A-202"
+    "room": "A-202",
+    "accountId": 2
   },
   {
     "courseNumber": "CSE2090",
@@ -27,7 +29,8 @@
     "professorName": "Chongkoo An",
     "weekDay": "Mon",
     "timeslot": "11:30",
-    "room": "A-202"
+    "room": "A-202",
+    "accountId": 2
   },
   {
     "courseNumber": "CSE2090",
@@ -37,7 +40,8 @@
     "professorName": "Chongkoo An",
     "weekDay": "Wed",
     "timeslot": "10:30",
-    "room": "A-202"
+    "room": "A-202",
+    "accountId": 2
   },
   {
     "courseNumber": "CSE2090",
@@ -47,7 +51,8 @@
     "professorName": "Chongkoo An",
     "weekDay": "Wed",
     "timeslot": "11:00",
-    "room": "A-202"
+    "room": "A-202",
+    "accountId": 2
   },
   {
     "courseNumber": "CSE2090",
@@ -57,7 +62,8 @@
     "professorName": "Chongkoo An",
     "weekDay": "Wed",
     "timeslot": "11:30",
-    "room": "A-202"
+    "room": "A-202",
+    "accountId": 2
   },
   {
     "courseNumber": "CSE2090",
@@ -67,7 +73,8 @@
     "professorName": "Chongkoo An",
     "weekDay": "Fri",
     "timeslot": "9:00",
-    "room": "A-202"
+    "room": "A-202",
+    "accountId": 2
   },
   {
     "courseNumber": "CSE2090",
@@ -77,7 +84,8 @@
     "professorName": "Chongkoo An",
     "weekDay": "Fri",
     "timeslot": "9:30",
-    "room": "A-202"
+    "room": "A-202",
+    "accountId": 2
   },
   {
     "courseNumber": "CSE2090",
@@ -87,7 +95,8 @@
     "professorName": "Chongkoo An",
     "weekDay": "Fri",
     "timeslot": "10:00",
-    "room": "A-202"
+    "room": "A-202",
+    "accountId": 2
   },
   {
     "courseNumber": "CSE2090",
@@ -97,7 +106,8 @@
     "professorName": "Chongkoo An",
     "weekDay": "Tue",
     "timeslot": "10:30",
-    "room": "A-202"
+    "room": "A-202",
+    "accountId": 2
   },
   {
     "courseNumber": "CSE2090",
@@ -107,7 +117,8 @@
     "professorName": "Chongkoo An",
     "weekDay": "Tue",
     "timeslot": "11:00",
-    "room": "A-202"
+    "room": "A-202",
+    "accountId": 2
   },
   {
     "courseNumber": "CSE2090",
@@ -117,7 +128,8 @@
     "professorName": "Chongkoo An",
     "weekDay": "Tue",
     "timeslot": "11:30",
-    "room": "A-202"
+    "room": "A-202",
+    "accountId": 2
   },
   {
     "courseNumber": "CSE2090",
@@ -127,7 +139,8 @@
     "professorName": "Chongkoo An",
     "weekDay": "Fri",
     "timeslot": "10:30",
-    "room": "A-202"
+    "room": "A-202",
+    "accountId": 2
   },
   {
     "courseNumber": "CSE2090",
@@ -137,7 +150,8 @@
     "professorName": "Chongkoo An",
     "weekDay": "Fri",
     "timeslot": "11:00",
-    "room": "A-202"
+    "room": "A-202",
+    "accountId": 2
   },
   {
     "courseNumber": "CSE2090",
@@ -147,7 +161,8 @@
     "professorName": "Chongkoo An",
     "weekDay": "Fri",
     "timeslot": "11:30",
-    "room": "A-202"
+    "room": "A-202",
+    "accountId": 2
   },
   {
     "courseNumber": "CSE2090",
@@ -157,7 +172,8 @@
     "professorName": "Chongkoo An",
     "weekDay": "Tue",
     "timeslot": "9:00",
-    "room": "A-202"
+    "room": "A-202",
+    "accountId": 2
   },
   {
     "courseNumber": "CSE2090",
@@ -167,7 +183,8 @@
     "professorName": "Chongkoo An",
     "weekDay": "Tue",
     "timeslot": "9:30",
-    "room": "A-202"
+    "room": "A-202",
+    "accountId": 2
   },
   {
     "courseNumber": "CSE2090",
@@ -177,7 +194,8 @@
     "professorName": "Chongkoo An",
     "weekDay": "Tue",
     "timeslot": "10:00",
-    "room": "A-202"
+    "room": "A-202",
+    "accountId": 2
   },
   {
     "courseNumber": "GEN1020",
@@ -3219,7 +3237,8 @@
     "professorName": "Chongkoo An",
     "weekDay": "Mon",
     "timeslot": "9:00",
-    "room": "A-202"
+    "room": "A-202",
+    "accountId": 2
   },
   {
     "courseNumber": "ICE2080",
@@ -3229,7 +3248,8 @@
     "professorName": "Chongkoo An",
     "weekDay": "Mon",
     "timeslot": "9:30",
-    "room": "A-202"
+    "room": "A-202",
+    "accountId": 2
   },
   {
     "courseNumber": "ICE2080",
@@ -3239,7 +3259,8 @@
     "professorName": "Chongkoo An",
     "weekDay": "Mon",
     "timeslot": "10:00",
-    "room": "A-202"
+    "room": "A-202",
+    "accountId": 2
   },
   {
     "courseNumber": "ICE2080",
@@ -3249,7 +3270,8 @@
     "professorName": "Chongkoo An",
     "weekDay": "Wed",
     "timeslot": "9:00",
-    "room": "A-202"
+    "room": "A-202",
+    "accountId": 2
   },
   {
     "courseNumber": "ICE2080",
@@ -3259,7 +3281,8 @@
     "professorName": "Chongkoo An",
     "weekDay": "Wed",
     "timeslot": "9:30",
-    "room": "A-202"
+    "room": "A-202",
+    "accountId": 2
   },
   {
     "courseNumber": "ICE2080",
@@ -3269,7 +3292,8 @@
     "professorName": "Chongkoo An",
     "weekDay": "Wed",
     "timeslot": "10:00",
-    "room": "A-202"
+    "room": "A-202",
+    "accountId": 2
   },
   {
     "courseNumber": "MSC1010",

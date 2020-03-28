@@ -1,5 +1,6 @@
+
 import models from '../models';
-import findWithPagination from '../util/pagination';
+import findWithPagination, { needsPagination } from '../util/pagination';
 
 const { Record } = models;
 
@@ -43,8 +44,7 @@ function find(where, res, next) {
 
 export default {
   getAll(req, res) {
-    if (Object.keys(req.query).indexOf('page') > -1
-        && Object.keys(req.query).indexOf('size') > -1) {
+    if (needsPagination(req)) {
       findWithPagination(Record, include, {
         page: Number(req.query.page),
         size: Number(req.query.size),

@@ -30,6 +30,7 @@ const storeTimetable = (req, res) => new Promise((resolve, reject) => {
       uid: obj.professorId,
       name: obj.professorName,
       rfid: obj.rfid || random(8),
+      accountId: obj.accountId,
     });
   });
 
@@ -225,9 +226,8 @@ const insertDummyRecords = async (req, res) => {
       },
     ],
   }, { raw: true });
-  console.log(classes);
   const tasks = [];
-  for (let i = 0; i < parseInt(classes.length / 15, 10); i += 1) {
+  for (let i = 0; i < parseInt(classes.length / 3, 10); i += 1) {
     const { classItems } = classes[i];
     for (let j = 0; j < classItems.length; j += 1) {
       tasks.push(models.ClassItem.update({
@@ -242,7 +242,7 @@ const insertDummyRecords = async (req, res) => {
   Promise.all(tasks)
     .then(() => {
       const records = [];
-      for (let i = 0; i < parseInt(classes.length / 15, 10); i += 1) {
+      for (let i = 0; i < parseInt(classes.length / 3, 10); i += 1) {
         const { classItems } = classes[i];
         for (let j = 0; j < classItems.length; j += 1) {
           const { students } = classes[i].section;

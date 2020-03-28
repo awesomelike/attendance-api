@@ -6,6 +6,7 @@ const router = Router();
 
 router.get('/', student.getAll);
 router.get('/:id', student.get);
+router.get('/:id/timetable', student.getTimetable);
 router.post('/rfid', checkStudentRfid, validateRfid, student.handleRfid);
 
 export default router;
