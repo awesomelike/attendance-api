@@ -46,14 +46,13 @@ export default {
     }
   },
   async getMissedClasses(req, res) {
-    models.sequelize.query('SELECT\n'
-    + 'courses.id AS courseId,\n'
-      + 'courses.name AS courseName,\n'
-      + 'records.studentId,\n'
-      + 'students.uid,\n'
-      + 'students.name,\n'
-      + 'professors.name AS professorName,'
-      + 'COUNT(records.isAttended) AS missCount\n'
+    try {
+      const data = await models.sequelize.query('SELECT\n'
+      + 'courses.name AS CourseName,\n'
+      + 'students.uid AS StudentID,\n'
+      + 'students.name AS Name,\n'
+      + 'professors.name AS Professor,\n'
+      + 'COUNT(records.isAttended) AS MissedClasses\n'
   + 'FROM courses\n'
     + 'JOIN sections\n'
     + 'ON courses.id=sections.id\n'
@@ -70,13 +69,18 @@ export default {
     + 'WHERE records.isAttended=0 AND classitems.week <= :week\n'
   + 'GROUP BY\n'
     + 'records.studentId, courses.id\n', {
-      replacements: {
-        week: parseInt(req.params.week, 10),
-      },
-      type: QueryTypes.SELECT,
-    })
-      .then((result) => res.status(200).json(result))
-      .catch((err) => res.status(502).json(err));
+        replacements: {
+          week: parseInt(req.params.week, 10),
+        },
+        type: QueryTypes.SELECT,
+      });
+      if (req.query.format === 'excel') return res.xls(`Report_Misses_Until_Week${req.params.week}.xlsx`, data);
+      res.status(200).json(data);
+    } catch (error) {
+      res.status(502).json(error);
+    }
+
+
     // const everything = [
     //   {
     //     model: models.Section,
@@ -122,9 +126,68 @@ export default {
     // Course.findAll({
     //   attributes: { include: ['id'] },
     //   include: everything,
-    //   group: ['id', 'sections->classes->classItems->records->studentId'],
+    //   group: ['id', 'records.studentId'],
     // })
     //   .then((result) => res.status(200).json(result))
     //   .catch((error) => res.status(502).json(error));
+  },
+  getSemesterReport(req, res) {
+    Course.findOne({
+      where: {
+        id: Number(req.query.courseId),
+      },
+      attributes: ['id', 'name', 'courseNumber'],
+      include: [
+        {
+          model: models.Section,
+          as: 'sections',
+          attributes: ['id', 'sectionNumber'],
+          where: {
+            id: Number(req.query.sectionId),
+          },
+          include: [
+            {
+              model: models.Professor,
+              as: 'professor',
+              where: {
+                id: Number(req.query.professorId),
+              },
+              attributes: { include: ['id', 'uid', 'name'] },
+            },
+            {
+              model: models.Student,
+              as: 'students',
+              attributes: ['id', 'uid', 'name'],
+              through: {
+                attributes: [],
+              },
+              include: [
+                {
+                  model: models.Record,
+                  as: 'records',
+                  attributes: { exclude: ['createdAt', 'updatedAt'] },
+                  include: [
+                    {
+                      model: models.ClassItem,
+                      as: 'classItem',
+                      attributes: { exclude: ['createdAt', 'updatedAt'] },
+                      include: [
+                        {
+                          model: models.Class,
+                          as: 'class',
+                          attributes: { exclude: ['createdAt', 'updatedAt'] },
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    })
+      .then((result) => res.status(200).json(result))
+      .catch((error) => res.status(502).json(error));
   },
 };

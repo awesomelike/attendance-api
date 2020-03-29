@@ -4,6 +4,7 @@ import { join } from 'path';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import logger from 'morgan';
+import json2xls from 'json2xls';
 import indexRouter from './routes/index';
 
 require('dotenv').config();
@@ -18,6 +19,7 @@ app.use(logger('dev'));
 app.use(json());
 app.use(urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(json2xls.middleware);
 app.use(cors());
 app.use(express.static(join(__dirname, 'public')));
 app.use('/assets', express.static(join(__dirname, 'assets')));
