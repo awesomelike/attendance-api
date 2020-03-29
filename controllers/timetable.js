@@ -270,4 +270,134 @@ export default {
     await storeTimetable(req, res);
     await insertDummyRecords(req, res);
   },
+  getProfessorTimetable(req, res) {
+    const { id } = req.params;
+    models.Professor.findOne({
+      where: {
+        id,
+      },
+      attributes: { exclude: ['createdAt', 'updatedAt'] },
+      include: [
+        {
+          model: models.Section,
+          as: 'sections',
+          attributes: ['sectionNumber', 'courseId'],
+          include: [
+            {
+              model: models.Course,
+              as: 'course',
+              attributes: { exclude: ['createdAt', 'updatedAt'] },
+            },
+            {
+              model: models.Class,
+              as: 'classes',
+              attributes: { exclude: ['createdAt', 'updatedAt'] },
+              include: [
+                {
+                  model: models.WeekDay,
+                  as: 'weekDay',
+                },
+                {
+                  model: models.TimeSlot,
+                  as: 'timeSlots',
+                  through: {
+                    attributes: [],
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    })
+      .then((result) => res.status(200).json(result))
+      .catch((error) => res.status(502).json(error));
+  },
+  getDayTimetable(req, res) {
+    const { weekDayId } = req.params;
+    models.WeekDay.findAll({
+      where: {
+        id: weekDayId,
+      },
+      attributes: { exclude: ['createdAt', 'updatedAt'] },
+      include: [
+        {
+          model: models.Class,
+          as: 'classes',
+          include: [
+            {
+              model: models.Section,
+              as: 'section',
+              attributes: ['sectionNumber', 'courseId'],
+              include: [
+                {
+                  model: models.Professor,
+                  as: 'professor',
+                  attributes: { exclude: ['createdAt', 'updatedAt'] },
+                },
+                {
+                  model: models.Course,
+                  as: 'course',
+                  attributes: { exclude: ['createdAt', 'updatedAt'] },
+                },
+              ],
+            },
+            {
+              model: models.TimeSlot,
+              as: 'timeSlots',
+              through: {
+                attributes: [],
+              },
+            },
+          ],
+        },
+      ],
+    })
+      .then((result) => res.status(200).json(result))
+      .catch((error) => res.status(502).json(error));
+  },
+  async getDateTimetable(req, res) {
+    const { date } = req.params;
+    models.ClassItem.findAll({
+      where: {
+        date: new Date(Number(date)),
+      },
+      attributes: { exclude: ['createdAt', 'updatedAt'] },
+      include: [
+        {
+          model: models.Class,
+          as: 'class',
+          attributes: { exclude: ['createdAt', 'updatedAt'] },
+          include: [
+            {
+              model: models.Section,
+              as: 'section',
+              attributes: { exclude: ['createdAt', 'updatedAt'] },
+              include: [
+                {
+                  model: models.Professor,
+                  as: 'professor',
+                  attributes: { exclude: ['createdAt', 'updatedAt'] },
+                },
+                {
+                  model: models.Course,
+                  as: 'course',
+                  attributes: { exclude: ['createdAt', 'updatedAt'] },
+                },
+              ],
+            },
+            {
+              model: models.TimeSlot,
+              as: 'timeSlots',
+              through: {
+                attributes: [],
+              },
+            },
+          ],
+        },
+      ],
+    })
+      .then((result) => res.status(200).json(result))
+      .catch((error) => { console.log(error); res.status(502).json(error); });
+  },
 };

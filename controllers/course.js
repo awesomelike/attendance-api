@@ -79,57 +79,6 @@ export default {
     } catch (error) {
       res.status(502).json(error);
     }
-
-
-    // const everything = [
-    //   {
-    //     model: models.Section,
-    //     as: 'sections',
-    //     attributes: [],
-    //     include: [
-    //       {
-    //         model: models.Class,
-    //         as: 'classes',
-    //         attributes: [],
-    //         include: [
-    //           {
-    //             model: models.ClassItem,
-    //             as: 'classItems',
-    //             attributes: [],
-    //             where: {
-    //               week: {
-    //                 [Op.lte]: 7,
-    //               },
-    //             },
-    //             include: [
-    //               {
-    //                 model: models.Record,
-    //                 as: 'records',
-    //                 attributes: ['studentId'],
-    //                 where: {
-    //                   isAttended: 0,
-    //                 },
-    //                 include: [
-    //                   {
-    //                     model: models.Student,
-    //                     as: 'student',
-    //                   },
-    //                 ],
-    //               },
-    //             ],
-    //           },
-    //         ],
-    //       },
-    //     ],
-    //   },
-    // ];
-    // Course.findAll({
-    //   attributes: { include: ['id'] },
-    //   include: everything,
-    //   group: ['id', 'records.studentId'],
-    // })
-    //   .then((result) => res.status(200).json(result))
-    //   .catch((error) => res.status(502).json(error));
   },
   getSemesterReport(req, res) {
     Course.findOne({
