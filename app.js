@@ -23,6 +23,7 @@ app.use(json2xls.middleware);
 app.use(cors());
 app.use(express.static(join(__dirname, 'public')));
 app.use('/assets', express.static(join(__dirname, 'assets')));
+app.use(express.static(join(__dirname, '../academic_affairs_client/dist')))
 
 indexRouter(app);
 
