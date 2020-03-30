@@ -9,6 +9,7 @@ import timeslots from './timeslots';
 import semesters from './semesters';
 import records from './records';
 import weekDays from './weekdays';
+import rooms from './rooms';
 
 export default (app) => {
   app.use('/api/students', students);
@@ -22,4 +23,5 @@ export default (app) => {
   app.use('/api/timetable', timetable);
   app.use('/api/records', records);
   app.use('/api/weekDays', weekDays);
+  app.use('/api/rooms', rooms);
 };

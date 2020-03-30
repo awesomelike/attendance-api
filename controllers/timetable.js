@@ -19,7 +19,7 @@ const storeTimetable = (req, res) => new Promise((resolve, reject) => {
   const courses = [];
   const professors = [];
   const sections = [];
-
+  const rooms = [];
   // Divide the data into multiple homogenous arrays
   timetable.forEach((obj) => {
     courses.push({
@@ -32,6 +32,9 @@ const storeTimetable = (req, res) => new Promise((resolve, reject) => {
       rfid: obj.rfid || random(8),
       accountId: obj.accountId,
     });
+    rooms.push({
+      label: obj.room,
+    });
   });
 
   // Uniqify the arrays
@@ -39,11 +42,12 @@ const storeTimetable = (req, res) => new Promise((resolve, reject) => {
     .map((courseNumber) => courses.find((course) => course.courseNumber === courseNumber));
   const uniqueProfessors = Array.from(new Set(professors.map((professor) => professor.uid)))
     .map((uid) => professors.find((professor) => professor.uid === uid));
-
+  const uniqueRooms = unique(rooms, ['label']);
   // Make an array of tasks/promises
   const insertProfessorsAndCourses = [
     models.sequelize.getQueryInterface().bulkInsert('Professors', uniqueProfessors, {}),
     models.sequelize.getQueryInterface().bulkInsert('Courses', uniqueCourses, {}),
+    models.sequelize.getQueryInterface().bulkInsert('Rooms', uniqueRooms, {}),
   ];
 
   Promise.all(insertProfessorsAndCourses)
@@ -85,6 +89,7 @@ const storeTimetable = (req, res) => new Promise((resolve, reject) => {
             ],
           });
           const weekDays = await models.WeekDay.findAll({ raw: true });
+          const dbRooms = await models.Room.findAll({ raw: true });
           const classesToInsert = [];
           for (let i = 0; i < uniqueSections.length; i += 1) {
             const { classes } = uniqueSections[i];
@@ -96,7 +101,7 @@ const storeTimetable = (req, res) => new Promise((resolve, reject) => {
                   && section.course.courseNumber === uniqueClasses[j].courseNumber).id,
                 weekDayId: weekDays
                   .find((weekDay) => weekDay.key === uniqueClasses[j].weekDay).id,
-                room: uniqueClasses[j].room,
+                roomId: dbRooms.find(({ label }) => label === uniqueClasses[j].room).id,
               });
             }
           }
@@ -188,6 +193,8 @@ const storeStudents = () => {
       uid: obj['Student ID'],
       name: obj.Name,
       rfid: obj.rfid || random(8),
+      schoolYear: obj['School Year'],
+      department: obj['Dept.'],
     });
   });
 
@@ -357,11 +364,7 @@ export default {
       .catch((error) => res.status(502).json(error));
   },
   async getDateTimetable(req, res) {
-    const { date } = req.params;
     models.ClassItem.findAll({
-      where: {
-        date: new Date(Number(date)),
-      },
       attributes: { exclude: ['createdAt', 'updatedAt'] },
       include: [
         {
@@ -369,6 +372,10 @@ export default {
           as: 'class',
           attributes: { exclude: ['createdAt', 'updatedAt'] },
           include: [
+            {
+              model: models.WeekDay,
+              as: 'weekDay',
+            },
             {
               model: models.Section,
               as: 'section',
@@ -397,7 +404,9 @@ export default {
         },
       ],
     })
-      .then((result) => res.status(200).json(result))
+      .then((result) => res.status(200)
+        .json(result
+          .filter(({ date }) => moment(date).startOf('day').valueOf() === moment(Number(req.params.date)).startOf('day').valueOf())))
       .catch((error) => { console.log(error); res.status(502).json(error); });
   },
 };

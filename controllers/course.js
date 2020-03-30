@@ -106,7 +106,7 @@ export default {
             {
               model: models.Student,
               as: 'students',
-              attributes: ['id', 'uid', 'name'],
+              attributes: ['id', 'uid', 'name', 'department', 'schoolYear'],
               through: {
                 attributes: [],
               },

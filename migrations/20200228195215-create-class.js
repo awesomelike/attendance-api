@@ -14,8 +14,12 @@ module.exports = {
         key: 'id',
       },
     },
-    room: {
-      type: Sequelize.STRING,
+    roomId: {
+      type: Sequelize.INTEGER,
+      references: {
+        model: 'Rooms',
+        key: 'id',
+      },
     },
     weekDayId: {
       type: Sequelize.INTEGER,

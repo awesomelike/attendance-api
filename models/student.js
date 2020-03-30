@@ -5,6 +5,8 @@ module.exports = (sequelize, DataTypes) => {
     rfid: DataTypes.STRING,
     name: DataTypes.STRING,
     image: DataTypes.STRING,
+    schoolYear: DataTypes.STRING,
+    department: DataTypes.STRING,
   }, {});
   Student.associate = (models) => {
     Student.hasMany(models.Record, { as: 'records', foreignKey: 'studentId' });
