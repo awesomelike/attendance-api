@@ -366,47 +366,56 @@ export default {
   async getDateTimetable(req, res) {
     models.ClassItem.findAll({
       attributes: { exclude: ['createdAt', 'updatedAt'] },
-      include: [
-        {
-          model: models.Class,
-          as: 'class',
-          attributes: { exclude: ['createdAt', 'updatedAt'] },
+    })
+      .then((result) => {
+        const neededClasses = result
+          .filter(({ date }) => moment(date).startOf('day').valueOf() === moment(Number(req.params.date)).startOf('day').valueOf());
+        models.ClassItem.findAll({
+          where: {
+            id: {
+              [Op.in]: neededClasses.map(({ id }) => id),
+            },
+          },
           include: [
             {
-              model: models.WeekDay,
-              as: 'weekDay',
-            },
-            {
-              model: models.Section,
-              as: 'section',
+              model: models.Class,
+              as: 'class',
               attributes: { exclude: ['createdAt', 'updatedAt'] },
               include: [
                 {
-                  model: models.Professor,
-                  as: 'professor',
-                  attributes: { exclude: ['createdAt', 'updatedAt'] },
+                  model: models.WeekDay,
+                  as: 'weekDay',
                 },
                 {
-                  model: models.Course,
-                  as: 'course',
+                  model: models.Section,
+                  as: 'section',
                   attributes: { exclude: ['createdAt', 'updatedAt'] },
+                  include: [
+                    {
+                      model: models.Professor,
+                      as: 'professor',
+                      attributes: { exclude: ['createdAt', 'updatedAt'] },
+                    },
+                    {
+                      model: models.Course,
+                      as: 'course',
+                      attributes: { exclude: ['createdAt', 'updatedAt'] },
+                    },
+                  ],
+                },
+                {
+                  model: models.TimeSlot,
+                  as: 'timeSlots',
+                  through: {
+                    attributes: [],
+                  },
                 },
               ],
             },
-            {
-              model: models.TimeSlot,
-              as: 'timeSlots',
-              through: {
-                attributes: [],
-              },
-            },
           ],
-        },
-      ],
-    })
-      .then((result) => res.status(200)
-        .json(result
-          .filter(({ date }) => moment(date).startOf('day').valueOf() === moment(Number(req.params.date)).startOf('day').valueOf())))
-      .catch((error) => { console.log(error); res.status(502).json(error); });
+        })
+          .then((finalResult) => res.status(200).json(finalResult));
+      })
+      .catch((error) => { res.status(502).json(error); });
   },
 };
