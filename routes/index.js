@@ -1,4 +1,5 @@
 import timetable from './timetable';
+import auth from './auth';
 import students from './students';
 import professors from './professors';
 import courses from './courses';
@@ -12,6 +13,7 @@ import weekDays from './weekdays';
 import rooms from './rooms';
 
 export default (app) => {
+  app.use('/api/auth', auth);
   app.use('/api/students', students);
   app.use('/api/professors', professors);
   app.use('/api/courses', courses);

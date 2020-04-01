@@ -20,6 +20,13 @@ module.exports = {
     date: {
       type: Sequelize.DATE,
     },
+    classItemStatusId: {
+      type: Sequelize.INTEGER,
+      references: {
+        model: 'ClassItemStatuses',
+        key: 'id',
+      },
+    },
     createdAt: {
       allowNull: false,
       type: Sequelize.DATE,

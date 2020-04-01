@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {});
   Account.associate = (models) => {
     Account.belongsTo(models.Role, { as: 'role', foreignKey: 'roleId' });
-    Account.belongsTo(models.Professor, { as: 'professor', foreignKey: 'accountId' });
+    Account.hasOne(models.Professor, { as: 'professor', foreignKey: 'accountId' });
   };
   return Account;
 };

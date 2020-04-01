@@ -1,24 +1,22 @@
 module.exports = {
-  up: (queryInterface, Sequelize) => queryInterface.createTable('Rooms', {
+  up: (queryInterface, Sequelize) => queryInterface.createTable('ClassItemStatuses', {
     id: {
       allowNull: false,
       autoIncrement: true,
       primaryKey: true,
       type: Sequelize.INTEGER,
     },
-    label: {
+    name: {
       type: Sequelize.STRING,
     },
     createdAt: {
       allowNull: false,
       type: Sequelize.DATE,
-      defaultValue: Sequelize.fn('now'),
     },
     updatedAt: {
       allowNull: false,
       type: Sequelize.DATE,
-      defaultValue: Sequelize.fn('now'),
     },
   }),
-  down: (queryInterface) => queryInterface.dropTable('Rooms'),
+  down: (queryInterface) => queryInterface.dropTable('ClassItemStatuses'),
 };
