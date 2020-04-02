@@ -1,4 +1,3 @@
-
 module.exports = (sequelize, DataTypes) => {
   const ClassItem = sequelize.define('ClassItem', {
     classId: DataTypes.INTEGER,

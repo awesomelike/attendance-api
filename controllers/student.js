@@ -1,9 +1,9 @@
 import { Op } from 'sequelize';
 import models from '../models';
 import findWithPagination, { needsPagination } from '../util/pagination';
+import bot from '../bot/utils/sender';
 
 const { Student } = models;
-
 
 const include = [
   {
@@ -93,10 +93,12 @@ export default {
       } else res.status(200).json(await Student.findAll({ where }));
     } else find(null, res, (students) => res.status(200).json(students));
   },
+
   async handleRfid(req, res) {
     const { rfid } = req;
-    const { classItemId } = req.body;
-    const { sectionId } = req.body;
+    const {
+      classItemId, sectionId, sectionNumber, courseName, week, date,
+    } = req.body;
 
     const student = await Student.findOne({ where: { rfid }, include });
     if (!student) return res.status(404).json({ error: 'No student found' });
@@ -114,6 +116,18 @@ export default {
         },
       });
       if (isUpdated) {
+        const telegramAccount = await student.getTelegramAccount({ attributes: ['chatId'] });
+        if (telegramAccount) {
+          bot.sendAttendanceMessage(
+            telegramAccount.chatId,
+            student.uid,
+            student.name,
+            courseName,
+            sectionNumber,
+            week,
+            date,
+          );
+        }
         return res.status(200).json(await models.Record.findOne({
           where: {
             studentId: student.id,
@@ -135,6 +149,7 @@ export default {
       });
       res.status(200).json(newRecord);
     } catch (error) {
+      console.log(error);
       res.status(502).json(error);
     }
   },
@@ -183,9 +198,4 @@ export default {
       .then((student) => res.status(200).json(student))
       .catch((error) => res.status(502).json(error));
   },
-  // getSemesterReport(req, res) {
-  //   Student.findAll({
-  //     include:
-  //   })
-  // },
 };

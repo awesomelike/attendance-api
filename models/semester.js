@@ -1,4 +1,3 @@
-
 module.exports = (sequelize, DataTypes) => {
   const Semester = sequelize.define('Semester', {
     year: DataTypes.INTEGER,

@@ -1,4 +1,3 @@
-
 module.exports = (sequelize, DataTypes) => {
   const Record = sequelize.define('Record', {
     classItemId: DataTypes.INTEGER,

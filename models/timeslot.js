@@ -1,4 +1,3 @@
-
 module.exports = (sequelize, DataTypes) => {
   const TimeSlot = sequelize.define('TimeSlot', {
     startTime: DataTypes.STRING,

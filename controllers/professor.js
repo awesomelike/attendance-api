@@ -89,7 +89,7 @@ export default {
     const professorSections = (await professor.getSections());
     const currentClasses = (await timeSlot.getClasses({
       where: {
-        weekDayId: (new Date(2020, 2, 13, 10, 35, 0)).getDay(),
+        weekDayId: (new Date(2020, 2, 30, 10, 35, 0)).getDay(),
       },
     }));
 
@@ -110,12 +110,20 @@ export default {
             attributes: [],
           },
         },
+        {
+          model: models.Course,
+          as: 'course',
+          attributes: ['id', 'name'],
+        },
       ],
     });
     try {
       const records = await insertDefaultRecords(currentClassItem.id, currentSection.students);
       res.status(200).json({
+        courseId: currentSection.course.id,
+        courseName: currentSection.course.name,
         sectionId: currentSection.id,
+        sectionNumber: currentSection.sectionNumber,
         classItem: currentClassItem,
         records,
       });

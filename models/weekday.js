@@ -1,4 +1,3 @@
-
 module.exports = (sequelize, DataTypes) => {
   const WeekDay = sequelize.define('WeekDay', {
     key: DataTypes.STRING,

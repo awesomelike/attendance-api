@@ -6,6 +6,7 @@ import cors from 'cors';
 import logger from 'morgan';
 import json2xls from 'json2xls';
 import indexRouter from './routes/index';
+import './bot/bot';
 
 require('dotenv').config();
 

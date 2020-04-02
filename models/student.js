@@ -1,4 +1,3 @@
-
 module.exports = (sequelize, DataTypes) => {
   const Student = sequelize.define('Student', {
     uid: DataTypes.STRING,
@@ -15,6 +14,7 @@ module.exports = (sequelize, DataTypes) => {
       through: models.StudentSection,
       foreignKey: 'studentId',
     });
+    Student.hasOne(models.TelegramAccount, { as: 'telegramAccount', foreignKey: 'studentId' });
   };
   return Student;
 };

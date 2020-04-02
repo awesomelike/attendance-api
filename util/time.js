@@ -8,7 +8,7 @@ export const parseTime = (time) => ({
 
 const dynamicGenerator = () => {
   // const timeNow = new Date();
-  const timeNow = (new Date(2019, 8, 27, 10, 35, 0));
+  const timeNow = (new Date(2019, 8, 23, 10, 35, 0));
   return timeSlots.map(({ id, startTime, endTime }) => ({
     id,
     startTime: new Date(timeNow.getFullYear(),
@@ -26,7 +26,7 @@ const dynamicGenerator = () => {
 export default {
   getCurrentTimeSlotId() {
     // const timeNow = (new Date()).getTime();
-    const timeNow = (new Date(2019, 8, 27, 10, 35, 0)).getTime();
+    const timeNow = (new Date(2019, 8, 23, 10, 35, 0)).getTime();
     try {
       const { id } = dynamicGenerator(timeSlots)
         .find((timeSlot) => timeNow >= timeSlot.startTime && timeNow < timeSlot.endTime);
@@ -46,6 +46,6 @@ export default {
     };
     const semesterStartDate = (await Semester.findByPk(2)).startDate;
     // return getWeekNumber(new Date()) - getWeekNumber(semesterStartDate) + 1;
-    return getWeekNumber(new Date(2019, 8, 27)) - getWeekNumber(semesterStartDate) + 1;
+    return getWeekNumber(new Date(2019, 8, 23)) - getWeekNumber(semesterStartDate) + 1;
   },
 };

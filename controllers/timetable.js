@@ -3,6 +3,7 @@ import { Op } from 'sequelize';
 import models from '../models';
 import timetable from '../data/timetable.json';
 import studentsTimetable from '../data/students.json';
+import mobiles from '../data/mobiles.json';
 import random from '../util/random';
 import { parseTime } from '../util/time';
 
@@ -200,9 +201,19 @@ const storeStudents = () => {
 
   const uniqueStudents = Array.from(new Set(students.map((student) => student.uid)))
     .map((uid) => students.find((student) => student.uid === uid));
-  models.sequelize.getQueryInterface().bulkInsert('Students', uniqueStudents, {})
-    .then(() => {
+  models.Student.bulkCreate(uniqueStudents, { returning: true })
+    .then((results) => {
+      console.log(results);
+      const telegramAccounts = [];
       console.log('Students inserted');
+      mobiles.forEach((mobile) => {
+        telegramAccounts.push({
+          studentId: results.find(({ uid }) => uid === mobile.uid).id,
+          phoneNumber: mobile.phoneNumber,
+        });
+      });
+      models.sequelize.getQueryInterface().bulkInsert('TelegramAccounts', telegramAccounts, {})
+        .then(() => console.log('Telegram accounts inserted'));
     });
 };
 

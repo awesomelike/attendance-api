@@ -1,4 +1,3 @@
-
 module.exports = (sequelize, DataTypes) => {
   const Room = sequelize.define('Room', {
     label: DataTypes.STRING,

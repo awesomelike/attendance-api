@@ -18,6 +18,14 @@ module.exports = {
       email: 'c.an@inha.uz',
       roleId: 2,
     },
+    {
+      id: 3,
+      username: 'admin',
+      password: hashSync('admin', genSaltSync()),
+      name: 'Admin',
+      email: 'iutattendancesystem@gmail.com',
+      roleId: 3,
+    },
   ]),
 
   down: (queryInterface) => queryInterface.bulkDelete('Accounts', null, {}),

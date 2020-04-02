@@ -1,4 +1,3 @@
-
 module.exports = (sequelize, DataTypes) => {
   const Class = sequelize.define('Class', {
     weekDayId: DataTypes.INTEGER,

@@ -6,6 +6,7 @@
     "professorId": "U15013",
     "professorName": "Chongkoo An",
     "weekDay": "Mon",
+    "rfid": "93605575",
     "timeslot": "10:30",
     "room": "A-202",
     "accountId": 2
@@ -17,6 +18,7 @@
     "professorId": "U15013",
     "professorName": "Chongkoo An",
     "weekDay": "Mon",
+    "rfid": "93605575",
     "timeslot": "11:00",
     "room": "A-202",
     "accountId": 2
@@ -28,6 +30,7 @@
     "professorId": "U15013",
     "professorName": "Chongkoo An",
     "weekDay": "Mon",
+    "rfid": "93605575",
     "timeslot": "11:30",
     "room": "A-202",
     "accountId": 2
@@ -39,6 +42,7 @@
     "professorId": "U15013",
     "professorName": "Chongkoo An",
     "weekDay": "Wed",
+    "rfid": "93605575",
     "timeslot": "10:30",
     "room": "A-202",
     "accountId": 2
@@ -50,6 +54,7 @@
     "professorId": "U15013",
     "professorName": "Chongkoo An",
     "weekDay": "Wed",
+    "rfid": "93605575",
     "timeslot": "11:00",
     "room": "A-202",
     "accountId": 2
@@ -61,6 +66,7 @@
     "professorId": "U15013",
     "professorName": "Chongkoo An",
     "weekDay": "Wed",
+    "rfid": "93605575",
     "timeslot": "11:30",
     "room": "A-202",
     "accountId": 2
@@ -72,6 +78,7 @@
     "professorId": "U15013",
     "professorName": "Chongkoo An",
     "weekDay": "Fri",
+    "rfid": "93605575",
     "timeslot": "9:00",
     "room": "A-202",
     "accountId": 2
@@ -83,6 +90,7 @@
     "professorId": "U15013",
     "professorName": "Chongkoo An",
     "weekDay": "Fri",
+    "rfid": "93605575",
     "timeslot": "9:30",
     "room": "A-202",
     "accountId": 2
@@ -94,6 +102,7 @@
     "professorId": "U15013",
     "professorName": "Chongkoo An",
     "weekDay": "Fri",
+    "rfid": "93605575",
     "timeslot": "10:00",
     "room": "A-202",
     "accountId": 2
@@ -105,6 +114,7 @@
     "professorId": "U15013",
     "professorName": "Chongkoo An",
     "weekDay": "Tue",
+    "rfid": "93605575",
     "timeslot": "10:30",
     "room": "A-202",
     "accountId": 2
@@ -116,6 +126,7 @@
     "professorId": "U15013",
     "professorName": "Chongkoo An",
     "weekDay": "Tue",
+    "rfid": "93605575",
     "timeslot": "11:00",
     "room": "A-202",
     "accountId": 2
@@ -127,6 +138,7 @@
     "professorId": "U15013",
     "professorName": "Chongkoo An",
     "weekDay": "Tue",
+    "rfid": "93605575",
     "timeslot": "11:30",
     "room": "A-202",
     "accountId": 2
@@ -138,6 +150,7 @@
     "professorId": "U15013",
     "professorName": "Chongkoo An",
     "weekDay": "Fri",
+    "rfid": "93605575",
     "timeslot": "10:30",
     "room": "A-202",
     "accountId": 2
@@ -149,6 +162,7 @@
     "professorId": "U15013",
     "professorName": "Chongkoo An",
     "weekDay": "Fri",
+    "rfid": "93605575",
     "timeslot": "11:00",
     "room": "A-202",
     "accountId": 2
@@ -160,6 +174,7 @@
     "professorId": "U15013",
     "professorName": "Chongkoo An",
     "weekDay": "Fri",
+    "rfid": "93605575",
     "timeslot": "11:30",
     "room": "A-202",
     "accountId": 2
@@ -171,6 +186,7 @@
     "professorId": "U15013",
     "professorName": "Chongkoo An",
     "weekDay": "Tue",
+    "rfid": "93605575",
     "timeslot": "9:00",
     "room": "A-202",
     "accountId": 2
@@ -182,6 +198,7 @@
     "professorId": "U15013",
     "professorName": "Chongkoo An",
     "weekDay": "Tue",
+    "rfid": "93605575",
     "timeslot": "9:30",
     "room": "A-202",
     "accountId": 2
@@ -193,6 +210,7 @@
     "professorId": "U15013",
     "professorName": "Chongkoo An",
     "weekDay": "Tue",
+    "rfid": "93605575",
     "timeslot": "10:00",
     "room": "A-202",
     "accountId": 2
@@ -204,7 +222,6 @@
     "professorId": "U19005",
     "professorName": "Turgunova Shaxnaza",
     "weekDay": "Tue",
-    "rfid": "93605575",
     "timeslot": "9:00",
     "room": "A-308"
   },
@@ -215,7 +232,6 @@
     "professorId": "U19005",
     "professorName": "Turgunova Shaxnaza",
     "weekDay": "Tue",
-    "rfid": "93605575",
     "timeslot": "9:30",
     "room": "A-308"
   },
@@ -226,7 +242,6 @@
     "professorId": "U19005",
     "professorName": "Turgunova Shaxnaza",
     "weekDay": "Tue",
-    "rfid": "93605575",
     "timeslot": "10:00",
     "room": "A-308"
   },
@@ -237,7 +252,6 @@
     "professorId": "U19005",
     "professorName": "Turgunova Shaxnaza",
     "weekDay": "Tue",
-    "rfid": "93605575",
     "timeslot": "10:30",
     "room": "A-308"
   },
@@ -248,7 +262,6 @@
     "professorId": "U19005",
     "professorName": "Turgunova Shaxnaza",
     "weekDay": "Wed",
-    "rfid": "93605575",
     "timeslot": "9:00",
     "room": "A-608"
   },
@@ -260,7 +273,6 @@
     "professorName": "Turgunova Shaxnaza",
     "weekDay": "Wed",
     "timeslot": "9:30",
-    "rfid": "93605575",
     "room": "A-608"
   },
   {
@@ -270,7 +282,6 @@
     "professorId": "U19005",
     "professorName": "Turgunova Shaxnaza",
     "weekDay": "Wed",
-    "rfid": "93605575",
     "timeslot": "10:00",
     "room": "A-608"
   },
@@ -281,7 +292,6 @@
     "professorId": "U19005",
     "professorName": "Turgunova Shaxnaza",
     "weekDay": "Wed",
-    "rfid": "93605575",
     "timeslot": "10:30",
     "room": "A-608"
   },
@@ -292,7 +302,6 @@
     "professorId": "U19005",
     "professorName": "Turgunova Shaxnaza",
     "weekDay": "Fri",
-    "rfid": "93605575",
     "timeslot": "10:30",
     "room": "A-607"
   },
@@ -303,7 +312,6 @@
     "professorId": "U19005",
     "professorName": "Turgunova Shaxnaza",
     "weekDay": "Fri",
-    "rfid": "93605575",
     "timeslot": "11:30",
     "room": "A-607"
   },
@@ -314,7 +322,6 @@
     "professorId": "U19005",
     "professorName": "Turgunova Shaxnaza",
     "weekDay": "Fri",
-    "rfid": "93605575",
     "timeslot": "11:30",
     "room": "A-607"
   },
@@ -325,7 +332,6 @@
     "professorId": "U19005",
     "professorName": "Turgunova Shaxnaza",
     "weekDay": "Fri",
-    "rfid": "93605575",
     "timeslot": "12:00",
     "room": "A-607"
   },
@@ -336,7 +342,6 @@
     "professorId": "U19005",
     "professorName": "Turgunova Shaxnaza",
     "weekDay": "Mon",
-    "rfid": "93605575",
     "timeslot": "9:00",
     "room": "A-605"
   },
@@ -347,7 +352,6 @@
     "professorId": "U19005",
     "professorName": "Turgunova Shaxnaza",
     "weekDay": "Mon",
-    "rfid": "93605575",
     "timeslot": "9:30",
     "room": "A-605"
   },
@@ -358,7 +362,6 @@
     "professorId": "U19005",
     "professorName": "Turgunova Shaxnaza",
     "weekDay": "Mon",
-    "rfid": "93605575",
     "timeslot": "10:00",
     "room": "A-605"
   },
@@ -369,7 +372,6 @@
     "professorId": "U19005",
     "professorName": "Turgunova Shaxnaza",
     "weekDay": "Mon",
-    "rfid": "93605575",
     "timeslot": "10:30",
     "room": "A-605"
   },
@@ -381,7 +383,6 @@
     "professorName": "Turgunova Shaxnaza",
     "weekDay": "Mon",
     "timeslot": "11:00",
-    "rfid": "93605575",
     "room": "A-513"
   },
   {
@@ -392,7 +393,6 @@
     "professorName": "Turgunova Shaxnaza",
     "weekDay": "Mon",
     "timeslot": "11:30",
-    "rfid": "93605575",
     "room": "A-513"
   },
   {
@@ -403,7 +403,6 @@
     "professorName": "Turgunova Shaxnaza",
     "weekDay": "Mon",
     "timeslot": "12:00",
-    "rfid": "93605575",
     "room": "A-513"
   },
   {
@@ -414,7 +413,6 @@
     "professorName": "Turgunova Shaxnaza",
     "weekDay": "Mon",
     "timeslot": "12:30",
-    "rfid": "93605575",
     "room": "A-513"
   },
   {

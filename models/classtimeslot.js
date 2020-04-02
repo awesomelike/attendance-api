@@ -1,4 +1,3 @@
-
 module.exports = (sequelize, DataTypes) => {
   const ClassTimeSlot = sequelize.define('ClassTimeSlot', {
     timeSlotId: DataTypes.INTEGER,

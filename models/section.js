@@ -1,4 +1,3 @@
-
 module.exports = (sequelize, DataTypes) => {
   const Section = sequelize.define('Section', {
     sectionNumber: DataTypes.STRING,
