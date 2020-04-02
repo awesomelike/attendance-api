@@ -11,6 +11,13 @@ export default {
         {
           model: models.Role,
           as: 'role',
+          include: [
+            {
+              model: models.Permission,
+              as: 'permissions',
+              attributes: ['id', 'name'],
+            },
+          ],
         },
       ];
       if (req.account.professorId) {

@@ -25,6 +25,10 @@ module.exports = {
       permissionId: 6,
     },
     {
+      roleId: 1,
+      permissionId: 7,
+    },
+    {
       roleId: 2,
       permissionId: 7,
     },

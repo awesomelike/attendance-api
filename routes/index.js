@@ -12,7 +12,8 @@ import semesters from './semesters';
 import records from './records';
 import weekDays from './weekdays';
 import rooms from './rooms';
-
+import roles from './roles';
+import permissions from './permissions';
 
 export default (app) => {
   app.use('/api/auth', auth);
@@ -29,4 +30,6 @@ export default (app) => {
   app.use('/api/records', records);
   app.use('/api/weekDays', weekDays);
   app.use('/api/rooms', rooms);
+  app.use('/api/roles', roles);
+  app.use('/api/permissions', permissions);
 };

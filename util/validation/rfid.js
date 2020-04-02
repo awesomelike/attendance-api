@@ -16,6 +16,21 @@ export const checkStudentRfid = checkSchema({
   sectionId: {
     isInt: true,
   },
+  sectionNumber: {
+    isString: true,
+  },
+  courseId: {
+    isInt: true,
+  },
+  courseName: {
+    isString: true,
+  },
+  week: {
+    isInt: true,
+  },
+  date: {
+    isInt: true,
+  },
 });
 
 // eslint-disable-next-line consistent-return
