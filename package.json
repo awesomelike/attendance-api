@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon ./bin/www --exec babel-node --presets babel-preset-env",
+    "start": "nodemon ./bin/www --exec babel-node --presets babel-preset-env --plugins babel-plugin-transform-object-rest-spread",
     "update": "sequelize db:drop && sequelize db:create --charset utf8mb4 && sequelize db:migrate --debug && sequelize db:seed:all --debug",
     "deploy": "babel-node ./bin/www --presets babel-preset-env"
   },
@@ -32,6 +32,7 @@
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
     "babel-loader": "^8.0.6",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-env": "^1.7.0",
     "eslint": "^6.8.0",
     "eslint-config-airbnb-base": "^14.0.0",

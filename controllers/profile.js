@@ -33,7 +33,7 @@ export default {
       const account = await Account.findByPk(req.account.id, options);
       res.status(200).json(account);
     } catch (error) {
-      res.status(502).json(error);
+      res.status(502).json(error.toString());
     }
   },
   updateProfile(req, res) {
