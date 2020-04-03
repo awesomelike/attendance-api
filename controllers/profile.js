@@ -11,11 +11,15 @@ export default {
         {
           model: models.Role,
           as: 'role',
+          attributes: ['id', 'name'],
           include: [
             {
               model: models.Permission,
               as: 'permissions',
               attributes: ['id', 'name'],
+              through: {
+                attributes: [],
+              },
             },
           ],
         },
@@ -31,5 +35,15 @@ export default {
     } catch (error) {
       res.status(502).json(error);
     }
+  },
+  updateProfile(req, res) {
+    Account.update(req.account, { where: { id: req.account.id } })
+      .then(() => res.sendStatus(200))
+      .catch((error) => res.status(502).json(error));
+  },
+  updatePassword(req, res) {
+    Account.update(req.newPassword, { where: { id: req.account.id } })
+      .then(() => res.sendStatus(200))
+      .catch((error) => res.status(502).json(error));
   },
 };
