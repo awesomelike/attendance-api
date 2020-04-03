@@ -2,10 +2,14 @@ module.exports = {
   up: (queryInterface) => queryInterface.bulkInsert('ClassItemStatuses', [
     {
       id: 1,
-      name: 'Going on',
+      name: 'Planned',
     },
     {
       id: 2,
+      name: 'Going on',
+    },
+    {
+      id: 3,
       name: 'Finished',
     },
   ]),

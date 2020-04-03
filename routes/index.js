@@ -14,6 +14,7 @@ import weekDays from './weekdays';
 import rooms from './rooms';
 import roles from './roles';
 import permissions from './permissions';
+import makeups from './makeups';
 
 export default (app) => {
   app.use('/api/auth', auth);
@@ -32,4 +33,5 @@ export default (app) => {
   app.use('/api/rooms', rooms);
   app.use('/api/roles', roles);
   app.use('/api/permissions', permissions);
+  app.use('/api/makeups', makeups);
 };
