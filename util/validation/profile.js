@@ -1,4 +1,4 @@
-import { checkSchema, validationResult } from 'express-validator/check';
+import { checkSchema, validationResult } from 'express-validator';
 import { compareSync, hashSync, genSaltSync } from 'bcryptjs';
 import models from '../../models';
 
@@ -39,7 +39,7 @@ export function validate(req, res, next) {
       errors: errors.array(),
     });
   }
-  req.account = {
+  req.validatedAccount = {
     username: req.body.username,
     name: req.body.name,
     email: req.body.email,

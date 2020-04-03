@@ -37,7 +37,7 @@ export default {
     }
   },
   updateProfile(req, res) {
-    Account.update(req.account, { where: { id: req.account.id } })
+    Account.update(req.validatedAccount, { where: { id: req.account.id } })
       .then(() => res.sendStatus(200))
       .catch((error) => res.status(502).json(error));
   },
