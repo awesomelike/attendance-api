@@ -40,7 +40,6 @@ export const check = (method) => {
       },
     });
   }
-  console.log(schema);
   return checkSchema(schema);
 };
 
