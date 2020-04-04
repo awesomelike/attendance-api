@@ -29,6 +29,7 @@ module.exports = {
         model: 'MakeupStatuses',
         key: 'id',
       },
+      defaultValue: 1,
     },
     resolvedById: {
       type: Sequelize.INTEGER,

@@ -25,6 +25,29 @@ function find(where, res, next) {
     .catch((error) => res.status(502).json(error));
 }
 
+export function isTaughtBy(classItemId, professorId) {
+  return new Promise((resolve, reject) => {
+    ClassItem.findByPk(classItemId, {
+      include: [
+        {
+          model: models.Class,
+          as: 'class',
+          attributes: ['id', 'sectionId'],
+          include: [
+            {
+              model: models.Section,
+              as: 'section',
+              attributes: ['id', 'professorId'],
+            },
+          ],
+        },
+      ],
+    })
+      .then((classItem) => resolve(classItem.class.section.professorId === professorId))
+      .catch((error) => reject(error));
+  });
+}
+
 export default {
   getAll(req, res) {
     if (needsPagination(req)) {

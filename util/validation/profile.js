@@ -1,4 +1,4 @@
-import { checkSchema, validationResult } from 'express-validator';
+import { checkSchema, validationResult } from 'express-validator/check';
 import { compareSync, hashSync, genSaltSync } from 'bcryptjs';
 import models from '../../models';
 

@@ -1,4 +1,4 @@
-import { checkSchema, validationResult } from 'express-validator';
+import { checkSchema, validationResult } from 'express-validator/check';
 
 export const check = checkSchema({
   name: {
