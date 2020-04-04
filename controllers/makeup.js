@@ -9,7 +9,6 @@ export default {
       .catch((error) => res.status(502).json(error));
   },
   get(req, res) {
-    console.log('GETTTTING MAKE UP');
     Makeup.findByPk(req.params.id)
       .then((makeup) => res.status(200).json(makeup))
       .catch((error) => res.status(502).json(error));
