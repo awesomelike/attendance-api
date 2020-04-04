@@ -1,18 +1,11 @@
 import { checkSchema, validationResult } from 'express-validator/check';
 import { isTaughtBy } from '../../controllers/classItem';
-import { RESOLVE } from '../../constants/makeup';
+import { CREATE, RESOLVE } from '../../constants/makeup';
 
 export const check = (method) => {
   const schema = {
     classItemId: {
       isInt: true,
-      custom: {
-        options: async (value, { req }) => {
-          const isItemValid = await isTaughtBy(value, req.account.professorId);
-          return !!req.account.professorId && isItemValid;
-        },
-        errorMessage: 'You are not authorized to request makeup for this class!',
-      },
     },
     newDate: {
       isInt: true,
@@ -25,6 +18,15 @@ export const check = (method) => {
       isInt: true,
     },
   };
+  if (method === CREATE) {
+    schema.classItemId.custom = {
+      options: async (value, { req }) => {
+        const isItemValid = await isTaughtBy(value, req.account.professorId);
+        return !!req.account.professorId && isItemValid;
+      },
+      errorMessage: 'You are not authorized to request makeup for this class!',
+    };
+  }
   if (method === RESOLVE) {
     Object.assign(schema, {
       makeupStatusId: {
@@ -38,6 +40,7 @@ export const check = (method) => {
       },
     });
   }
+  console.log(schema);
   return checkSchema(schema);
 };
 
