@@ -2,14 +2,64 @@ import models from '../models';
 
 const { Makeup } = models;
 
+const options = {
+  include: [
+    {
+      model: models.MakeupStatus,
+      as: 'makeupStatus',
+    },
+    {
+      model: models.Room,
+      as: 'room',
+    },
+    {
+      model: models.ClassItem,
+      as: 'classItem',
+      include: [
+        {
+          model: models.Class,
+          as: 'class',
+          include: [
+            {
+              model: models.WeekDay,
+              as: 'weekDay',
+            },
+            {
+              model: models.TimeSlot,
+              as: 'timeSlots',
+              through: {
+                attributes: [],
+              },
+            },
+            {
+              model: models.Section,
+              as: 'section',
+              include: [
+                {
+                  model: models.Professor,
+                  as: 'professor',
+                },
+                {
+                  model: models.Course,
+                  as: 'course',
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+  ],
+};
+
 export default {
   getAll(_, res) {
-    Makeup.findAll()
+    Makeup.findAll(options)
       .then((makeups) => res.status(200).json(makeups))
       .catch((error) => res.status(502).json(error));
   },
   get(req, res) {
-    Makeup.findByPk(req.params.id)
+    Makeup.findByPk(req.params.id, options)
       .then((makeup) => res.status(200).json(makeup))
       .catch((error) => res.status(502).json(error));
   },

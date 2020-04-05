@@ -23,7 +23,7 @@ async function findAccount(where, res, next) {
     }, { raw: true });
     if (account) {
       next(account);
-    } else res.sendStatus(404);
+    } else res.status(404).json({ error: 'Invalid login or password' });
   } catch (error) {
     console.log(error);
     res.status(502).json(error);
