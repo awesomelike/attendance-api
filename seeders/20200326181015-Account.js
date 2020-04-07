@@ -15,7 +15,7 @@ module.exports = {
       username: 'professor',
       password: hashSync('professor', genSaltSync()),
       name: 'Chongkoo An',
-      email: 'c.an@inha.uz',
+      email: 'familyhomeuz@gmail.com',
       roleId: 2,
     },
     {

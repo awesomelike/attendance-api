@@ -11,6 +11,11 @@ module.exports = (sequelize, DataTypes) => {
       through: models.ClassTimeSlot,
       foreignKey: 'timeSlotId',
     });
+    TimeSlot.belongsToMany(models.Makeup, {
+      as: 'makeups',
+      through: models.MakeupTimeSlot,
+      foreignKey: 'timeSlotId',
+    });
   };
   return TimeSlot;
 };

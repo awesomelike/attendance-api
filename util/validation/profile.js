@@ -32,6 +32,12 @@ export const checkPassword = checkSchema({
   },
 });
 
+export const checkEmail = checkSchema({
+  email: {
+    isEmail: true,
+  },
+});
+
 export function validate(req, res, next) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -58,5 +64,15 @@ export function validatePassword(req, res, next) {
   req.newPassword = {
     password: hashSync(req.body.newPassword, genSaltSync()),
   };
+  next();
+}
+
+export function validateEmail(req, res, next) {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(403).json({
+      errors: errors.array(),
+    });
+  }
   next();
 }

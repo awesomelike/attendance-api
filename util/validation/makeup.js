@@ -1,4 +1,5 @@
 import { checkSchema, validationResult } from 'express-validator/check';
+import moment from 'moment';
 import { isTaughtBy } from '../../controllers/classItem';
 import { CREATE, RESOLVE } from '../../constants/makeup';
 
@@ -16,6 +17,9 @@ export const check = (method) => {
     },
     roomId: {
       isInt: true,
+    },
+    timeSlots: {
+      isArray: true,
     },
   };
   if (method === CREATE) {
@@ -53,10 +57,11 @@ export function validate(req, res, next) {
   }
   req.makeup = {
     classItemId: req.body.classItemId,
-    newDate: req.body.newDate,
+    newDate: moment(req.body.newDate).startOf('day'),
     roomId: req.body.roomId,
     makeupStatusId: req.body.makeupStatusId,
     resolvedById: req.body.resolvedById,
+    timeSlots: req.body.timeSlots,
   };
   next();
 }

@@ -1,4 +1,6 @@
+import { sign } from 'jsonwebtoken';
 import models from '../models';
+import { sendEmail, passwordReset } from '../tasks/email';
 
 const { Account } = models;
 
@@ -45,5 +47,23 @@ export default {
     Account.update(req.newPassword, { where: { id: req.account.id } })
       .then(() => res.sendStatus(200))
       .catch((error) => res.status(502).json(error));
+  },
+  async sendPasswordResetEmail(req, res) {
+    const { email } = req.body;
+    const account = await models.Account.findOne({ where: { email } });
+    if (!account) {
+      return res.status(404).json({ error: 'No confirmed user with this email' });
+    }
+    sign({ accountId: account.id },
+      process.env.JWT_KEY, {
+        expiresIn: '5m',
+      }, (error, token) => {
+        if (error) {
+          return res.sendStatus(500);
+        }
+        sendEmail(passwordReset(email, account.name, token))
+          .then(() => res.status(200).json({ message: 'Check your email for the password reset link' }))
+          .catch((emailError) => res.status(502).json(emailError));
+      });
   },
 };

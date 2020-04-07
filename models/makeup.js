@@ -12,6 +12,11 @@ module.exports = (sequelize, DataTypes) => {
     Makeup.belongsTo(models.Room, { as: 'room', foreignKey: 'roomId' });
     Makeup.belongsTo(models.MakeupStatus, { as: 'makeupStatus', foreignKey: 'makeupStatusId' });
     Makeup.belongsTo(models.Account, { as: 'resolvedBy', foreignKey: 'resolvedById' });
+    Makeup.belongsToMany(models.TimeSlot, {
+      as: 'timeSlots',
+      through: models.MakeupTimeSlot,
+      foreignKey: 'makeupId',
+    });
   };
   return Makeup;
 };

@@ -63,10 +63,20 @@ export default {
       .then((makeup) => res.status(200).json(makeup))
       .catch((error) => res.status(502).json(error));
   },
-  create(req, res) {
-    Makeup.create(req.makeup)
-      .then((makeup) => res.status(200).json(makeup))
-      .catch((error) => res.status(502).json(error));
+  async create(req, res) {
+    try {
+      const makeup = await Makeup.create({
+        classItemId: req.makeup.classItemId,
+        newDate: req.makeup.newDate,
+        roomId: req.makeup.roomId,
+        makeupStatusId: req.makeup.makeupStatusId,
+        resolvedById: req.makeup.resolvedById,
+      });
+      await makeup.addTimeSlots(req.makeup.timeSlots);
+      res.status(200).json(makeup);
+    } catch (error) {
+      res.status(502).json(error);
+    }
   },
   update(req, res) {
     Makeup.update(req.makeup, { where: { id: req.params.id } })
