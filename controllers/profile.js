@@ -56,7 +56,7 @@ export default {
     }
     sign({ accountId: account.id },
       process.env.JWT_KEY, {
-        expiresIn: '5m',
+        expiresIn: '10m',
       }, (error, token) => {
         if (error) {
           return res.sendStatus(500);

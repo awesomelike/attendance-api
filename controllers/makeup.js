@@ -13,6 +13,13 @@ const options = {
       as: 'room',
     },
     {
+      model: models.TimeSlot,
+      as: 'timeSlots',
+      through: {
+        attributes: [],
+      },
+    },
+    {
       model: models.ClassItem,
       as: 'classItem',
       include: [
@@ -23,6 +30,10 @@ const options = {
             {
               model: models.WeekDay,
               as: 'weekDay',
+            },
+            {
+              model: models.Room,
+              as: 'room',
             },
             {
               model: models.TimeSlot,
@@ -72,7 +83,7 @@ export default {
         makeupStatusId: req.makeup.makeupStatusId,
         resolvedById: req.makeup.resolvedById,
       });
-      await makeup.addTimeSlots(req.makeup.timeSlots);
+      await makeup.setTimeSlots(req.makeup.timeSlots);
       res.status(200).json(makeup);
     } catch (error) {
       res.status(502).json(error);
