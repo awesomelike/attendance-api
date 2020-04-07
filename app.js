@@ -5,12 +5,18 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import logger from 'morgan';
 import json2xls from 'json2xls';
+import socketIO from 'socket.io';
+import { createServer } from 'http';
 import indexRouter from './routes/index';
 import './bot/bot';
 
 require('dotenv').config();
 
 const app = express();
+
+const server = createServer(app);
+const io = socketIO(server);
+io.origins('*:*');
 
 // view engine setup
 app.set('views', join(__dirname, 'views'));
@@ -26,8 +32,13 @@ app.use(express.static(join(__dirname, 'public')));
 app.use('/assets', express.static(join(__dirname, 'assets')));
 app.use(express.static(join(__dirname, '../academic_affairs_client/dist')));
 
-indexRouter(app);
+// Append Socket.IO to the res object
+app.use((req, res, next) => {
+  res.io = io;
+  next();
+});
 
+indexRouter(app);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
@@ -45,4 +56,4 @@ app.use((err, req, res) => {
   res.render('error');
 });
 
-export default app;
+export { app as default, server };

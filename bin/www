@@ -4,9 +4,8 @@
  * Module dependencies.
  */
 
-import { createServer } from 'http';
 import ip from 'ip';
-import app from '../app';
+import app, { server } from '../app';
 
 require('dotenv').config();
 const debug = require('debug')('librarian-server:server');
@@ -17,12 +16,6 @@ const debug = require('debug')('librarian-server:server');
 
 const port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
-
-/**
- * Create HTTP server.
- */
-
-const server = createServer(app);
 
 /**
  * Listen on provided port, on all network interfaces.

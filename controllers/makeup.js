@@ -80,10 +80,10 @@ export default {
         classItemId: req.makeup.classItemId,
         newDate: req.makeup.newDate,
         roomId: req.makeup.roomId,
-        makeupStatusId: req.makeup.makeupStatusId,
-        resolvedById: req.makeup.resolvedById,
       });
       await makeup.setTimeSlots(req.makeup.timeSlots);
+      const result = await Makeup.findByPk(makeup.id, options);
+      res.io.emit('newMakeup', result);
       res.status(200).json(makeup);
     } catch (error) {
       res.status(502).json(error);
@@ -96,8 +96,8 @@ export default {
   },
   resolve(req, res) {
     Makeup.update({
-      ...req.makeup,
       resolvedAt: (new Date()).getTime(),
+      resolvedById: req.account.id,
     }, { where: { id: req.params.id } })
       .then(() => res.sendStatus(200))
       .catch((error) => res.status(502).json(error));

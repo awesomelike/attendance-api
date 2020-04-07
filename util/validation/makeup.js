@@ -3,6 +3,19 @@ import moment from 'moment';
 import { isTaughtBy } from '../../controllers/classItem';
 import { CREATE, RESOLVE } from '../../constants/makeup';
 
+const isTimeslotArrayValid = (array) => {
+  const areIntegers = array.filter((element) => Number.isInteger(element));
+  if (areIntegers.length !== array.length) return false;
+
+  for (let index = 0; index < array.length - 1; index += 1) {
+    const element = array[index];
+    if (element !== array[index + 1] - 1) {
+      return false;
+    }
+  }
+  return true;
+};
+
 export const check = (method) => {
   const schema = {
     classItemId: {
@@ -20,6 +33,10 @@ export const check = (method) => {
     },
     timeSlots: {
       isArray: true,
+      custom: {
+        options: (array) => isTimeslotArrayValid(array),
+        errorMessage: 'Invalid timeSlots array',
+      },
     },
   };
   if (method === CREATE) {
@@ -35,18 +52,14 @@ export const check = (method) => {
     Object.assign(schema, {
       makeupStatusId: {
         isInt: true,
-      },
-      resolvedById: {
-        isInt: true,
         custom: {
-          options: (value, { req }) => value === req.account.id,
+          options: (value) => [2, 3].includes(value),
         },
       },
     });
   }
   return checkSchema(schema);
 };
-
 
 export function validate(req, res, next) {
   const errors = validationResult(req);
