@@ -9,6 +9,7 @@ module.exports = {
       name: 'Ulugbek Muratov',
       email: 'u.muratov@inha.uz',
       roleId: 1,
+      accountStatus: 1,
     },
     {
       id: 2,
@@ -17,6 +18,7 @@ module.exports = {
       name: 'Chongkoo An',
       email: 'familyhomeuz@gmail.com',
       roleId: 2,
+      accountStatus: 1,
     },
     {
       id: 3,
@@ -25,6 +27,7 @@ module.exports = {
       name: 'Admin',
       email: 'iutattendancesystem@gmail.com',
       roleId: 3,
+      accountStatus: 1,
     },
   ]),
 

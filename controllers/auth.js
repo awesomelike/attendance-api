@@ -46,7 +46,10 @@ export default {
             if (error) return res.status(502).json(error);
             return res.status(200).json({ token });
           });
-      } else res.sendStatus(401);
+      } else {
+        console.log('inside auth controller');
+        res.sendStatus(401);
+      }
     });
   },
 };

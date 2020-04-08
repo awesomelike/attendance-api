@@ -5,6 +5,7 @@ module.exports = (sequelize, DataTypes) => {
     name: DataTypes.STRING,
     email: DataTypes.STRING,
     roleId: DataTypes.INTEGER,
+    accountStatus: DataTypes.INTEGER,
   }, {});
   Account.associate = (models) => {
     Account.belongsTo(models.Role, { as: 'role', foreignKey: 'roleId' });
