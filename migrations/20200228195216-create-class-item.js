@@ -17,6 +17,9 @@ module.exports = {
     week: {
       type: Sequelize.INTEGER,
     },
+    plannedDate: {
+      type: Sequelize.DATE,
+    },
     date: {
       type: Sequelize.DATE,
     },

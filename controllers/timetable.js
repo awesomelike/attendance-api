@@ -5,7 +5,7 @@ import timetable from '../data/timetable.json';
 import studentsTimetable from '../data/students.json';
 import mobiles from '../data/mobiles.json';
 import random from '../util/random';
-import { parseTime } from '../util/time';
+import { parseTime, getSemesterTimeOffset } from '../util/time';
 
 function unique(arr, keyProps) {
   const kvArray = arr.map((entry) => {
@@ -150,6 +150,7 @@ const storeTimetable = (req, res) => new Promise((resolve, reject) => {
                         classItems.push({
                           classId: dbClass.id,
                           week: i,
+                          classItemStatusId: 1,
                         });
                       }
                     }
@@ -249,11 +250,9 @@ const insertDummyRecords = async (req, res) => {
     const { classItems } = classes[i];
     for (let j = 0; j < classItems.length; j += 1) {
       tasks.push(models.ClassItem.update({
-        date: moment(semester.startDate)
-          .add(classes[i].weekDayId - 1, 'days')
-          .add(parseTime(classes[i].timeSlots[0].startTime).hour, 'hours')
-          .add(parseTime(classes[i].timeSlots[0].startTime).minute, 'minutes')
-          .add(classItems[j].week - 1, 'weeks'),
+        plannedDate: getSemesterTimeOffset(semester.startDate, classes[i], classItems[j]),
+        date: getSemesterTimeOffset(semester.startDate, classes[i], classItems[j]),
+        classItemStatusId: 3,
       }, { where: { id: classItems[j].id } }));
     }
   }

@@ -2,7 +2,7 @@ import { Router } from 'express';
 import authMiddleware from '../middlewares/auth';
 import makeup from '../controllers/makeup';
 import { check, validate } from '../util/validation/makeup';
-import { CREATE, RESOLVE } from '../constants/makeup';
+import { CREATE, RESOLVE } from '../constants/types';
 
 const router = Router();
 

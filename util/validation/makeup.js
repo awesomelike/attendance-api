@@ -1,7 +1,7 @@
 import { checkSchema, validationResult } from 'express-validator/check';
 import moment from 'moment';
 import { isTaughtBy } from '../../controllers/classItem';
-import { CREATE, RESOLVE } from '../../constants/makeup';
+import { CREATE, RESOLVE } from '../../constants/types';
 
 const isTimeslotArrayValid = (array) => {
   const areIntegers = array.filter((element) => Number.isInteger(element));

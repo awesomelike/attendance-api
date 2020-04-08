@@ -1,3 +1,4 @@
+import moment from 'moment';
 import timeSlots from '../data/timeslots.json';
 import { Semester } from '../models';
 
@@ -5,6 +6,15 @@ export const parseTime = (time) => ({
   hour: parseInt(time.split(':')[0], 10),
   minute: parseInt(time.split(':')[1], 10),
 });
+
+export const getSemesterTimeOffset = (
+  semesterStartDate, classObject, classItem,
+) => moment(semesterStartDate)
+  .add(classObject.weekDayId - 1, 'days')
+  .add(parseTime(classObject.timeSlots[0].startTime).hour, 'hours')
+  .add(parseTime(classObject.timeSlots[0].startTime).minute, 'minutes')
+  .add(classItem.week - 1, 'weeks');
+
 
 const dynamicGenerator = () => {
   // const timeNow = new Date();
