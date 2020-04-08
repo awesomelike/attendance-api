@@ -53,4 +53,9 @@ export default {
       res.status(502).json(error);
     }
   },
+  update(req, res) {
+    Account.update(req.newAccount, { where: { id: req.params.id } })
+      .then(() => res.sendStatus(200))
+      .catch((error) => res.status(502).json(error));
+  },
 };

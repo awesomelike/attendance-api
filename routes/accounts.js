@@ -8,5 +8,6 @@ const router = Router();
 router.get('/', authMiddleware, account.getAll);
 router.get('/:id', authMiddleware, account.get);
 router.post('/', authMiddleware, check, validate, account.create);
+router.post('/:id', authMiddleware, check, validate, account.update);
 
 export default router;
