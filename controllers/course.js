@@ -55,7 +55,7 @@ export default {
       + 'COUNT(records.isAttended) AS MissedClasses\n'
   + 'FROM courses\n'
     + 'JOIN sections\n'
-    + 'ON courses.id=sections.id\n'
+    + 'ON courses.id=sections.courseId\n'
     + 'JOIN classes\n'
     + 'ON sections.id=classes.sectionId\n'
     + 'JOIN classitems\n'

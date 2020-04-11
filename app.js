@@ -8,7 +8,7 @@ import json2xls from 'json2xls';
 import socketIO from 'socket.io';
 import { createServer } from 'http';
 import indexRouter from './routes/index';
-import './bot/bot';
+// import './bot/bot';
 
 require('dotenv').config();
 
