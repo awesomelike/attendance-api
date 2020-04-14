@@ -27,6 +27,6 @@ module.exports = {
     dialect: 'mysql',
     operatorsAliases: 0,
     timezone: '+05:00',
-    // logging: true,
+    logging: false,
   },
 };

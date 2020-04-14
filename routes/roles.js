@@ -1,12 +1,13 @@
 import { Router } from 'express';
 import role from '../controllers/role';
 import { check, validate } from '../util/validation/role';
+import auth from '../middlewares/auth';
 
 const router = Router();
 
-router.get('/', role.getAll);
-router.get('/', role.get);
-router.post('/', role.create);
-router.post('/:id', check, validate, role.update);
+router.get('/', auth, role.getAll);
+router.get('/:id', auth, role.get);
+router.post('/', auth, role.create);
+router.post('/:id', auth, check, validate, role.update);
 
 export default router;

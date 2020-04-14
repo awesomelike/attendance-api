@@ -1,14 +1,16 @@
 import { Router } from 'express';
 import profile from '../controllers/profile';
-import authMiddleware from '../middlewares/auth';
+import auth from '../middlewares/auth';
 import {
   check, checkPassword, validate, validatePassword,
 } from '../util/validation/profile';
+import allowRoles from '../middlewares/role';
+import { ADMIN, ACADEMIC_AFFAIRS, PROFESSOR } from '../data/seed/roles';
 
 const router = Router();
 
-router.get('/', authMiddleware, profile.getProfile);
-router.post('/', authMiddleware, check, validate, profile.updateProfile);
-router.post('/changePassword', authMiddleware, checkPassword, validatePassword, profile.updatePassword);
+router.get('/', auth, allowRoles([ADMIN, ACADEMIC_AFFAIRS, PROFESSOR]), profile.getProfile);
+router.post('/', auth, allowRoles([ADMIN, ACADEMIC_AFFAIRS, PROFESSOR]), check, validate, profile.updateProfile);
+router.post('/changePassword', auth, allowRoles([ADMIN, ACADEMIC_AFFAIRS, PROFESSOR]), checkPassword, validatePassword, profile.updatePassword);
 
 export default router;

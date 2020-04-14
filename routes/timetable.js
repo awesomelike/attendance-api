@@ -1,10 +1,11 @@
 import { Router } from 'express';
 import timetable from '../controllers/timetable';
+import auth from '../middlewares/auth';
 
 const router = Router();
-router.get('/professor/:id', timetable.getProfessorTimetable);
-router.get('/day/:weekDayId', timetable.getDayTimetable);
-router.get('/date/:date', timetable.getDateTimetable);
-router.post('/', timetable.handlePost);
+router.get('/professor/:id', auth, timetable.getProfessorTimetable);
+router.get('/day/:weekDayId', auth, timetable.getDayTimetable);
+router.get('/date/:date', auth, timetable.getDateTimetable);
+router.post('/', auth, timetable.handlePost);
 
 export default router;
