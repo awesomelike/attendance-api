@@ -96,6 +96,7 @@ export default {
   },
   resolve(req, res) {
     Makeup.update({
+      makeupStatusId: req.makeup.makeupStatusId,
       resolvedAt: (new Date()).getTime(),
       resolvedById: req.account.id,
     }, { where: { id: req.params.id } })

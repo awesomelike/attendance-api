@@ -16,6 +16,7 @@ import rooms from './rooms';
 import roles from './roles';
 import permissions from './permissions';
 import makeups from './makeups';
+import makeupStatuses from './makeupStatuses';
 
 export default (app) => {
   app.use('/api/auth', auth);
@@ -36,4 +37,5 @@ export default (app) => {
   app.use('/api/roles', roles);
   app.use('/api/permissions', permissions);
   app.use('/api/makeups', makeups);
+  app.use('/api/makeupstatuses', makeupStatuses);
 };
