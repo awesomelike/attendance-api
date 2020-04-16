@@ -179,6 +179,7 @@ const storeTimetable = (req, res) => new Promise((resolve, reject) => {
         }
         // models.sequelize.getQueryInterface().bulkInsert('StudentSections', studentSections, {})
         await models.StudentSection.bulkCreate(studentSections, { updateOnDuplicate: ['studentId', 'sectionId'] });
+        res.sendStatus(200);
       } catch (error) {
         res.status(502).json(error);
       }
@@ -277,9 +278,11 @@ const insertDummyRecords = async (req, res) => {
 };
 
 export default {
-  async handlePost(req, res) {
+  async handlePostTimetable(req, res) {
     await storeStudents(req, res);
     await storeTimetable(req, res);
+  },
+  async handlePostRecords(req, res) {
     await insertDummyRecords(req, res);
   },
   getProfessorTimetable(req, res) {
