@@ -5,7 +5,7 @@ import timetable from '../data/timetable.json';
 import studentsTimetable from '../data/students.json';
 import mobiles from '../data/mobiles.json';
 import random from '../util/random';
-import { parseTime, getSemesterTimeOffset } from '../util/time';
+import { getSemesterTimeOffset } from '../util/time';
 
 function unique(arr, keyProps) {
   const kvArray = arr.map((entry) => {
@@ -46,9 +46,12 @@ const storeTimetable = (req, res) => new Promise((resolve, reject) => {
   const uniqueRooms = unique(rooms, ['label']);
   // Make an array of tasks/promises
   const insertProfessorsAndCourses = [
-    models.sequelize.getQueryInterface().bulkInsert('Professors', uniqueProfessors, {}),
-    models.sequelize.getQueryInterface().bulkInsert('Courses', uniqueCourses, {}),
-    models.sequelize.getQueryInterface().bulkInsert('Rooms', uniqueRooms, {}),
+    // models.sequelize.getQueryInterface().bulkInsert('Professors', uniqueProfessors, {}),
+    // models.sequelize.getQueryInterface().bulkInsert('Courses', uniqueCourses, {}),
+    // models.sequelize.getQueryInterface().bulkInsert('Rooms', uniqueRooms, {}),
+    models.Professor.bulkCreate(uniqueProfessors, { updateOnDuplicate: ['name'] }),
+    models.Course.bulkCreate(uniqueCourses, { updateOnDuplicate: ['name'] }),
+    models.Room.bulkCreate(uniqueRooms, { updateOnDuplicate: ['label'] }),
   ];
 
   Promise.all(insertProfessorsAndCourses)
@@ -79,7 +82,8 @@ const storeTimetable = (req, res) => new Promise((resolve, reject) => {
         courseId, sectionNumber, professorId, semesterId,
       }));
 
-      models.sequelize.getQueryInterface().bulkInsert('Sections', sectionsToInsert, {})
+      // models.sequelize.getQueryInterface().bulkInsert('Sections', sectionsToInsert, {})
+      models.Section.bulkCreate(sectionsToInsert, { updateOnDuplicate: ['sectionNumber'] })
         .then(async () => {
           const allSections = await models.Section.findAll({
             include: [
@@ -106,7 +110,8 @@ const storeTimetable = (req, res) => new Promise((resolve, reject) => {
               });
             }
           }
-          models.sequelize.getQueryInterface().bulkInsert('Classes', classesToInsert)
+          // models.sequelize.getQueryInterface().bulkInsert('Classes', classesToInsert)
+          models.Class.bulkCreate(classesToInsert, { updateOnDuplicate: ['sectionId', 'roomId', 'weekDayId'] })
             .then(async () => {
               const dbClasses = await models.Class.findAll({
                 include: [
@@ -141,7 +146,7 @@ const storeTimetable = (req, res) => new Promise((resolve, reject) => {
                   classTimeSlots.push({ timeSlotId, classId });
                 });
               }
-              models.sequelize.getQueryInterface().bulkInsert('ClassTimeSlots', classTimeSlots, {})
+              models.ClassTimeSlot.bulkCreate(classTimeSlots, { updateOnDuplicate: ['timeSlotId', 'classId'] })
                 .then(() => {
                   const classItems = [];
                   dbClasses.forEach((dbClass) => {
@@ -155,7 +160,8 @@ const storeTimetable = (req, res) => new Promise((resolve, reject) => {
                       }
                     }
                   });
-                  models.sequelize.getQueryInterface().bulkInsert('ClassItems', classItems, {})
+                  // models.sequelize.getQueryInterface().bulkInsert('ClassItems', classItems, {})
+                  models.ClassItem.bulkCreate(classItems, { updateOnDuplicate: ['plannedDate', 'classId', 'week'] })
                     .then(async () => {
                       const students = await models.Student.findAll();
                       const dbSections = await models.Section.findAll();
@@ -174,7 +180,8 @@ const storeTimetable = (req, res) => new Promise((resolve, reject) => {
                           });
                         }
                       }
-                      models.sequelize.getQueryInterface().bulkInsert('StudentSections', studentSections, {})
+                      // models.sequelize.getQueryInterface().bulkInsert('StudentSections', studentSections, {})
+                      models.StudentSection.bulkCreate(studentSections, { updateOnDuplicate: ['studentId', 'sectionId'] })
                         .then(async () => {
                           resolve('success');
                         })
@@ -202,9 +209,8 @@ const storeStudents = () => {
 
   const uniqueStudents = Array.from(new Set(students.map((student) => student.uid)))
     .map((uid) => students.find((student) => student.uid === uid));
-  models.Student.bulkCreate(uniqueStudents, { returning: true })
+  models.Student.bulkCreate(uniqueStudents, { returning: true, updateOnDuplicate: ['name'] })
     .then((results) => {
-      console.log(results);
       const telegramAccounts = [];
       console.log('Students inserted');
       mobiles.forEach((mobile) => {
@@ -213,7 +219,8 @@ const storeStudents = () => {
           phoneNumber: mobile.phoneNumber,
         });
       });
-      models.sequelize.getQueryInterface().bulkInsert('TelegramAccounts', telegramAccounts, {})
+      // models.sequelize.getQueryInterface().bulkInsert('TelegramAccounts', telegramAccounts, {})
+      models.TelegramAccount.bulkCreate(telegramAccounts)
         .then(() => console.log('Telegram accounts inserted'));
     });
 };

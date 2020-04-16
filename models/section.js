@@ -16,5 +16,6 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'sectionId',
     });
   };
+
   return Section;
 };
