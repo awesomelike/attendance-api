@@ -8,5 +8,6 @@ router.get('/day/:weekDayId', auth, timetable.getDayTimetable);
 router.get('/date/:date', auth, timetable.getDateTimetable);
 router.post('/', auth, timetable.handlePostTimetable);
 router.post('/records', auth, timetable.handlePostRecords);
+router.post('/telegram', auth, timetable.handlePostTelegram);
 
 export default router;

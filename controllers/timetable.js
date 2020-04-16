@@ -159,7 +159,7 @@ const storeTimetable = (req, res) => new Promise((resolve, reject) => {
           }
         });
         // models.sequelize.getQueryInterface().bulkInsert('ClassItems', classItems, {})
-        await models.ClassItem.bulkCreate(classItems, { updateOnDuplicate: ['plannedDate', 'classId', 'week'] });
+        await models.ClassItem.bulkCreate(classItems);
         const students = await models.Student.findAll();
         const dbSections = await models.Section.findAll();
         const dbCourses = await models.Course.findAll();
@@ -186,32 +186,25 @@ const storeTimetable = (req, res) => new Promise((resolve, reject) => {
     });
 });
 
-const storeStudents = async () => {
-  const students = [];
-  studentsTimetable.forEach((obj) => {
-    students.push({
-      uid: obj['Student ID'],
-      name: obj.Name,
-      rfid: obj.rfid || random(8),
-      schoolYear: obj['School Year'],
-      department: obj['Dept.'],
+const storeStudents = async (req, res) => {
+  try {
+    const students = [];
+    studentsTimetable.forEach((obj) => {
+      students.push({
+        uid: obj['Student ID'],
+        name: obj.Name,
+        rfid: obj.rfid || random(8),
+        schoolYear: obj['School Year'],
+        department: obj['Dept.'],
+      });
     });
-  });
 
-  const uniqueStudents = Array.from(new Set(students.map((student) => student.uid)))
-    .map((uid) => students.find((student) => student.uid === uid));
-  const results = await models.Student.bulkCreate(uniqueStudents, { returning: true, updateOnDuplicate: ['name'] });
-  const telegramAccounts = [];
-  console.log('Students inserted');
-  mobiles.forEach((mobile) => {
-    telegramAccounts.push({
-      studentId: results.find(({ uid }) => uid === mobile.uid).id,
-      phoneNumber: mobile.phoneNumber,
-    });
-  });
-  // models.sequelize.getQueryInterface().bulkInsert('TelegramAccounts', telegramAccounts, {})
-  await models.TelegramAccount.bulkCreate(telegramAccounts);
-  console.log('Telegram accounts inserted!');
+    const uniqueStudents = Array.from(new Set(students.map((student) => student.uid)))
+      .map((uid) => students.find((student) => student.uid === uid));
+    await models.Student.bulkCreate(uniqueStudents, { returning: true, updateOnDuplicate: ['name'] });
+  } catch (error) {
+    res.status(502).json(error);
+  }
 };
 
 const insertDummyRecords = async (req, res) => {
@@ -244,13 +237,18 @@ const insertDummyRecords = async (req, res) => {
   const tasks = [];
   for (let i = 0; i < parseInt(classes.length / 3, 10); i += 1) {
     const { classItems } = classes[i];
+    const arrayToUpdate = [];
     for (let j = 0; j < classItems.length; j += 1) {
-      tasks.push(models.ClassItem.update({
+      arrayToUpdate.push({
+        id: classItems[j].id,
         plannedDate: getSemesterTimeOffset(semester.startDate, classes[i], classItems[j]),
         date: getSemesterTimeOffset(semester.startDate, classes[i], classItems[j]),
         classItemStatusId: 3,
-      }, { where: { id: classItems[j].id } }));
+      });
     }
+    tasks.push(models.ClassItem.bulkCreate(arrayToUpdate, {
+      updateOnDuplicate: ['plannedDate', 'date', 'classItemStatusId'],
+    }));
   }
   Promise.all(tasks)
     .then(() => {
@@ -284,6 +282,20 @@ export default {
   },
   async handlePostRecords(req, res) {
     await insertDummyRecords(req, res);
+  },
+  async handlePostTelegram(req, res) {
+    const telegramAccounts = [];
+    const students = await models.Student.findAll({ raw: true });
+    mobiles.forEach((mobile) => {
+      telegramAccounts.push({
+        studentId: students.find(({ uid }) => uid === mobile.uid).id,
+        phoneNumber: mobile.phoneNumber,
+      });
+    });
+    // models.sequelize.getQueryInterface().bulkInsert('TelegramAccounts', telegramAccounts, {})
+    await models.TelegramAccount.bulkCreate(telegramAccounts);
+    console.log('Telegram accounts inserted!');
+    res.sendStatus(200);
   },
   getProfessorTimetable(req, res) {
     const { id } = req.params;
