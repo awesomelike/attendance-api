@@ -64,8 +64,16 @@ export default {
       }, {
         raw: true,
       });
-      if (classItemWithRecords) res.status(200).json(classItemWithRecords);
-      else res.sendStatus(404);
+      if (classItemWithRecords) {
+        if (req.query.format === 'excel') {
+          const data = classItemWithRecords.records.map(({ student, isAttended }) => ({
+            Name: student.name,
+            Attended: isAttended,
+          }));
+          return res.xls(`ClassReport_${classItemWithRecords.id}`, data);
+        }
+        res.status(200).json(classItemWithRecords);
+      } else res.sendStatus(404);
     } catch (error) {
       res.status(502).json(error);
     }
