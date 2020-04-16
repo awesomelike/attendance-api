@@ -1,4 +1,3 @@
-
 module.exports = {
   up: (queryInterface, Sequelize) => queryInterface.createTable('Courses', {
     id: {
@@ -11,7 +10,8 @@ module.exports = {
       type: Sequelize.STRING,
     },
     courseNumber: {
-      type: Sequelize.STRING,
+      type: Sequelize.STRING(32),
+      unique: true,
     },
     createdAt: {
       allowNull: false,

@@ -1,4 +1,3 @@
-
 module.exports = {
   up: (queryInterface, Sequelize) => queryInterface.createTable('TimeSlots', {
     id: {
@@ -13,16 +12,6 @@ module.exports = {
     endTime: {
       type: Sequelize.STRING,
     },
-    // createdAt: {
-    //   allowNull: false,
-    //   type: Sequelize.DATE,
-    //   defaultValue: Sequelize.fn('now'),
-    // },
-    // updatedAt: {
-    //   allowNull: false,
-    //   type: Sequelize.DATE,
-    //   defaultValue: Sequelize.fn('now'),
-    // },
   }),
   down: (queryInterface) => queryInterface.dropTable('TimeSlots'),
 };

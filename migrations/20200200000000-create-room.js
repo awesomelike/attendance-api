@@ -7,7 +7,8 @@ module.exports = {
       type: Sequelize.INTEGER,
     },
     label: {
-      type: Sequelize.STRING,
+      type: Sequelize.STRING(64),
+      unique: true,
     },
     createdAt: {
       allowNull: false,
