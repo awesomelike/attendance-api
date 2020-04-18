@@ -71,7 +71,7 @@ export default {
             Name: student.name,
             Attended: isAttended,
           }));
-          return res.xls(`ClassReport_${classItemWithRecords.id}`, data);
+          return res.xls(`ClassReport_${classItemWithRecords.id}.xlsx`, data);
         }
         res.status(200).json(classItemWithRecords);
       } else res.sendStatus(404);
