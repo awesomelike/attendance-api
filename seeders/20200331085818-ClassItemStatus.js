@@ -1,15 +1,17 @@
+const { PLANNED, GOING_ON, FINISHED } = require('../constants/classItems');
+
 module.exports = {
   up: (queryInterface) => queryInterface.bulkInsert('ClassItemStatuses', [
     {
-      id: 1,
+      id: PLANNED,
       name: 'Planned',
     },
     {
-      id: 2,
+      id: GOING_ON,
       name: 'Going on',
     },
     {
-      id: 3,
+      id: FINISHED,
       name: 'Finished',
     },
   ]),

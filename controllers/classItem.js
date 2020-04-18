@@ -1,5 +1,6 @@
 import models from '../models';
 import findWithPagination, { needsPagination } from '../util/pagination';
+import { GOING_ON, FINISHED } from '../constants/classItems';
 
 const { ClassItem } = models;
 
@@ -74,6 +75,32 @@ export default {
         }
         res.status(200).json(classItemWithRecords);
       } else res.sendStatus(404);
+    } catch (error) {
+      res.status(502).json(error);
+    }
+  },
+  async finishClass(req, res) {
+    try {
+      const { rfid } = req;
+      const classItemId = req.params.id;
+
+      const professor = await models.Professor.findOne({ where: { rfid } });
+      if (!professor) return res.status(404).json({ error: 'No such professor' });
+
+      const classItem = await ClassItem.findByPk(classItemId, { include });
+      if (!classItem) return res.status(404).json({ error: 'No such class item' });
+
+      if (classItem.classItemStatusId !== GOING_ON) {
+        return res.status(403).json({
+          error: 'This class was either not started or already finished!',
+        });
+      }
+      if (!(await isTaughtBy(classItemId, professor.id))) {
+        return res.status(403).json({
+          error: 'This class is not taught by this professor',
+        });
+      }
+      classItem.update({ classItemStatusId: FINISHED });
     } catch (error) {
       res.status(502).json(error);
     }

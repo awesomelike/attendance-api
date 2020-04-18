@@ -2,6 +2,7 @@ import { QueryTypes } from 'sequelize';
 import models from '../models';
 import time from '../util/time';
 import findWithPagination, { needsPagination } from '../util/pagination';
+import { PLANNED, GOING_ON } from '../constants/classItems';
 
 const { Professor } = models;
 
@@ -100,7 +101,10 @@ export default {
       .find((currentClass) => professorSections.map((section) => section.id)
         .includes(currentClass.sectionId));
     const [currentClassItem] = await classNow.getClassItems({
-      where: { week: await time.getCurrentWeek() },
+      where: {
+        week: await time.getCurrentWeek(),
+        classItemStatusId: PLANNED,
+      },
     });
     const currentSection = await classNow.getSection({
       include: [
@@ -120,6 +124,7 @@ export default {
     });
     try {
       const records = await insertDefaultRecords(currentClassItem.id, currentSection.students);
+      currentClassItem.update({ classItemStatusId: GOING_ON });
       res.status(200).json({
         courseId: currentSection.course.id,
         courseName: currentSection.course.name,

@@ -34,8 +34,16 @@ const passwordReset = (email, name, token) => ({
   html: `<div style="display: flex; justify-content: center;"> <div style="text-align:center;"> <strong style="font-family: 'Arial';">Dear ${name}</strong>, <br> <p style="font-family: 'Arial';">You can reset your password using this link: </p> <br> <a style="text-decoration: none; color: #fff; background-color: #398AD7; padding: 10px; box-shadow: 10px 10px 35px -9px rgba(57,138,215,1); font-family: 'Arial';" href="${process.env.BASE_URL}/api/auth/resetPassword/${token}">Reset password</a> <br><br><br> <p style="font-family: 'Arial'; font-size:100;">If you think this is by mistake, simply ignore this. </p><br> </div> </div>`,
 });
 
+const missedClassesNotification = (email, name, course, count) => ({
+  from: process.env.GMAIL,
+  to: email,
+  subject: `Attendance attention required! Course:${course}`,
+  html: `<div style="display: flex; justify-content: center;"><div style="text-align:center;"><p style="font-family: 'Arial'; background-color: #FF4136; color: white; border-radius: 10px; padding: 10px; font-weight: bold">ATTENTION REQUIRED</p> <strong style="font-family: 'Arial';">Dear ${name}</strong>, <br><p style="font-family: 'Arial';">Please be notified that, you have missed <span style="font-weight: bold">${count}</span> classes from <span style="font-weight: bold">${course}</span>.</p><br><p style="font-family: 'Arial'; font-size:100;">With best regards, IUT Attendance Management System </p><br> </div> </div>`,
+});
+
 export {
   sendEmail,
   confirmation,
   passwordReset,
+  missedClassesNotification,
 };

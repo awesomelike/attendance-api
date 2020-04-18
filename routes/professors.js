@@ -13,4 +13,5 @@ router.get('/:id', auth, allowRoles([ADMIN, ACADEMIC_AFFAIRS, PROFESSOR]), profe
 router.get('/:id/sections', auth, allowRoles([ADMIN, ACADEMIC_AFFAIRS, PROFESSOR]), professor.getSections);
 router.get('/rfid/:rfid', professor.getByRfid);
 router.post('/rfid', checkProfessorRfid, validateRfid, professor.handleRfid);
+
 export default router;
