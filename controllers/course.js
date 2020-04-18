@@ -1,5 +1,5 @@
-import { QueryTypes } from 'sequelize';
 import models from '../models';
+import executeMissedClasses from '../util/sql/missedClasses';
 
 const { Course } = models;
 
@@ -47,33 +47,7 @@ export default {
   },
   async getMissedClasses(req, res) {
     try {
-      const data = await models.sequelize.query('SELECT\n'
-      + 'courses.name AS CourseName,\n'
-      + 'students.uid AS StudentID,\n'
-      + 'students.name AS Name,\n'
-      + 'professors.name AS Professor,\n'
-      + 'COUNT(records.isAttended) AS MissedClasses\n'
-  + 'FROM courses\n'
-    + 'JOIN sections\n'
-    + 'ON courses.id=sections.courseId\n'
-    + 'JOIN classes\n'
-    + 'ON sections.id=classes.sectionId\n'
-    + 'JOIN classitems\n'
-    + 'ON classes.id=classitems.classId\n'
-    + 'JOIN records\n'
-    + 'ON classitems.id=records.classItemId\n'
-    + 'JOIN students\n'
-    + 'ON students.id=records.studentId\n'
-    + 'JOIN professors\n'
-    + 'ON professors.id=sections.professorId\n'
-    + 'WHERE records.isAttended=0 AND classitems.week <= :week\n'
-  + 'GROUP BY\n'
-    + 'records.studentId, courses.id\n', {
-        replacements: {
-          week: parseInt(req.params.week, 10),
-        },
-        type: QueryTypes.SELECT,
-      });
+      const data = await executeMissedClasses(req.query.week);
       if (req.query.format === 'excel') return res.xls(`Report_Misses_Until_Week${req.params.week}.xlsx`, data);
       res.status(200).json(data);
     } catch (error) {

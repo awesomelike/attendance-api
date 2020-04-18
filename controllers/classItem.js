@@ -1,10 +1,13 @@
 import models from '../models';
 import findWithPagination, { needsPagination } from '../util/pagination';
 import { GOING_ON, FINISHED } from '../constants/classItems';
+import { executeMissedAtDangerZone } from '../util/sql/missedClasses';
+import { sendEmail, missedClassesNotification } from '../tasks/email';
+import time from '../util/time';
 
 const { ClassItem } = models;
 
-const include = [
+const includeWithStudents = [
   {
     model: models.Record,
     as: 'records',
@@ -17,10 +20,32 @@ const include = [
   },
 ];
 
+const includeWithCourse = [
+  {
+    model: models.Class,
+    as: 'class',
+    attributes: ['id', 'sectionId'],
+    include: [
+      {
+        model: models.Section,
+        as: 'section',
+        attributes: ['id', 'professorId'],
+        include: [
+          {
+            model: models.Course,
+            as: 'course',
+            attributes: ['id', 'name'],
+          },
+        ],
+      },
+    ],
+  },
+];
+
 function find(where, res, next) {
   ClassItem.findAll({
     where,
-    include,
+    include: includeWithStudents,
   })
     .then((classItems) => next(classItems))
     .catch((error) => res.status(502).json(error));
@@ -29,22 +54,30 @@ function find(where, res, next) {
 export function isTaughtBy(classItemId, professorId) {
   return new Promise((resolve, reject) => {
     ClassItem.findByPk(classItemId, {
-      include: [
-        {
-          model: models.Class,
-          as: 'class',
-          attributes: ['id', 'sectionId'],
-          include: [
-            {
-              model: models.Section,
-              as: 'section',
-              attributes: ['id', 'professorId'],
-            },
-          ],
-        },
-      ],
+      include: includeWithCourse,
     })
       .then((classItem) => resolve(classItem.class.section.professorId === professorId))
+      .catch((error) => reject(error));
+  });
+}
+
+function notifyStudents(students) {
+  return new Promise((resolve, reject) => {
+    const tasks = [];
+    students.forEach(({
+      email, name, CourseName, MissedClasses,
+    }) => {
+      tasks.push(
+        sendEmail(missedClassesNotification(
+          email,
+          name,
+          CourseName,
+          MissedClasses,
+        )),
+      );
+    });
+    Promise.all(tasks)
+      .then((result) => resolve(result))
       .catch((error) => reject(error));
   });
 }
@@ -52,7 +85,7 @@ export function isTaughtBy(classItemId, professorId) {
 export default {
   getAll(req, res) {
     if (needsPagination(req)) {
-      findWithPagination(ClassItem, include, {
+      findWithPagination(ClassItem, includeWithStudents, {
         page: Number(req.query.page),
         size: Number(req.query.size),
       }, null, res, (classItems) => res.status(200).json(classItems));
@@ -61,7 +94,7 @@ export default {
   async get(req, res) {
     try {
       const classItemWithRecords = await ClassItem.findByPk(req.params.id, {
-        include,
+        include: includeWithStudents,
       }, {
         raw: true,
       });
@@ -87,12 +120,12 @@ export default {
       const professor = await models.Professor.findOne({ where: { rfid } });
       if (!professor) return res.status(404).json({ error: 'No such professor' });
 
-      const classItem = await ClassItem.findByPk(classItemId, { include });
+      const classItem = await ClassItem.findByPk(classItemId, { include: includeWithCourse });
       if (!classItem) return res.status(404).json({ error: 'No such class item' });
 
       if (classItem.classItemStatusId !== GOING_ON) {
         return res.status(403).json({
-          error: 'This class was either not started or already finished!',
+          error: 'This class has invalid status. So it cannot be finished!',
         });
       }
       if (!(await isTaughtBy(classItemId, professor.id))) {
@@ -101,6 +134,12 @@ export default {
         });
       }
       classItem.update({ classItemStatusId: FINISHED });
+      const dangerZoneStudents = await executeMissedAtDangerZone(
+        time.getCurrentWeek(),
+        classItem.class.section.course.name,
+      );
+      notifyStudents(dangerZoneStudents);
+      res.sendStatus(200);
     } catch (error) {
       res.status(502).json(error);
     }
