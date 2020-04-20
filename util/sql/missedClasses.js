@@ -1,7 +1,10 @@
 import { QueryTypes } from 'sequelize';
 import models from '../../models';
 
-export const executeMissedAtDangerZone = (currentWeek, courseId) => new Promise((resolve, reject) => {
+export const executeMissedAtDangerZone = (
+  currentWeek,
+  courseId,
+) => new Promise((resolve, reject) => {
   models.sequelize.query(`SELECT
   courses.name AS CourseName,
   courses.id as CourseId,

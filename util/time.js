@@ -8,12 +8,12 @@ export const parseTime = (time) => ({
 });
 
 export const getSemesterTimeOffset = (
-  semesterStartDate, classObject, classItem,
+  semesterStartDate, classObject, week,
 ) => moment(semesterStartDate)
   .add(classObject.weekDayId - 1, 'days')
   .add(parseTime(classObject.timeSlots[0].startTime).hour, 'hours')
   .add(parseTime(classObject.timeSlots[0].startTime).minute, 'minutes')
-  .add(classItem.week - 1, 'weeks');
+  .add(week - 1, 'weeks');
 
 
 const dynamicGenerator = () => {

@@ -8,6 +8,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {});
   Professor.associate = (models) => {
     Professor.hasMany(models.Section, { as: 'sections', foreignKey: 'professorId' });
+    Professor.hasMany(models.Assistant, { as: 'assistants', foreignKey: 'professorId' });
     Professor.belongsTo(models.Account, { as: 'account', foreignKey: 'accountId' });
   };
   return Professor;

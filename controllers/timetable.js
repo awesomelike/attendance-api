@@ -112,23 +112,24 @@ const storeTimetable = (req, res) => new Promise((resolve, reject) => {
         }
         // models.sequelize.getQueryInterface().bulkInsert('Classes', classesToInsert)
         await models.Class.bulkCreate(classesToInsert, { updateOnDuplicate: ['sectionId', 'roomId', 'weekDayId'] });
+        const classInclude = [
+          {
+            model: models.Section,
+            as: 'section',
+            include: [
+              {
+                model: models.Professor,
+                as: 'professor',
+              },
+              {
+                model: models.Course,
+                as: 'course',
+              },
+            ],
+          },
+        ];
         const dbClasses = await models.Class.findAll({
-          include: [
-            {
-              model: models.Section,
-              as: 'section',
-              include: [
-                {
-                  model: models.Professor,
-                  as: 'professor',
-                },
-                {
-                  model: models.Course,
-                  as: 'course',
-                },
-              ],
-            },
-          ],
+          include: classInclude,
         });
         const timeSlots = await models.TimeSlot.findAll({ raw: true });
         const classTimeSlots = [];
@@ -146,13 +147,27 @@ const storeTimetable = (req, res) => new Promise((resolve, reject) => {
           });
         }
         await models.ClassTimeSlot.bulkCreate(classTimeSlots, { updateOnDuplicate: ['timeSlotId', 'classId'] });
+        const semester = await models.Semester.findByPk(2);
         const classItems = [];
-        dbClasses.forEach((dbClass) => {
+        const classesWithTimeSlots = await models.Class.findAll({
+          include: [
+            ...classInclude,
+            {
+              model: models.TimeSlot,
+              as: 'timeSlots',
+              through: {
+                attributes: [],
+              },
+            },
+          ],
+        });
+        classesWithTimeSlots.forEach((dbClass) => {
           for (let i = 1; i <= 16; i += 1) {
             if (i !== 8 && i !== 16) {
               classItems.push({
                 classId: dbClass.id,
                 week: i,
+                plannedDate: getSemesterTimeOffset(semester.startDate, dbClass, i),
                 classItemStatusId: 1,
               });
             }
@@ -181,6 +196,7 @@ const storeTimetable = (req, res) => new Promise((resolve, reject) => {
         await models.StudentSection.bulkCreate(studentSections, { updateOnDuplicate: ['studentId', 'sectionId'] });
         res.sendStatus(200);
       } catch (error) {
+        console.log(error);
         res.status(502).json(error);
       }
     });
@@ -241,13 +257,13 @@ const insertDummyRecords = async (req, res) => {
     for (let j = 0; j < classItems.length; j += 1) {
       arrayToUpdate.push({
         id: classItems[j].id,
-        plannedDate: getSemesterTimeOffset(semester.startDate, classes[i], classItems[j]),
-        date: getSemesterTimeOffset(semester.startDate, classes[i], classItems[j]),
+        // plannedDate: getSemesterTimeOffset(semester.startDate, classes[i], classItems[j].week),
+        date: getSemesterTimeOffset(semester.startDate, classes[i], classItems[j].week),
         classItemStatusId: 3,
       });
     }
     tasks.push(models.ClassItem.bulkCreate(arrayToUpdate, {
-      updateOnDuplicate: ['plannedDate', 'date', 'classItemStatusId'],
+      updateOnDuplicate: ['date', 'classItemStatusId'],
     }));
   }
   Promise.all(tasks)
