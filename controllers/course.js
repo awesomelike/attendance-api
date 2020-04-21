@@ -1,5 +1,8 @@
 import models from '../models';
 import executeMissedClasses from '../util/sql/missedClasses';
+import { idOf } from '../util/id';
+import { PROFESSOR } from '../data/seed/roles';
+import getProfessorCourses from '../util/sql/professorCourses';
 
 const { Course } = models;
 
@@ -20,8 +23,13 @@ function find(where, res, next) {
 }
 
 export default {
-  getAll(_, res) {
-    find(null, res, (courses) => res.status(200).json(courses));
+  async getAll(req, res) {
+    if (idOf(PROFESSOR) === req.account.roleId) {
+      const professorCourses = await getProfessorCourses(req.account.id);
+      res.status(200).json(professorCourses);
+    } else {
+      find(null, res, (courses) => res.status(200).json(courses));
+    }
   },
   get(req, res) {
     Course.findByPk(req.params.id, { include })

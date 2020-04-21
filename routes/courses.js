@@ -6,7 +6,7 @@ import { ADMIN, ACADEMIC_AFFAIRS, PROFESSOR } from '../data/seed/roles';
 
 const router = Router();
 
-router.get('/', auth, allowRoles([ADMIN, ACADEMIC_AFFAIRS]), course.getAll);
+router.get('/', auth, allowRoles([ADMIN, ACADEMIC_AFFAIRS, PROFESSOR]), course.getAll);
 router.get('/missedClasses/:week', auth, allowRoles([ADMIN, ACADEMIC_AFFAIRS]), course.getMissedClasses);
 router.get('/semesterReport', auth, allowRoles([ADMIN, ACADEMIC_AFFAIRS]), course.getSemesterReport);
 router.get('/:id', auth, allowRoles([ADMIN, ACADEMIC_AFFAIRS, PROFESSOR]), course.get);
