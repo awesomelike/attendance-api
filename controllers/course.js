@@ -2,7 +2,6 @@ import models from '../models';
 import executeMissedClasses from '../util/sql/missedClasses';
 import { idOf } from '../util/id';
 import { PROFESSOR } from '../data/seed/roles';
-import getProfessorCourses from '../util/sql/professorCourses';
 
 const { Course } = models;
 
