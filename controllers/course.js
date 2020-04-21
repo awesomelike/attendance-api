@@ -25,7 +25,17 @@ function find(where, res, next) {
 export default {
   async getAll(req, res) {
     if (idOf(PROFESSOR) === req.account.roleId) {
-      const professorCourses = await getProfessorCourses(req.account.id);
+      const professorCourses = await Course.findAll({
+        include: [
+          {
+            model: models.Section,
+            as: 'sections',
+            where: {
+              professorId: req.account.professorId,
+            },
+          },
+        ],
+      });
       res.status(200).json(professorCourses);
     } else {
       find(null, res, (courses) => res.status(200).json(courses));
