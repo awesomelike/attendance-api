@@ -34,7 +34,7 @@ export function getAvailableRooms(date, timeSlots) {
           const { classes } = room;
           for (let i = 0; i < classes.length; i += 1) {
             const { classItems } = classes[i];
-            if (classItems.filter((classItem) => moment(classItem.plannedDate).startOf('day') === date).length > 0) {
+            if (classItems.filter((classItem) => moment(classItem.plannedDate).startOf('day').valueOf() === date).length > 0) {
               if (timeSlots
                 .filter((timeSlot) => classes[i].timeSlots.map(({ id }) => id)
                   .includes(timeSlot)).length > 0) { return false; }
@@ -51,7 +51,7 @@ export function getAvailableRooms(date, timeSlots) {
 export default {
   async getAll(req, res) {
     if (req.query.date && req.query.timeSlots) {
-      const date = moment(parseInt(req.query.date, 10)).startOf('day');
+      const date = moment(parseInt(req.query.date, 10)).startOf('day').valueOf();
       const timeSlots = JSON.parse(req.query.timeSlots);
       const availableRooms = await getAvailableRooms(date, timeSlots);
       console.log(availableRooms.length);
