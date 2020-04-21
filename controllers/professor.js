@@ -3,6 +3,7 @@ import models from '../models';
 import time from '../util/time';
 import findWithPagination, { needsPagination } from '../util/pagination';
 import { PLANNED, GOING_ON } from '../constants/classItems';
+import { getPlannedLectures, getGivenLectures } from '../util/sql/lecturesReport';
 
 const { Professor } = models;
 
@@ -143,35 +144,8 @@ export default {
       .then((professor) => res.status(200).json(professor));
   },
   async getLecturesReport(req, res) {
-    const planned = await models.sequelize.query(`
-    SELECT professors.id AS id, professors.name AS Professor, courses.name as Course, COUNT(classitems.id) AS Planned
-FROM sections
-LEFT JOIN professors
-ON professors.id=sections.professorId
-LEFT JOIN courses
-ON sections.courseId=courses.id
-LEFT JOIN classes
-ON sections.id=classes.sectionId
-LEFT JOIN classitems
-ON classes.id=classitems.classId
-GROUP BY professors.id, courses.id`, {
-      type: QueryTypes.SELECT,
-    });
-    const given = await models.sequelize.query(`
-SELECT professors.id AS id, professors.name AS Professor, courses.name as Course, COUNT(classitems.id) AS Given
-FROM sections
-LEFT JOIN professors
-ON professors.id=sections.professorId
-LEFT JOIN courses
-ON sections.courseId=courses.id
-LEFT JOIN classes
-ON sections.id=classes.sectionId
-LEFT JOIN classitems
-ON classes.id=classitems.classId
-WHERE classitems.classItemStatusId=3
-GROUP BY professors.id, courses.id`, {
-      type: QueryTypes.SELECT,
-    });
+    const planned = await getPlannedLectures();
+    const given = await getGivenLectures();
     const result = [];
     planned.forEach(({
       id, Professor, Course, Planned,
@@ -186,5 +160,8 @@ GROUP BY professors.id, courses.id`, {
     });
     if (req.query.format === 'excel') return res.xls('LecturesReport.xlsx', result);
     res.status(200).json(result);
+  },
+  getMakeups(req, res) {
+
   },
 };

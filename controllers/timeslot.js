@@ -27,7 +27,13 @@ const find = (where, res, next) => {
 
 export default {
   getAll(req, res) {
-    find(null, res, (timeslots) => res.status(200).json(timeslots));
+    if (req.query.raw) {
+      TimeSlot.findAll()
+        .then((timeSlots) => res.status(200).json(timeSlots))
+        .catch((error) => res.status(502).json(error));
+    } else {
+      find(null, res, (timeslots) => res.status(200).json(timeslots));
+    }
   },
   get(req, res) {
     TimeSlot.findByPk(req.params.id)
