@@ -38,6 +38,11 @@ export default {
       res.status(502).json(error.toString());
     }
   },
+  getMakeups(req, res) {
+    models.Professor.findByPk(req.account.professorId, { include: [{ model: models.Makeup, as: 'makeups' }] })
+      .then((result) => res.status(200).json(result.makeups))
+      .catch((error) => res.status(502).json(error));
+  },
   updateProfile(req, res) {
     Account.update(req.validatedAccount, { where: { id: req.account.id } })
       .then(() => res.sendStatus(200))
