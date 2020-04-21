@@ -162,12 +162,8 @@ export default {
     res.status(200).json(result);
   },
   async getMakeups(req, res) {
-    try {
-      const makeups = await models.Makeup.findAll({ raw: true });
-      const filteredMakeups = makeups.filter((makeup) => isTaughtBy(makeup.classItemId, req.params.id));
-      res.status(200).json(filteredMakeups);
-    } catch (error) {
-      res.status(502).json(error);
-    }
+    Professor.findByPk(req.params.id, { include: [{ model: models.Makeup, as: 'makeups' }] })
+      .then((result) => res.status(200).json(result.makeups))
+      .catch((error) => res.status(502).json(error));
   },
 };

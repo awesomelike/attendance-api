@@ -13,6 +13,13 @@ module.exports = {
         key: 'id',
       },
     },
+    professorId: {
+      type: Sequelize.INTEGER,
+      references: {
+        model: 'Professors',
+        key: 'id',
+      },
+    },
     newDate: {
       type: Sequelize.DATE,
     },

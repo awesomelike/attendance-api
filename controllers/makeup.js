@@ -77,6 +77,7 @@ export default {
   async create(req, res) {
     try {
       const makeup = await Makeup.create({
+        professorId: req.account.professorId,
         classItemId: req.makeup.classItemId,
         newDate: req.makeup.newDate,
         roomId: req.makeup.roomId,
