@@ -1,9 +1,9 @@
-import { QueryTypes } from 'sequelize';
 import models from '../models';
 import time from '../util/time';
 import findWithPagination, { needsPagination } from '../util/pagination';
 import { PLANNED, GOING_ON } from '../constants/classItems';
 import { getPlannedLectures, getGivenLectures } from '../util/sql/lecturesReport';
+import { isTaughtBy } from './classItem';
 
 const { Professor } = models;
 
@@ -161,7 +161,13 @@ export default {
     if (req.query.format === 'excel') return res.xls('LecturesReport.xlsx', result);
     res.status(200).json(result);
   },
-  getMakeups(req, res) {
-
+  async getMakeups(req, res) {
+    try {
+      const makeups = await models.Makeup.findAll({ raw: true });
+      const filteredMakeups = makeups.filter((makeup) => isTaughtBy(makeup.classItemId, req.params.id));
+      res.status(200).json(filteredMakeups);
+    } catch (error) {
+      res.status(502).json(error);
+    }
   },
 };
