@@ -3,6 +3,7 @@ module.exports = (sequelize, DataTypes) => {
     year: DataTypes.INTEGER,
     season: DataTypes.STRING,
     startDate: DataTypes.DATE,
+    endDate: DataTypes.DATE,
   }, {});
   Semester.associate = (models) => {
     Semester.hasMany(models.Section, { as: 'sections', foreignKey: 'semesterId' });

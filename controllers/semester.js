@@ -2,13 +2,24 @@ import models from '../models';
 
 const { Semester } = models;
 
-const find = (where, res, next) => {
+const find = (where, include, res, next) => {
   Semester.findAll({
     where,
-    include: [
+    include,
+  })
+    .then((semesters) => next(semesters))
+    .catch((error) => res.status(502).json(error));
+};
+
+export default {
+  getAll(req, res) {
+    if (req.query.raw) {
+      return find(null, null, res, (semesters) => res.status(200).json(semesters));
+    }
+    find(null, [
       {
         model: models.Section,
-        as: 'section',
+        as: 'sections',
         include: [
           {
             model: models.Course,
@@ -20,18 +31,15 @@ const find = (where, res, next) => {
           },
         ],
       },
-    ],
-  })
-    .then((semesters) => next(semesters))
-    .catch((error) => res.status(502).json(error));
-};
-
-export default {
-  getAll(req, res) {
-    find(null, res, (semesters) => { res.status(200).json(semesters); });
+    ], res, (semesters) => res.status(200).json(semesters));
   },
   get(req, res) {
     Semester.findByPk(req.params.id)
+      .then((semester) => res.status(200).json(semester))
+      .catch((error) => res.status(502).json(error));
+  },
+  create(req, res) {
+    Semester.create(req.semester)
       .then((semester) => res.status(200).json(semester))
       .catch((error) => res.status(502).json(error));
   },
