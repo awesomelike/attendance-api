@@ -46,7 +46,8 @@ export default {
           model: models.Makeup,
           as: 'makeups',
           include: makeupOptions.include,
-        }],
+        },
+      ],
     })
       .then((result) => res.status(200).json(result.makeups))
       .catch((error) => res.status(502).json(error));
