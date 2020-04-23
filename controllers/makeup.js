@@ -5,6 +5,11 @@ const { Makeup } = models;
 export const options = {
   include: [
     {
+      model: models.Account,
+      as: 'resolvedBy',
+      attributes: ['id', 'name', 'email'],
+    },
+    {
       model: models.MakeupStatus,
       as: 'makeupStatus',
     },
@@ -63,6 +68,12 @@ export const options = {
   ],
 };
 
+const isAlreadyResolved = (makeupId) => new Promise((resolve, reject) => {
+  models.Makeup.findByPk(makeupId)
+    .then((makeup) => resolve(makeup.resolvedById !== null))
+    .catch((error) => reject(error));
+});
+
 export default {
   getAll(_, res) {
     Makeup.findAll(options)
@@ -95,7 +106,10 @@ export default {
       .then(() => res.sendStatus(200))
       .catch((error) => res.status(502).json(error));
   },
-  resolve(req, res) {
+  async resolve(req, res) {
+    if (await isAlreadyResolved(req.params.id)) {
+      return res.status(403).json({ error: 'This makeup is already resolved' });
+    }
     Makeup.update({
       makeupStatusId: req.makeup.makeupStatusId,
       resolvedAt: (new Date()).getTime(),

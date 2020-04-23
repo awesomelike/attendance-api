@@ -17,46 +17,49 @@ const isTimeslotArrayValid = (array) => {
 };
 
 export const check = (method) => {
-  const schema = {
-    classItemId: {
-      isInt: true,
-    },
-    newDate: {
-      isInt: true,
-      custom: {
-        options: (value) => value > (new Date()).getTime(),
-        errorMessage: 'You can not set makeups to the past!',
-      },
-    },
-    roomId: {
-      isInt: true,
-    },
-    timeSlots: {
-      isArray: true,
-      custom: {
-        options: (array) => isTimeslotArrayValid(array),
-        errorMessage: 'Invalid timeSlots array',
-      },
-    },
-  };
-  if (method === CREATE) {
-    schema.classItemId.custom = {
-      options: async (value, { req }) => {
-        const isItemValid = await isTaughtBy(value, req.account.professorId);
-        return !!req.account.professorId && isItemValid;
-      },
-      errorMessage: 'You are not authorized to request makeup for this class!',
-    };
-  }
+  let schema = {};
   if (method === RESOLVE) {
-    Object.assign(schema, {
+    schema = {
       makeupStatusId: {
         isInt: true,
         custom: {
           options: (value) => [2, 3].includes(value),
+          errorMessage: 'Invalid makeupStatusId, you should either accept it or reject',
         },
       },
-    });
+    };
+  } else {
+    schema = {
+      classItemId: {
+        isInt: true,
+      },
+      newDate: {
+        isInt: true,
+        custom: {
+          options: (value) => value > (new Date()).getTime(),
+          errorMessage: 'You can not set makeups to the past!',
+        },
+      },
+      roomId: {
+        isInt: true,
+      },
+      timeSlots: {
+        isArray: true,
+        custom: {
+          options: (array) => isTimeslotArrayValid(array),
+          errorMessage: 'Invalid timeSlots array',
+        },
+      },
+    };
+    if (method === CREATE) {
+      schema.classItemId.custom = {
+        options: async (value, { req }) => {
+          const isItemValid = await isTaughtBy(value, req.account.professorId);
+          return !!req.account.professorId && isItemValid;
+        },
+        errorMessage: 'You are not authorized to request makeup for this class!',
+      };
+    }
   }
   return checkSchema(schema);
 };
