@@ -1,6 +1,7 @@
 import { sign } from 'jsonwebtoken';
 import models from '../models';
 import { sendEmail, passwordReset } from '../tasks/email';
+import { options as makeupOptions } from './makeup';
 
 const { Account } = models;
 
@@ -39,7 +40,14 @@ export default {
     }
   },
   getMakeups(req, res) {
-    models.Professor.findByPk(req.account.professorId, { include: [{ model: models.Makeup, as: 'makeups' }] })
+    models.Professor.findByPk(req.account.professorId, {
+      include: [
+        {
+          model: models.Makeup,
+          as: 'makeups',
+          include: makeupOptions.include,
+        }],
+    })
       .then((result) => res.status(200).json(result.makeups))
       .catch((error) => res.status(502).json(error));
   },

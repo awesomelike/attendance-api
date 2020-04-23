@@ -2,7 +2,7 @@ import models from '../models';
 
 const { Makeup } = models;
 
-const options = {
+export const options = {
   include: [
     {
       model: models.MakeupStatus,
