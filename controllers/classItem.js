@@ -1,3 +1,4 @@
+import moment from 'moment';
 import models from '../models';
 import findWithPagination, { needsPagination } from '../util/pagination';
 import { GOING_ON, FINISHED } from '../constants/classItems';
@@ -100,9 +101,11 @@ export default {
       });
       if (classItemWithRecords) {
         if (req.query.format === 'excel') {
-          const data = classItemWithRecords.records.map(({ student, isAttended }) => ({
+          // Later when we will work with real data, will change updatedAt to attendedAt
+          const data = classItemWithRecords.records.map(({ student, isAttended, updatedAt }) => ({
             Name: student.name,
             Attended: isAttended,
+            Time: moment(updatedAt).format('DD/MM/YYYY HH:mm'),
           }));
           return res.xls(`ClassReport_${classItemWithRecords.id}.xlsx`, data);
         }

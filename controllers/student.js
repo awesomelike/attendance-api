@@ -105,6 +105,7 @@ export default {
 
     const record = {
       isAttended: 1,
+      attendedAt: (new Date()).getTime(),
       isAdditional: student.sections.map(({ id }) => id).indexOf(sectionId) > -1 ? 0 : 1,
       rfid,
     };
@@ -146,6 +147,7 @@ export default {
         studentId: student.id,
         isAdditional: 1,
         isAttended: 1,
+        attendedAt: (new Date()).getTime(),
       });
       res.status(200).json(newRecord);
     } catch (error) {

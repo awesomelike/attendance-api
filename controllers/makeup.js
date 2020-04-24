@@ -1,4 +1,5 @@
 import models from '../models';
+// import { NOT_SEEN, ACCEPTED, REJECTED } from '../constants/makeups';
 
 const { Makeup } = models;
 
@@ -12,6 +13,7 @@ export const options = {
     {
       model: models.MakeupStatus,
       as: 'makeupStatus',
+      attributes: ['id', 'name'],
     },
     {
       model: models.Room,
@@ -75,8 +77,15 @@ const isAlreadyResolved = (makeupId) => new Promise((resolve, reject) => {
 });
 
 export default {
-  getAll(_, res) {
-    Makeup.findAll(options)
+  getAll(req, res) {
+    const getAllOptions = req.query.makeupStatusId
+      ? {
+        ...options,
+        where: {
+          makeupStatusId: parseInt(req.query.makeupStatusId, 10),
+        },
+      } : options;
+    Makeup.findAll(getAllOptions)
       .then((makeups) => res.status(200).json(makeups))
       .catch((error) => res.status(502).json(error));
   },

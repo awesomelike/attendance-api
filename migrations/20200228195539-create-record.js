@@ -25,6 +25,9 @@ module.exports = {
         type: Sequelize.INTEGER,
         defaultValue: 0,
       },
+      attendedAt: {
+        type: Sequelize.DATE,
+      },
       rfid: {
         type: Sequelize.STRING,
       },

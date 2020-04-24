@@ -1,15 +1,17 @@
+const { NOT_SEEN, ACCEPTED, REJECTED } = require('../constants/makeups');
+
 module.exports = {
   up: (queryInterface) => queryInterface.bulkInsert('MakeupStatuses', [
     {
-      id: 1,
+      id: NOT_SEEN,
       name: 'Not seen',
     },
     {
-      id: 2,
+      id: ACCEPTED,
       name: 'Accepted',
     },
     {
-      id: 3,
+      id: REJECTED,
       name: 'Rejected',
     },
   ]),

@@ -3,6 +3,7 @@ module.exports = (sequelize, DataTypes) => {
     classItemId: DataTypes.INTEGER,
     studentId: DataTypes.INTEGER,
     isAttended: DataTypes.INTEGER,
+    attendedAt: DataTypes.INTEGER,
     rfid: DataTypes.STRING,
     isAdditional: DataTypes.INTEGER,
   }, {});
