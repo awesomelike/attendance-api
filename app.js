@@ -11,6 +11,7 @@ import indexRouter from './routes/index';
 // import './bot/bot';
 
 require('dotenv').config();
+require('./tasks/backup');
 
 const app = express();
 
