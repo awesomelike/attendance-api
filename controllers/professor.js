@@ -3,7 +3,6 @@ import time from '../util/time';
 import findWithPagination, { needsPagination } from '../util/pagination';
 import { PLANNED, GOING_ON } from '../constants/classItems';
 import { getPlannedLectures, getGivenLectures } from '../util/sql/lecturesReport';
-import { isTaughtBy } from './classItem';
 
 const { Professor } = models;
 
@@ -56,12 +55,92 @@ function insertDefaultRecords(classItemId, students) {
   });
 }
 
+const getProfessorByRfid = (rfid) => Professor.findOne({ where: { rfid }, include });
+
+async function getCurrentClassAndSection(rfid, res, callback) {
+  try {
+    const professor = await getProfessorByRfid(rfid);
+    if (!professor) return res.status(404).json({ error: 'No such professor!' });
+
+    const timeSlotId = time.getCurrentTimeSlotId();
+    if (!timeSlotId) return res.status(404).json({ error: 'You have no classes right now!' });
+
+    const timeSlot = await models.TimeSlot.findByPk(timeSlotId);
+    const professorSections = await professor.getSections();
+    const currentClasses = await timeSlot.getClasses({
+      where: {
+        weekDayId: (new Date(2020, 2, 30, 10, 35, 0)).getDay(),
+      },
+    });
+
+    if (!currentClasses.length) return res.status(404).json({ error: 'No classes today!' });
+
+    const classNow = currentClasses
+      .find((currentClass) => professorSections.map((section) => section.id)
+        .includes(currentClass.sectionId));
+    const [currentClassItem] = await classNow.getClassItems({
+      where: {
+        week: await time.getCurrentWeek(),
+      },
+      include: [
+        {
+          model: models.Class,
+          as: 'class',
+          include: [
+            {
+              model: models.TimeSlot,
+              as: 'timeSlots',
+              through: { attributes: [] },
+            },
+            {
+              model: models.Room,
+              as: 'room',
+              attributes: ['id', 'label'],
+            },
+          ],
+        },
+        {
+          model: models.Record,
+          as: 'records',
+          include: [
+            {
+              model: models.Student,
+              as: 'student',
+            },
+          ],
+        },
+        {
+          model: models.ClassItemStatus,
+          as: 'status',
+        },
+      ],
+    });
+    const currentSection = await classNow.getSection({
+      include: [
+        {
+          model: models.Student,
+          as: 'students',
+          through: { attributes: [] },
+        },
+        {
+          model: models.Course,
+          as: 'course',
+          attributes: ['id', 'name'],
+        },
+      ],
+    });
+    callback(null, { currentClassItem, currentSection, professor });
+  } catch (error) {
+    callback(error, { currentClassItem: null, currentSection: null, professor: null });
+  }
+}
+
 export default {
   getAll(req, res) {
     if (needsPagination(req)) {
       findWithPagination(Professor, include, {
-        page: Number(req.query.page),
-        size: Number(req.query.size),
+        page: parseInt(req.query.page, 10),
+        size: parseInt(req.query.size, 10),
       }, null, res, (professors) => res.status(200).json(professors));
     } else find(null, res, (professors) => res.status(200).json(professors));
   },
@@ -79,75 +158,81 @@ export default {
       res.status(502).json(error);
     }
   },
-  async handleRfid(req, res) {
-    const { rfid } = req;
-
-    const professor = await Professor.findOne({ where: { rfid }, include });
-    if (!professor) return res.status(404).json({ error: 'No such professor!' });
-
-    const timeSlotId = time.getCurrentTimeSlotId();
-    if (!timeSlotId) return res.status(404).json({ error: 'You have no classes right now!' });
-
-    const timeSlot = await models.TimeSlot.findByPk(timeSlotId);
-    const professorSections = (await professor.getSections());
-    const currentClasses = (await timeSlot.getClasses({
-      where: {
-        weekDayId: (new Date(2020, 2, 30, 10, 35, 0)).getDay(),
-      },
-    }));
-
-    if (!currentClasses.length) return res.status(404).json({ error: 'No classes today!' });
-
-    const classNow = currentClasses
-      .find((currentClass) => professorSections.map((section) => section.id)
-        .includes(currentClass.sectionId));
-    const [currentClassItem] = await classNow.getClassItems({
-      where: {
-        week: await time.getCurrentWeek(),
-        classItemStatusId: PLANNED,
-      },
-    });
-    const currentSection = await classNow.getSection({
-      include: [
-        {
-          model: models.Student,
-          as: 'students',
-          through: {
-            attributes: [],
-          },
-        },
-        {
-          model: models.Course,
-          as: 'course',
-          attributes: ['id', 'name'],
-        },
-      ],
-    });
-    try {
-      const records = await insertDefaultRecords(currentClassItem.id, currentSection.students);
-      currentClassItem.update({ classItemStatusId: GOING_ON });
+  async getCurrentClass(req, res) {
+    getCurrentClassAndSection(req.params.rfid, res, (error, {
+      currentClassItem,
+      currentSection,
+      professor,
+    }) => {
+      if (error) return res.status(502).json(error);
       res.status(200).json({
+        professorUid: professor.uid,
+        professorName: professor.name,
+        professorRfid: professor.rfid,
         courseId: currentSection.course.id,
         courseName: currentSection.course.name,
         sectionId: currentSection.id,
         sectionNumber: currentSection.sectionNumber,
+        auditory: currentSection.students.length,
         classItem: currentClassItem,
-        records,
       });
+    });
+  },
+  async startAttendance(req, res) {
+    const { rfid } = req;
+    console.log(req.body);
+    getCurrentClassAndSection(rfid, res, async (error, {
+      currentClassItem,
+      currentSection,
+      professor,
+    }) => {
+      if (error) return res.status(502).json(error);
+      try {
+        let insertedRecords;
+        if (currentClassItem.classItemStatusId === PLANNED
+          && currentClassItem.records.length === 0) {
+          insertedRecords = await insertDefaultRecords(
+            currentClassItem.id,
+            currentSection.students,
+          );
+          currentClassItem.update({ classItemStatusId: GOING_ON, date: +new Date() });
+        }
+        res.status(200).json({
+          // professorUid: professor.uid,
+          // professorName: professor.name,
+          // courseId: currentSection.course.id,
+          // courseName: currentSection.course.name,
+          // sectionId: currentSection.id,
+          // sectionNumber: currentSection.sectionNumber,
+          // auditory: currentSection.students.length,
+          // classItem: currentClassItem,
+          records: insertedRecords ? insertedRecords.map((record) => ({
+            ...record,
+            student: currentSection.students.find((s) => s.id === record.studentId),
+          })) : currentClassItem.records,
+        });
+      // eslint-disable-next-line no-shadow
+      } catch (error) {
+        console.log(error);
+        res.status(502).json(error);
+      }
+    });
+  },
+  async getByRfid(req, res) {
+    try {
+      const { rfid } = req.params;
+      const professor = await Professor.findOne({ where: { rfid } });
+      res.status(200).json(professor);
     } catch (error) {
       res.status(502).json(error);
     }
-  },
-  getByRfid(req, res) {
-    const { rfid } = req.params;
-    Professor.findOne({ where: { rfid } })
-      .then((professor) => res.status(200).json(professor));
   },
   async getLecturesReport(req, res) {
     const planned = await getPlannedLectures();
     const given = await getGivenLectures();
     const result = [];
     planned.forEach(({
+      // eslint-disable-next-line no-shadow
       id, Professor, Course, Planned,
     }) => {
       const associatedGiven = given.find((givenObject) => givenObject.id === id);

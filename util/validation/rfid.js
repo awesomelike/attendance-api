@@ -19,9 +19,6 @@ export const checkStudentRfid = checkSchema({
   sectionNumber: {
     isString: true,
   },
-  courseId: {
-    isInt: true,
-  },
   courseName: {
     isString: true,
   },

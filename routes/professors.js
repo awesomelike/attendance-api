@@ -13,6 +13,7 @@ router.get('/:id', auth, allowRoles([ADMIN, ACADEMIC_AFFAIRS, PROFESSOR]), profe
 router.get('/:id/sections', auth, allowRoles([ADMIN, ACADEMIC_AFFAIRS, PROFESSOR]), professor.getSections);
 router.get('/:id/makeups', auth, allowRoles([ADMIN, ACADEMIC_AFFAIRS]), professor.getMakeups);
 router.get('/rfid/:rfid', professor.getByRfid);
-router.post('/rfid', checkProfessorRfid, validateRfid, professor.handleRfid);
+router.get('/:rfid/currentClass', professor.getCurrentClass);
+router.post('/rfid', checkProfessorRfid, validateRfid, professor.startAttendance);
 
 export default router;
