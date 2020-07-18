@@ -16,7 +16,7 @@ function unique(arr, keyProps) {
   return Array.from(map.values());
 }
 
-const storeTimetable = (req, res) => new Promise((resolve, reject) => {
+const storeTimetable = (req, res) => new Promise(() => {
   const courses = [];
   const professors = [];
   const sections = [];
@@ -139,8 +139,8 @@ const storeTimetable = (req, res) => new Promise((resolve, reject) => {
             const classId = dbClasses
               .find((obj) => obj.weekDayId === weekDays
                 .find((wd) => wd.key === inclass.weekDay).id
-                      && obj.section.course.courseNumber === inclass.courseNumber
-                      && obj.section.sectionNumber === inclass.sectionNumber).id;
+                    && obj.section.course.courseNumber === inclass.courseNumber
+                    && obj.section.sectionNumber === inclass.sectionNumber).id;
             const timeSlotId = timeSlots
               .find((timeslot) => timeslot.startTime === inclass.timeslot).id;
             classTimeSlots.push({ timeSlotId, classId });
@@ -155,9 +155,7 @@ const storeTimetable = (req, res) => new Promise((resolve, reject) => {
             {
               model: models.TimeSlot,
               as: 'timeSlots',
-              through: {
-                attributes: [],
-              },
+              through: { attributes: [] },
             },
           ],
         });
@@ -188,7 +186,7 @@ const storeTimetable = (req, res) => new Promise((resolve, reject) => {
               sectionId: dbSections
                 .find((section) => section.courseId === dbCourses
                   .find((course) => course.courseNumber === particularStudents[j]['Course No']).id
-                                && section.sectionNumber === particularStudents[j]['Class No']).id,
+                      && section.sectionNumber === particularStudents[j]['Class No']).id,
             });
           }
         }

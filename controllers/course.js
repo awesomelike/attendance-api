@@ -74,7 +74,7 @@ export default {
   getSemesterReport(req, res) {
     Course.findOne({
       where: {
-        id: Number(req.query.courseId),
+        id: parseInt(req.query.courseId, 10),
       },
       attributes: ['id', 'name', 'courseNumber'],
       include: [
@@ -83,14 +83,14 @@ export default {
           as: 'sections',
           attributes: ['id', 'sectionNumber'],
           where: {
-            id: Number(req.query.sectionId),
+            id: parseInt(req.query.sectionId, 10),
           },
           include: [
             {
               model: models.Professor,
               as: 'professor',
               where: {
-                id: Number(req.query.professorId),
+                id: parseInt(req.query.professorId, 10),
               },
               attributes: { include: ['id', 'uid', 'name'] },
             },
@@ -98,9 +98,7 @@ export default {
               model: models.Student,
               as: 'students',
               attributes: ['id', 'uid', 'name', 'department', 'schoolYear'],
-              through: {
-                attributes: [],
-              },
+              through: { attributes: [] },
               include: [
                 {
                   model: models.Record,
