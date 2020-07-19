@@ -2,6 +2,7 @@ import { Op } from 'sequelize';
 import models from '../models';
 import findWithPagination, { needsPagination } from '../util/pagination';
 import bot from '../bot/utils/sender';
+import cache from '../cache';
 
 const { Student } = models;
 
@@ -26,7 +27,6 @@ const include = [
                 model: models.TimeSlot,
                 as: 'timeSlots',
               },
-
             ],
           },
         ],
@@ -85,8 +85,8 @@ export default {
       });
       if (needsPagination(req)) {
         findWithPagination(Student, include, {
-          page: Number(req.query.page),
-          size: Number(req.query.size),
+          page: parseInt(req.query.page, 10),
+          size: parseInt(req.query.size, 10),
         }, where, res, (students) => {
           res.status(200).json(students);
         });
@@ -100,20 +100,21 @@ export default {
       classItemId, sectionId, sectionNumber, courseName, week, date,
     } = req.body;
 
-    const student = await Student.findOne({
-      where: { rfid },
-      include: [
-        {
-          model: models.Section,
-          as: 'sections',
-          attributes: ['id'],
-          through: { attributes: [] },
-        },
-      ],
-    });
+    // const student = await Student.findOne({
+    //   where: { rfid },
+    //   include: [
+    //     {
+    //       model: models.Section,
+    //       as: 'sections',
+    //       attributes: ['id'],
+    //       through: { attributes: [] },
+    //     },
+    //   ],
+    // });
+    const student = cache.get(rfid);
     if (!student) return res.status(404).json({ error: 'No student found' });
 
-    const isStranger = student.sections.map(({ id }) => id).indexOf(sectionId) === -1;
+    const isStranger = student.sections.indexOf(sectionId) === -1;
 
     const record = {
       isAttended: 1,
@@ -129,13 +130,14 @@ export default {
         },
       });
 
-      student.dataValues.isAttended = true;
+      student.isAttended = true;
 
-      if (!isUpdated && !isStranger) {
+      if (!isStranger && isUpdated) {
         res.status(200).json(student);
-      } else if (!isStranger && isUpdated) {
-        res.status(200).json(student);
-        const telegramAccount = await student.getTelegramAccount({ attributes: ['chatId'] });
+        const telegramAccount = await models.TelegramAccount.findOne({
+          where: { studentId: student.id },
+          attributes: ['chatId'],
+        });
         if (telegramAccount) {
           return bot.sendAttendanceMessage(
             telegramAccount.chatId,

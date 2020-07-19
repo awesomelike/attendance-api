@@ -66,7 +66,7 @@ function insertDefaultRecords(classItemId, students) {
           }],
         })
           .then((results) => resolve(results))
-          .catch((error) => reject(error));
+          .catch((error) => { throw new Error(error); });
       })
       .catch((error) => reject(error));
   });
@@ -114,7 +114,7 @@ export default {
         });
       });
   },
-  async startAttendance(req, res) {
+  async startAttendance(req, res, next) {
     const { currentClassItem, currentSection } = req.classAndSection;
     try {
       let insertedRecords = null;
@@ -137,6 +137,7 @@ export default {
         // classItem: currentClassItem,
         records: insertedRecords || currentClassItem.records,
       });
+      next();
       // eslint-disable-next-line no-shadow
     } catch (error) {
       console.log(error);

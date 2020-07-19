@@ -87,8 +87,8 @@ export default {
   getAll(req, res) {
     if (needsPagination(req)) {
       findWithPagination(ClassItem, includeWithStudents, {
-        page: Number(req.query.page),
-        size: Number(req.query.size),
+        page: parseInt(req.query.page, 10),
+        size: parseInt(req.query.size, 10),
       }, null, res, (classItems) => res.status(200).json(classItems));
     } else find(null, res, (classItems) => res.status(200).json(classItems));
   },
@@ -96,7 +96,6 @@ export default {
     try {
       const classItemWithRecords = await ClassItem.findByPk(req.params.id, {
         include: includeWithStudents,
-      }, {
         raw: true,
       });
       if (classItemWithRecords) {
@@ -136,14 +135,16 @@ export default {
           error: 'This class is not taught by this professor',
         });
       }
+      res.sendStatus(200);
+
       classItem.update({ classItemStatusId: FINISHED });
       const dangerZoneStudents = await executeMissedAtDangerZone(
         time.getCurrentWeek(),
         classItem.class.section.course.name,
       );
       notifyStudents(dangerZoneStudents);
-      res.sendStatus(200);
     } catch (error) {
+      console.log(error.message);
       res.status(502).json(error);
     }
   },

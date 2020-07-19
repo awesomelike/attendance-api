@@ -5,7 +5,7 @@ const getProfessorByRfid = (rfid) => models.Professor.findOne({ where: { rfid } 
 
 export default async function getCurrentClassAndSection(req, res, next) {
   try {
-    const { rfid } = req;
+    const rfid = req.body.rfid || req.params.rfid;
     const professor = await getProfessorByRfid(rfid);
     if (!professor) return res.status(404).json({ error: 'No such professor!' });
 
@@ -67,7 +67,16 @@ export default async function getCurrentClassAndSection(req, res, next) {
         {
           model: models.Student,
           as: 'students',
+          include: [
+            {
+              model: models.Section,
+              as: 'sections',
+              attributes: ['id'],
+              through: { attributes: [] },
+            },
+          ],
           through: { attributes: [] },
+          raw: true,
         },
         {
           model: models.Course,
@@ -79,6 +88,7 @@ export default async function getCurrentClassAndSection(req, res, next) {
     req.classAndSection = { currentClassItem, currentSection, professor };
     next();
   } catch (error) {
-    res.status(502).json(error);
+    console.log(error.message);
+    res.status(502).json(error.message);
   }
 }

@@ -5,6 +5,7 @@ import auth from '../middlewares/auth';
 import allowRoles from '../middlewares/role';
 import { ADMIN, ACADEMIC_AFFAIRS, PROFESSOR } from '../data/seed/roles';
 import getCurrent from '../middlewares/professor';
+import storeCache from '../middlewares/caching/students';
 
 const router = Router();
 
@@ -15,6 +16,6 @@ router.get('/:id/sections', auth, allowRoles([ADMIN, ACADEMIC_AFFAIRS, PROFESSOR
 router.get('/:id/makeups', auth, allowRoles([ADMIN, ACADEMIC_AFFAIRS]), professor.getMakeups);
 router.get('/rfid/:rfid', professor.getByRfid);
 router.get('/:rfid/currentClass', getCurrent, professor.getCurrentClass);
-router.post('/rfid', checkProfessorRfid, validateRfid, getCurrent, professor.startAttendance);
+router.post('/rfid', checkProfessorRfid, validateRfid, getCurrent, professor.startAttendance, storeCache);
 
 export default router;
