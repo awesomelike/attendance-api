@@ -4,6 +4,7 @@ import { checkProfessorRfid, validateRfid } from '../util/validation/rfid';
 import auth from '../middlewares/auth';
 import allowRoles from '../middlewares/role';
 import { ADMIN, ACADEMIC_AFFAIRS, PROFESSOR } from '../data/seed/roles';
+import getCurrent from '../middlewares/professor';
 
 const router = Router();
 
@@ -13,7 +14,7 @@ router.get('/:id', auth, allowRoles([ADMIN, ACADEMIC_AFFAIRS, PROFESSOR]), profe
 router.get('/:id/sections', auth, allowRoles([ADMIN, ACADEMIC_AFFAIRS, PROFESSOR]), professor.getSections);
 router.get('/:id/makeups', auth, allowRoles([ADMIN, ACADEMIC_AFFAIRS]), professor.getMakeups);
 router.get('/rfid/:rfid', professor.getByRfid);
-router.get('/:rfid/currentClass', professor.getCurrentClass);
-router.post('/rfid', checkProfessorRfid, validateRfid, professor.startAttendance);
+router.get('/:rfid/currentClass', getCurrent, professor.getCurrentClass);
+router.post('/rfid', checkProfessorRfid, validateRfid, getCurrent, professor.startAttendance);
 
 export default router;

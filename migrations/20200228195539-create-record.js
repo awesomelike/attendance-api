@@ -22,8 +22,8 @@ module.exports = {
         },
       },
       isAttended: {
-        type: Sequelize.INTEGER,
-        defaultValue: 0,
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
       },
       attendedAt: {
         type: Sequelize.DATE,

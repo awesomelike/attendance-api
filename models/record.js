@@ -5,7 +5,7 @@ module.exports = (sequelize, DataTypes) => {
     isAttended: DataTypes.INTEGER,
     attendedAt: DataTypes.DATE,
     rfid: DataTypes.STRING,
-    isAdditional: DataTypes.INTEGER,
+    isAdditional: DataTypes.BOOLEAN,
   }, {});
   Record.associate = (models) => {
     Record.belongsTo(models.Student, { as: 'student', foreignKey: 'studentId' });

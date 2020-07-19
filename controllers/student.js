@@ -100,13 +100,25 @@ export default {
       classItemId, sectionId, sectionNumber, courseName, week, date,
     } = req.body;
 
-    const student = await Student.findOne({ where: { rfid }, include });
+    const student = await Student.findOne({
+      where: { rfid },
+      include: [
+        {
+          model: models.Section,
+          as: 'sections',
+          attributes: ['id'],
+          through: { attributes: [] },
+        },
+      ],
+    });
     if (!student) return res.status(404).json({ error: 'No student found' });
+
+    const isStranger = student.sections.map(({ id }) => id).indexOf(sectionId) === -1;
 
     const record = {
       isAttended: 1,
       attendedAt: (new Date()).getTime(),
-      isAdditional: student.sections.map(({ id }) => id).indexOf(sectionId) > -1 ? 0 : 1,
+      isAdditional: isStranger,
       rfid,
     };
     try {
@@ -116,10 +128,16 @@ export default {
           studentId: student.id,
         },
       });
-      if (isUpdated) {
+
+      student.dataValues.isAttended = true;
+
+      if (!isUpdated && !isStranger) {
+        res.status(200).json(student);
+      } else if (!isStranger && isUpdated) {
+        res.status(200).json(student);
         const telegramAccount = await student.getTelegramAccount({ attributes: ['chatId'] });
         if (telegramAccount) {
-          bot.sendAttendanceMessage(
+          return bot.sendAttendanceMessage(
             telegramAccount.chatId,
             student.uid,
             student.name,
@@ -129,33 +147,27 @@ export default {
             date,
           );
         }
-        return res.status(200).json(await models.Record.findOne({
-          where: {
-            studentId: student.id,
-            classItemId,
-          },
-        }));
+      } else if (isStranger) {
+        /* If the code below is reached, it means: no record is updated,
+        then this student does not belong to this section, and we
+        add this student as additional */
+
+        const newRecord = await models.Record.create({
+          classItemId,
+          rfid,
+          studentId: student.id,
+          isAdditional: 1,
+          isAttended: 1,
+          attendedAt: (new Date()).getTime(),
+        });
+        res.status(200).json(newRecord);
       }
-
-      /* If the code below is reached, it means: no record is updated,
-      then this student does not belong to this section, and we
-      add this student as additional */
-
-      const newRecord = await models.Record.create({
-        classItemId,
-        rfid,
-        studentId: student.id,
-        isAdditional: 1,
-        isAttended: 1,
-        attendedAt: (new Date()).getTime(),
-      });
-      res.status(200).json(newRecord);
     } catch (error) {
       console.log(error);
       res.status(502).json(error);
     }
   },
-  getTimetable(req, res) {
+  async getTimetable(req, res) {
     const timetableInclude = [
       {
         model: models.Section,
@@ -196,8 +208,11 @@ export default {
         ],
       },
     ];
-    Student.findByPk(req.params.id, { include: timetableInclude })
-      .then((student) => res.status(200).json(student))
-      .catch((error) => res.status(502).json(error));
+    try {
+      const student = await Student.findByPk(req.params.id, { include: timetableInclude });
+      res.status(200).json(student);
+    } catch (error) {
+      res.status(502).json(error);
+    }
   },
 };

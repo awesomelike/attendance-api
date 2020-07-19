@@ -7805,6 +7805,7 @@
     "Student ID": "U1610128",
     "Name": "Osmanova Madina",
     "School Year": 3,
+    "rfid": "8058525f",
     "Course No": "CSE2090",
     "Class No": "001",
     "Classroom": "A-202"
@@ -7815,6 +7816,7 @@
     "Student ID": "U1610128",
     "Name": "Osmanova Madina",
     "School Year": 3,
+    "rfid": "8058525f",
     "Course No": "NTS3032",
     "Class No": "002",
     "Classroom": "B-202"
@@ -7825,6 +7827,7 @@
     "Student ID": "U1610128",
     "Name": "Osmanova Madina",
     "School Year": 3,
+    "rfid": "8058525f",
     "Course No": "NTS3040",
     "Class No": "001",
     "Classroom": "B-101"
@@ -7835,6 +7838,7 @@
     "Student ID": "U1610128",
     "Name": "Osmanova Madina",
     "School Year": 3,
+    "rfid": "8058525f",
     "Course No": "SOC3010",
     "Class No": "002",
     "Classroom": "A-203"
@@ -7845,6 +7849,7 @@
     "Student ID": "U1610128",
     "Name": "Osmanova Madina",
     "School Year": 3,
+    "rfid": "8058525f",
     "Course No": "SOC3020",
     "Class No": "001",
     "Classroom": "B-101"
@@ -7855,6 +7860,7 @@
     "Student ID": "U1610128",
     "Name": "Osmanova Madina",
     "School Year": 3,
+    "rfid": "8058525f",
     "Course No": "SOC3030",
     "Class No": "001",
     "Classroom": "B-304"
@@ -7865,6 +7871,7 @@
     "Student ID": "U1610128",
     "Name": "Osmanova Madina",
     "School Year": 3,
+    "rfid": "8058525f",
     "Course No": "SOC3070",
     "Class No": "002",
     "Classroom": "B-201"
@@ -16021,6 +16028,7 @@
     "Major": "Computer Science and Software Engineering",
     "Student ID": "U1710018",
     "Name": "ABDUGANIEV ABDUMALIK",
+    "rfid": "4050455f",
     "School Year": 3,
     "Course No": "CSE2090",
     "Class No": "001",
@@ -16031,6 +16039,7 @@
     "Major": "Computer Science and Software Engineering",
     "Student ID": "U1710018",
     "Name": "ABDUGANIEV ABDUMALIK",
+    "rfid": "4050455f",
     "School Year": 3,
     "Course No": "NTS3032",
     "Class No": "002",
@@ -16042,6 +16051,7 @@
     "Student ID": "U1710018",
     "Name": "ABDUGANIEV ABDUMALIK",
     "School Year": 3,
+    "rfid": "4050455f",
     "Course No": "NTS3040",
     "Class No": "001",
     "Classroom": "B-101"
@@ -16052,6 +16062,7 @@
     "Student ID": "U1710018",
     "Name": "ABDUGANIEV ABDUMALIK",
     "School Year": 3,
+    "rfid": "4050455f",
     "Course No": "SOC3010",
     "Class No": "002",
     "Classroom": "A-203"
@@ -16062,6 +16073,7 @@
     "Student ID": "U1710018",
     "Name": "ABDUGANIEV ABDUMALIK",
     "School Year": 3,
+    "rfid": "4050455f",
     "Course No": "SOC3020",
     "Class No": "001",
     "Classroom": "B-101"
@@ -16072,6 +16084,7 @@
     "Student ID": "U1710018",
     "Name": "ABDUGANIEV ABDUMALIK",
     "School Year": 3,
+    "rfid": "4050455f",
     "Course No": "SOC3030",
     "Class No": "001",
     "Classroom": "B-304"
@@ -16082,6 +16095,7 @@
     "Student ID": "U1710018",
     "Name": "ABDUGANIEV ABDUMALIK",
     "School Year": 3,
+    "rfid": "4050455f",
     "Course No": "SOC3070",
     "Class No": "002",
     "Classroom": "B-201"
