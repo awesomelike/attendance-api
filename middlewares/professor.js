@@ -1,5 +1,7 @@
+import { Op } from 'sequelize';
 import models from '../models';
 import time from '../util/time';
+import { FINISHED } from '../constants/classItems';
 
 const getProfessorByRfid = (rfid) => models.Professor.findOne({ where: { rfid } });
 
@@ -28,6 +30,7 @@ export default async function getCurrentClassAndSection(req, res, next) {
     const [currentClassItem] = await classNow.getClassItems({
       where: {
         week: await time.getCurrentWeek(),
+        classItemStatusId: { [Op.ne]: FINISHED },
       },
       include: [
         {
@@ -62,6 +65,11 @@ export default async function getCurrentClassAndSection(req, res, next) {
         },
       ],
     });
+    if (!currentClassItem) {
+      return res.status(406).json({
+        error: 'You have no planned classes for now',
+      });
+    }
     const currentSection = await classNow.getSection({
       include: [
         {

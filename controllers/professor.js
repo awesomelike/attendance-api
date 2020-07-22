@@ -41,17 +41,14 @@ function find(where, res, next) {
 }
 
 function insertDefaultRecords(classItemId, students) {
-  const records = [];
-  for (let i = 0; i < students.length; i += 1) {
-    records.push({
-      classItemId,
-      studentId: students[i].id,
-      isAttended: 0,
-      isAdditional: 0,
-    });
-  }
+  const recordsData = students.map(({ id }) => ({
+    classItemId,
+    studentId: id,
+    isAttended: 0,
+    isAdditional: 0,
+  }));
   return new Promise((resolve, reject) => {
-    models.Record.bulkCreate(records)
+    models.Record.bulkCreate(recordsData)
       .then(() => {
         models.ClassItem.findByPk(classItemId, {
           include: [{
@@ -65,7 +62,7 @@ function insertDefaultRecords(classItemId, students) {
             ],
           }],
         })
-          .then((results) => resolve(results))
+          .then(({ records }) => resolve(records))
           .catch((error) => { throw new Error(error); });
       })
       .catch((error) => reject(error));

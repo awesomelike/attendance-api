@@ -142,6 +142,7 @@ export default {
         time.getCurrentWeek(),
         classItem.class.section.course.name,
       );
+      console.log(classItem.class.section.course.name);
       notifyStudents(dangerZoneStudents);
     } catch (error) {
       console.log(error.message);

@@ -123,7 +123,7 @@ export default {
       rfid,
     };
     try {
-      const [isUpdated] = await models.Record.update(record, {
+      await models.Record.update(record, {
         where: {
           classItemId,
           studentId: student.id,
@@ -132,7 +132,7 @@ export default {
 
       student.isAttended = true;
 
-      if (!isStranger && isUpdated) {
+      if (!isStranger) {
         res.status(200).json(student);
         const telegramAccount = await models.TelegramAccount.findOne({
           where: { studentId: student.id },
