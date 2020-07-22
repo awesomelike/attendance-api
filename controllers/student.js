@@ -97,9 +97,8 @@ export default {
   async handleRfid(req, res) {
     const { rfid } = req;
     const {
-      classItemId, sectionId, sectionNumber, courseName, week, date,
+      recordId, classItemId, sectionId, sectionNumber, courseName, week, date,
     } = req.body;
-
     // const student = await Student.findOne({
     //   where: { rfid },
     //   include: [
@@ -125,15 +124,19 @@ export default {
     try {
       await models.Record.update(record, {
         where: {
-          classItemId,
-          studentId: student.id,
+          id: recordId,
         },
       });
-
       student.isAttended = true;
 
+      const response = {
+        studentId: student.id,
+        uid: student.uid,
+        name: student.name,
+        record: { id: recordId, attendedAt: Date.now() },
+      };
       if (!isStranger) {
-        res.status(200).json(student);
+        res.status(200).json(response);
         const telegramAccount = await models.TelegramAccount.findOne({
           where: { studentId: student.id },
           attributes: ['chatId'],

@@ -46,9 +46,29 @@ export default {
   getAll(req, res) {
     if (needsPagination(req)) {
       findWithPagination(Record, include, {
-        page: Number(req.query.page),
-        size: Number(req.query.size),
+        page: parseInt(req.query.page, 10),
+        size: parseInt(req.query.size, 10),
       }, null, res, (records) => res.status(200).json(records));
     }
+  },
+  attend(req, res) {
+    const recordId = parseInt(req.params.id, 10);
+    Record.update({ isAttended: true, attendedAt: Date.now(), rfid: null }, {
+      where: {
+        id: recordId,
+      },
+    })
+      .then(() => res.status(200).json({ record: { id: recordId, attendedAt: Date.now() } }))
+      .catch((error) => res.sendStatus(502).json(error.message));
+  },
+  unattend(req, res) {
+    const recordId = parseInt(req.params.id, 10);
+    Record.update({ isAttended: false, attendedAt: null, rfid: null }, {
+      where: {
+        id: recordId,
+      },
+    })
+      .then(() => res.status(200).json({ record: { id: recordId, attendedAt: null } }))
+      .catch((error) => res.sendStatus(502).json(error.message));
   },
 };
