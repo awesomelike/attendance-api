@@ -7,6 +7,8 @@ import logger from 'morgan';
 import json2xls from 'json2xls';
 import socketIO from 'socket.io';
 import { createServer } from 'http';
+import authSocket from 'socketio-auth';
+import { socketAuth } from './middlewares/auth';
 import indexRouter from './routes/index';
 // import './bot/bot';
 
@@ -18,6 +20,7 @@ const app = express();
 const server = createServer(app);
 const io = socketIO(server);
 io.origins('*:*');
+authSocket(io, { authenticate: socketAuth });
 
 // view engine setup
 app.set('views', join(__dirname, 'views'));

@@ -21,9 +21,7 @@ export function getAvailableRooms(date, timeSlots) {
             {
               model: models.TimeSlot,
               as: 'timeSlots',
-              through: {
-                attributes: [],
-              },
+              through: { attributes: [] },
             },
           ],
         },

@@ -94,7 +94,7 @@ export default {
       .then((makeup) => res.status(200).json(makeup))
       .catch((error) => res.status(502).json(error));
   },
-  async create(req, res) {
+  async create(req, res, next) {
     try {
       const makeup = await Makeup.create({
         professorId: req.account.professorId,
@@ -104,7 +104,9 @@ export default {
       });
       await makeup.setTimeSlots(req.makeup.timeSlots);
       const result = await Makeup.findByPk(makeup.id, options);
-      res.io.emit('newMakeup', result);
+      // res.io.emit('newMakeup', result);
+      req.event = { name: 'newMakeup', data: result };
+      next();
       res.status(200).json(makeup);
     } catch (error) {
       res.status(502).json(error);
