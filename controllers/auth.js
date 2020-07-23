@@ -41,13 +41,12 @@ export default {
       if (account.professor) toEncode.professorId = account.professor.id;
 
       if (compareSync(req.body.password, account.password)) {
-        sign(toEncode, process.env.JWT_KEY, { expiresIn: '2h' },
+        sign(toEncode, process.env.JWT_KEY, { expiresIn: '12h' },
           (error, token) => {
             if (error) return res.status(502).json(error);
             return res.status(200).json({ token });
           });
       } else {
-        console.log('inside auth controller');
         res.sendStatus(401);
       }
     });

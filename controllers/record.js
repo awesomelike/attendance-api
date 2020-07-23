@@ -33,15 +33,6 @@ const include = [
   },
 ];
 
-function find(where, res, next) {
-  Record.findAll({
-    where,
-    include,
-  })
-    .then((items) => res.status(200).json(items))
-    .catch((error) => res.status(502).json(error));
-}
-
 export default {
   getAll(req, res) {
     if (needsPagination(req)) {
@@ -54,9 +45,7 @@ export default {
   attend(req, res) {
     const recordId = parseInt(req.params.id, 10);
     Record.update({ isAttended: true, attendedAt: Date.now(), rfid: null }, {
-      where: {
-        id: recordId,
-      },
+      where: { id: recordId },
     })
       .then(() => res.status(200).json({ record: { id: recordId, attendedAt: Date.now() } }))
       .catch((error) => res.sendStatus(502).json(error.message));
@@ -64,9 +53,7 @@ export default {
   unattend(req, res) {
     const recordId = parseInt(req.params.id, 10);
     Record.update({ isAttended: false, attendedAt: null, rfid: null }, {
-      where: {
-        id: recordId,
-      },
+      where: { id: recordId },
     })
       .then(() => res.status(200).json({ record: { id: recordId, attendedAt: null } }))
       .catch((error) => res.sendStatus(502).json(error.message));
