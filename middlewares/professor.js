@@ -118,7 +118,15 @@ export default async function getCurrentClassAndSection(req, res, next) {
       if (!currentMakeup) {
         return res.status(406).json({ error: 'You have no planned classes for now' });
       }
-      currentClassItem = await currentMakeup.getClassItem({ include: classItemInclude });
+      currentClassItem = await currentMakeup.getClassItem({
+        include: classItemInclude,
+        where: {
+          classItemStatusId: { [Op.ne]: FINISHED },
+        },
+      });
+      if (!currentClassItem) {
+        return res.status(406).json({ error: 'You have no planned classes for now' });
+      }
       currentClassItem.dataValues.isMakeup = true;
       currentSection = await currentClassItem.class.getSection({ include: sectionInclude });
     } else {
