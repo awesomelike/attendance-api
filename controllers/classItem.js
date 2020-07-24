@@ -96,7 +96,6 @@ export default {
     try {
       const classItemWithRecords = await ClassItem.findByPk(req.params.id, {
         include: includeWithStudents,
-        raw: true,
       });
       if (classItemWithRecords) {
         if (req.query.format === 'excel') {

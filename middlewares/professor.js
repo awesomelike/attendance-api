@@ -73,7 +73,6 @@ export default async function getCurrentClassAndSection(req, res, next) {
 
     const timeSlotId = time.getCurrentTimeSlotId();
     if (!timeSlotId) return res.status(404).json({ error: 'You have no classes right now!' });
-
     const timeSlot = await models.TimeSlot.findByPk(timeSlotId);
     const professorSections = await professor.getSections({
       where: { semesterId },
@@ -81,9 +80,17 @@ export default async function getCurrentClassAndSection(req, res, next) {
         {
           model: models.Class,
           as: 'classes',
-          where: {
-            weekDayId: (new Date(2020, 2, 30, 10, 35, 0)).getDay(),
-          },
+          include: [
+            {
+              model: models.ClassItem,
+              as: 'classItems',
+              where: { week: 3 },
+            },
+            {
+              model: models.WeekDay,
+              as: 'weekDay',
+            },
+          ],
         },
       ],
     });
