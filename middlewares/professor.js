@@ -4,6 +4,7 @@ import models from '../models';
 import time from '../util/time';
 import { FINISHED } from '../constants/classItems';
 import { ACCEPTED } from '../constants/makeups';
+import { getCurrentSemester } from '../controllers/semester';
 
 const getProfessorByRfid = (rfid) => models.Professor.findOne({ where: { rfid } });
 
@@ -68,11 +69,24 @@ export default async function getCurrentClassAndSection(req, res, next) {
     const professor = await getProfessorByRfid(rfid);
     if (!professor) return res.status(404).json({ error: 'No such professor!' });
 
+    const semesterId = await getCurrentSemester();
+
     const timeSlotId = time.getCurrentTimeSlotId();
     if (!timeSlotId) return res.status(404).json({ error: 'You have no classes right now!' });
 
     const timeSlot = await models.TimeSlot.findByPk(timeSlotId);
-    const professorSections = await professor.getSections();
+    const professorSections = await professor.getSections({
+      where: { semesterId },
+      include: [
+        {
+          model: models.Class,
+          as: 'classes',
+          where: {
+            weekDayId: (new Date(2020, 2, 30, 10, 35, 0)).getDay(),
+          },
+        },
+      ],
+    });
     const currentClasses = await timeSlot.getClasses({
       where: {
         weekDayId: (new Date(2020, 2, 30, 10, 35, 0)).getDay(),
@@ -133,8 +147,11 @@ export default async function getCurrentClassAndSection(req, res, next) {
       currentClassItem.dataValues.isMakeup = false;
       currentSection = await classNow.getSection({ include: sectionInclude });
     }
-
-    req.classAndSection = { currentClassItem, currentSection, professor };
+    const courseSections = professorSections
+      .filter(({ courseId }) => courseId === currentSection.courseId);
+    req.classAndSection = {
+      currentClassItem, currentSection, professor, courseSections,
+    };
     next();
   } catch (error) {
     console.log(error.message);

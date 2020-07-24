@@ -58,4 +58,27 @@ export default {
       .then(() => res.status(200).json({ record: { id: recordId, attendedAt: null } }))
       .catch((error) => res.sendStatus(502).json(error.message));
   },
+  async getClassRecords(req, res) {
+    try {
+      const week = parseInt(req.query.week, 10);
+      const sectionId = parseInt(req.query.sectionId, 10);
+      const records = await Record.findAll({
+        include: [
+          {
+            model: models.ClassItem,
+            as: 'classItem',
+            where: { week },
+          },
+          {
+            model: models.Student,
+            as: 'student',
+          },
+        ],
+      });
+      res.status(200).json(records);
+    } catch (error) {
+      console.log(error);
+      res.status(502).json(error);
+    }
+  },
 };

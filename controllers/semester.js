@@ -1,6 +1,32 @@
+import { Op } from 'sequelize';
 import models from '../models';
+import appEmitter from '../events/app';
+import cache from '../cache';
 
 const { Semester } = models;
+
+const setCache = async (callback) => {
+  const semester = await Semester.findOne({ where: { endDate: { [Op.gte]: Date.now() } }, attributes: ['id', 'startDate', 'endDate'] });
+  if (!semester) return callback(null);
+  cache.set('SEMESTER', semester.id);
+  callback(semester.id);
+};
+
+appEmitter.on('started', async () => {
+  setCache(() => console.log('Cache has been initialized'));
+});
+
+export const getCurrentSemester = () => new Promise((resolve) => {
+  const value = cache.get('SEMESTER');
+  if (!value) {
+    setCache((semesterId) => {
+      if (!semesterId) resolve(null);
+      console.log('Cache has been set');
+      resolve(cache.get('SEMESTER'));
+    });
+  }
+  resolve(value);
+});
 
 const find = (where, include, res, next) => {
   Semester.findAll({

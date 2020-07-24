@@ -6,6 +6,7 @@
 
 import ip from 'ip';
 import app, { server } from '../app';
+import appEmitter from '../events/app';
 
 require('dotenv').config();
 const debug = require('debug')('librarian-server:server');
@@ -86,6 +87,7 @@ function onListening() {
     ? `pipe ${addr}`
     : `port ${addr.port}`;
   debug(`Listening on ${bind}`);
+  appEmitter.emit('started');
   // eslint-disable-next-line no-console
   console.log(`Local:    http://localhost:${port}/`);
   // eslint-disable-next-line no-console

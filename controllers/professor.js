@@ -3,6 +3,7 @@ import models from '../models';
 import findWithPagination, { needsPagination } from '../util/pagination';
 import { PLANNED, GOING_ON } from '../constants/classItems';
 import { getPlannedLectures, getGivenLectures } from '../util/sql/lecturesReport';
+import makeOptions from '../util/queryOptions';
 
 const { Professor } = models;
 
@@ -83,9 +84,10 @@ export default {
       .then((professor) => res.status(200).json(professor));
   },
   async getSections(req, res) {
+    const options = makeOptions(req, { include: [{ model: models.Course, as: 'course' }] });
     try {
       const professor = await Professor.findByPk(req.params.id);
-      const sections = await professor.getSections({ include: [{ model: models.Course, as: 'course' }] });
+      const sections = await professor.getSections(options);
       if (sections) res.status(200).json(sections);
       else res.sendStatus(404);
     } catch (error) {
@@ -93,7 +95,9 @@ export default {
     }
   },
   async getCurrentClass(req, res) {
-    const { currentClassItem, currentSection, professor } = req.classAndSection;
+    const {
+      currentClassItem, currentSection, professor, courseSections,
+    } = req.classAndSection;
     sign({ professorRfid: professor.rfid }, process.env.JWT_KEY, { expiresIn: '3h' },
       (tokenError, token) => {
         if (tokenError) return res.status(502).json({ error: tokenError });
@@ -108,6 +112,7 @@ export default {
           sectionNumber: currentSection.sectionNumber,
           auditory: currentSection.students.length,
           classItem: currentClassItem,
+          courseSections,
         });
       });
   },
@@ -123,19 +128,8 @@ export default {
         );
         currentClassItem.update({ classItemStatusId: GOING_ON, date: +new Date() });
       }
-      res.status(200).json({
-        // professorUid: professor.uid,
-        // professorName: professor.name,
-        // courseId: currentSection.course.id,
-        // courseName: currentSection.course.name,
-        // sectionId: currentSection.id,
-        // sectionNumber: currentSection.sectionNumber,
-        // auditory: currentSection.students.length,
-        // classItem: currentClassItem,
-        records: insertedRecords || currentClassItem.records,
-      });
+      res.status(200).json({ records: insertedRecords || currentClassItem.records });
       next();
-      // eslint-disable-next-line no-shadow
     } catch (error) {
       console.log(error);
       res.status(502).json(error);
