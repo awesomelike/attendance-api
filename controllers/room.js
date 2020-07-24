@@ -28,19 +28,23 @@ export function getAvailableRooms(date, timeSlots) {
       ],
     })
       .then((rooms) => {
+        console.log('rooms.length', rooms.length);
         const availableRooms = rooms.filter((room) => {
-          const { classes } = room;
-          for (let i = 0; i < classes.length; i += 1) {
-            const { classItems } = classes[i];
-            if (classItems.filter((classItem) => moment(classItem.plannedDate).startOf('day').valueOf() === date).length > 0) {
+          const { classes: c } = room;
+          for (let i = 0; i < c.length; i += 1) {
+            const { classItems: ci } = c[i];
+            // First check if there are planned classes on this day
+            if (ci.filter(({ plannedDate: p }) => moment(p).startOf('day').valueOf() === date).length > 0) {
+              // If there exist classes on the same day, then look for free timeslots
               if (timeSlots
-                .filter((timeSlot) => classes[i].timeSlots.map(({ id }) => id)
+                .filter((timeSlot) => c[i].timeSlots.map(({ id }) => id)
                   .includes(timeSlot)).length > 0) { return false; }
             }
           }
           return true;
         });
-        resolve(availableRooms.map(({ id, label }) => ({ id, label })));
+        const result = availableRooms.map(({ id, label }) => ({ id, label }));
+        resolve(result);
       })
       .catch((error) => reject(error));
   });
@@ -52,7 +56,7 @@ export default {
       const date = moment(parseInt(req.query.date, 10)).startOf('day').valueOf();
       const timeSlots = JSON.parse(req.query.timeSlots);
       const availableRooms = await getAvailableRooms(date, timeSlots);
-      console.log(availableRooms.length);
+      console.log('available.length', availableRooms.length);
       res.status(200).json(availableRooms);
     } else {
       Room.findAll({
