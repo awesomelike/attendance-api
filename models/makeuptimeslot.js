@@ -3,8 +3,6 @@ module.exports = (sequelize, DataTypes) => {
     makeupId: DataTypes.INTEGER,
     timeSlotId: DataTypes.INTEGER,
   }, {});
-  MakeupTimeSlot.associate = (models) => {
-    // associations can be defined here
-  };
+  MakeupTimeSlot.associate = () => {};
   return MakeupTimeSlot;
 };

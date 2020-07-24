@@ -10,6 +10,7 @@ module.exports = (sequelize, DataTypes) => {
     ClassItem.belongsTo(models.Class, { as: 'class', foreignKey: 'classId' });
     ClassItem.belongsTo(models.ClassItemStatus, { as: 'status', foreignKey: 'classItemStatusId' });
     ClassItem.hasMany(models.Record, { as: 'records', foreignKey: 'classItemId' });
+    ClassItem.hasOne(models.Makeup, { as: 'makeup', foreignKey: 'classItemId' });
   };
   return ClassItem;
 };

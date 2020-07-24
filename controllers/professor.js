@@ -94,7 +94,7 @@ export default {
   },
   async getCurrentClass(req, res) {
     const { currentClassItem, currentSection, professor } = req.classAndSection;
-    sign({ professorRfid: professor.rfid }, process.env.JWT_KEY, { expiresIn: '4h' },
+    sign({ professorRfid: professor.rfid }, process.env.JWT_KEY, { expiresIn: '3h' },
       (tokenError, token) => {
         if (tokenError) return res.status(502).json({ error: tokenError });
         res.status(200).json({

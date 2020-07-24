@@ -1,6 +1,9 @@
 import { verify } from 'jsonwebtoken';
+import rooms from '../constants/socket';
 
 require('dotenv').config();
+
+const path = (req) => req.originalUrl.split('/').slice(-1)[0];
 
 export const socketAuth = async (socket, data, callback) => {
   const { token } = data;
@@ -9,19 +12,17 @@ export const socketAuth = async (socket, data, callback) => {
       console.log(error);
       return callback(new Error('Invalid'));
     }
-    console.log(decoded);
     if (decoded.roleId) {
       switch (decoded.roleId) {
         case 1:
-          socket.join('AFFAIRS');
+          socket.join(rooms.AFFAIRS);
           break;
         case 2:
-          socket.join('PROFESSORS');
+          socket.join(rooms.PROFESSORS);
           break;
         default:
           break;
       }
-      console.log('authenticated');
       return callback(null, !!decoded);
     }
   });
@@ -42,7 +43,11 @@ export const authAttendance = (req, res, next) => {
       return res.status(401).json(error);
     }
     req.professorRfid = decoded;
-    next();
+    if (path(req) === 'verifyToken') {
+      res.sendStatus(200);
+    } else {
+      next();
+    }
   });
 };
 

@@ -104,7 +104,6 @@ export default {
       });
       await makeup.setTimeSlots(req.makeup.timeSlots);
       const result = await Makeup.findByPk(makeup.id, options);
-      // res.io.emit('newMakeup', result);
       req.event = { name: 'newMakeup', data: result };
       next();
       res.status(200).json(makeup);
@@ -118,15 +117,18 @@ export default {
       .catch((error) => res.status(502).json(error));
   },
   async resolve(req, res) {
-    if (await isAlreadyResolved(req.params.id)) {
-      return res.status(403).json({ error: 'This makeup is already resolved' });
+    try {
+      if (await isAlreadyResolved(req.params.id)) {
+        return res.status(403).json({ error: 'This makeup is already resolved' });
+      }
+      await Makeup.update({
+        makeupStatusId: req.makeup.makeupStatusId,
+        resolvedAt: Date.now(),
+        resolvedById: req.account.id,
+      }, { where: { id: req.params.id } });
+      res.sendStatus(200);
+    } catch (error) {
+      res.status(502).json(error);
     }
-    Makeup.update({
-      makeupStatusId: req.makeup.makeupStatusId,
-      resolvedAt: (new Date()).getTime(),
-      resolvedById: req.account.id,
-    }, { where: { id: req.params.id } })
-      .then(() => res.sendStatus(200))
-      .catch((error) => res.status(502).json(error));
   },
 };
