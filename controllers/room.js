@@ -64,10 +64,12 @@ export function getAvailableRooms(date, timeSlots) {
         });
         availableRooms = availableRooms.filter((room) => {
           for (let i = 0; i < makeups.length; i += 1) {
-            const b = timeSlots
-              .filter((timeSlot) => makeups[i].timeSlots.map(({ id }) => id).includes(timeSlot));
-            if (makeups[i].roomId === room.id && b.length > 0) {
-              console.log('here');
+            const isTimeSlotOk = timeSlots
+              .filter((timeSlot) => makeups[i]
+                .timeSlots.map(({ id }) => id)
+                .includes(timeSlot))
+              .length > 0;
+            if (makeups[i].roomId === room.id && isTimeSlotOk) {
               return false;
             }
           }

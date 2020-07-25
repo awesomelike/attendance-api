@@ -1,10 +1,12 @@
 import models from '../models';
 // import { NOT_SEEN, ACCEPTED, REJECTED } from '../constants/makeups';
 import { getAvailableRooms } from './room';
+import { ACCEPTED } from '../constants/makeups';
 
 const { Makeup } = models;
 
 export const options = {
+  order: [['id', 'DESC']],
   include: [
     {
       model: models.Account,
@@ -123,9 +125,11 @@ export default {
         return res.status(403).json({ error: 'This makeup is already resolved' });
       }
       const { newDate, timeSlots, roomId } = req.makeup;
-      const availableRooms = await getAvailableRooms(newDate, timeSlots);
-      if (!availableRooms.map(({ id }) => id).includes(roomId)) {
-        return res.status(403).json({ error: 'This room is already reserved!' });
+      if (req.makeup.makeupStatusId === ACCEPTED) {
+        const availableRooms = await getAvailableRooms(newDate, timeSlots);
+        if (!availableRooms.map(({ id }) => id).includes(roomId)) {
+          return res.status(403).json({ error: 'This room is already reserved!' });
+        }
       }
       await Makeup.update({
         makeupStatusId: req.makeup.makeupStatusId,

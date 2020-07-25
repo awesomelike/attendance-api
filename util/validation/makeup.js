@@ -37,7 +37,7 @@ export const check = (method) => {
       newDate: {
         isInt: true,
         custom: {
-          options: (value) => value > (new Date()).getTime(),
+          options: (value) => value > Date.now(),
           errorMessage: 'You can not set makeups to the past!',
         },
       },
@@ -82,7 +82,6 @@ export function validate(req, res, next) {
   };
   next();
 }
-
 
 export const isRoomFree = async (req, res, next) => {
   const { newDate, timeSlots } = req.makeup;
