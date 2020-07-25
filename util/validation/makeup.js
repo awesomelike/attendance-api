@@ -2,6 +2,7 @@ import { checkSchema, validationResult } from 'express-validator/check';
 import moment from 'moment';
 import { isTaughtBy } from '../../controllers/classItem';
 import { CREATE, RESOLVE } from '../../constants/types';
+import { getAvailableRooms } from '../../controllers/room';
 
 const isTimeslotArrayValid = (array) => {
   const areIntegers = array.filter((element) => Number.isInteger(element));
@@ -24,7 +25,7 @@ export const check = (method) => {
         isInt: true,
         custom: {
           options: (value) => [2, 3].includes(value),
-          errorMessage: 'Invalid makeupStatusId, you should either accept it or reject',
+          errorMessage: 'Invalid makeupStatusId, you should either accept or reject',
         },
       },
     };
@@ -73,11 +74,21 @@ export function validate(req, res, next) {
   }
   req.makeup = {
     classItemId: req.body.classItemId,
-    newDate: moment(req.body.newDate).startOf('day'),
-    roomId: req.body.roomId,
-    makeupStatusId: req.body.makeupStatusId,
-    resolvedById: req.body.resolvedById,
+    newDate: moment(req.body.newDate).startOf('day').valueOf(),
+    roomId: parseInt(req.body.roomId, 10),
+    makeupStatusId: parseInt(req.body.makeupStatusId, 10),
+    resolvedById: parseInt(req.body.resolvedById, 10),
     timeSlots: req.body.timeSlots,
   };
   next();
 }
+
+
+export const isRoomFree = async (req, res, next) => {
+  const { newDate, timeSlots } = req.makeup;
+  const availableRooms = await getAvailableRooms(newDate, timeSlots);
+  if (availableRooms.map(({ id }) => id).includes(req.makeup.roomId)) {
+    return next();
+  }
+  res.status(403).json({ error: 'Room is already reserved' });
+};

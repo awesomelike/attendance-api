@@ -4,6 +4,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {});
   Room.associate = (models) => {
     Room.hasMany(models.Class, { as: 'classes', foreignKey: 'roomId' });
+    Room.hasMany(models.Makeup, { as: 'makeups', foreignKey: 'roomId' });
   };
   return Room;
 };
