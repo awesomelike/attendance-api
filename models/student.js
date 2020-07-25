@@ -6,6 +6,7 @@ module.exports = (sequelize, DataTypes) => {
     image: DataTypes.STRING,
     schoolYear: DataTypes.STRING,
     department: DataTypes.STRING,
+    inClass: DataTypes.BOOLEAN,
   }, {});
   Student.associate = (models) => {
     Student.hasMany(models.Record, { as: 'records', foreignKey: 'studentId' });

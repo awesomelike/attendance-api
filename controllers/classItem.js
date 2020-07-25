@@ -54,9 +54,7 @@ function find(where, res, next) {
 
 export function isTaughtBy(classItemId, professorId) {
   return new Promise((resolve, reject) => {
-    ClassItem.findByPk(classItemId, {
-      include: includeWithCourse,
-    })
+    ClassItem.findByPk(classItemId, { include: includeWithCourse })
       .then((classItem) => resolve(classItem.class.section.professorId === professorId))
       .catch((error) => reject(error));
   });
@@ -99,18 +97,19 @@ export default {
       });
       if (classItemWithRecords) {
         if (req.query.format === 'excel') {
-          // Later when we will work with real data, will change updatedAt to attendedAt
-          const data = classItemWithRecords.records.map(({ student, isAttended, updatedAt }) => ({
+          // Later when we will work with real data, will change updatedAt to attendedAt: DONE
+          const data = classItemWithRecords.records.map(({ student, isAttended, attendedAt }) => ({
             Name: student.name,
             Attended: isAttended,
-            Time: moment(updatedAt).format('DD/MM/YYYY HH:mm'),
+            Time: moment(attendedAt).format('DD/MM/YYYY HH:mm'),
           }));
           return res.xls(`ClassReport_${classItemWithRecords.id}.xlsx`, data);
         }
         res.status(200).json(classItemWithRecords);
       } else res.sendStatus(404);
     } catch (error) {
-      res.status(502).json(error);
+      console.log(error);
+      res.status(502).json(error.message);
     }
   },
   async finishClass(req, res) {

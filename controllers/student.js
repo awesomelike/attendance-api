@@ -117,7 +117,7 @@ export default {
 
     const record = {
       isAttended: 1,
-      attendedAt: (new Date()).getTime(),
+      attendedAt: Date.now(),
       isAdditional: isStranger,
       rfid,
     };

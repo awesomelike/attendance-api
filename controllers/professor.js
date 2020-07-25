@@ -126,9 +126,24 @@ export default {
           currentClassItem.id,
           currentSection.students,
         );
-        currentClassItem.update({ classItemStatusId: GOING_ON, date: +new Date() });
+        await currentClassItem.update({ classItemStatusId: GOING_ON, date: Date.now() });
+        await models.Student.update({
+          inClass: true,
+        }, {
+          where: { id: currentSection.students.map(({ id }) => id) },
+        });
       }
-      res.status(200).json({ records: insertedRecords || currentClassItem.records });
+      let records = insertedRecords || currentClassItem.records;
+      records = await models.Record.findAll({
+        where: { id: records.map(({ id }) => id) },
+        include: [
+          {
+            model: models.Student,
+            as: 'student',
+          },
+        ],
+      });
+      res.status(200).json({ records });
       next();
     } catch (error) {
       console.log(error);

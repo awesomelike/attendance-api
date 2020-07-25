@@ -1,6 +1,7 @@
 import moment from 'moment';
 import timeSlots from '../data/timeslots.json';
 import { Semester } from '../models';
+import { getCurrentSemester } from '../controllers/semester';
 
 export const parseTime = (time) => ({
   hour: parseInt(time.split(':')[0], 10),
@@ -51,8 +52,17 @@ export default {
     }
   },
   async getCurrentWeek() {
-    const semesterStartDate = (await Semester.findByPk(2)).startDate;
-    // return getWeekNumber(new Date()) - getWeekNumber(semesterStartDate) + 1;
-    return moment(new Date(2019, 8, 23)).week() - moment(semesterStartDate).week() + 1;
+    return new Promise((resolve, reject) => {
+      // return getWeekNumber(new Date()) - getWeekNumber(semesterStartDate) + 1;
+      getCurrentSemester()
+        .then(({ startDate: semesterStartDate }) => {
+          const week = moment(new Date(2019, 8, 23)).week() - moment(semesterStartDate).week() + 1;
+          resolve(week);
+        })
+        .catch((error) => reject(error));
+    });
+  },
+  isToday(date) {
+    return moment(date).startOf('day').valueOf() === moment(new Date(2020, 6, 31)).startOf('day').valueOf();
   },
 };

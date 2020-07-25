@@ -1,5 +1,4 @@
 import { Op } from 'sequelize';
-import moment from 'moment';
 import models from '../models';
 import time from '../util/time';
 import { FINISHED } from '../constants/classItems';
@@ -41,7 +40,7 @@ const classItemInclude = [
   },
 ];
 
-const sectionInclude = [
+export const sectionInclude = [
   {
     model: models.Student,
     as: 'students',
@@ -54,7 +53,6 @@ const sectionInclude = [
       },
     ],
     through: { attributes: [] },
-    raw: true,
   },
   {
     model: models.Course,
@@ -70,7 +68,7 @@ export default async function getCurrentClassAndSection(req, res, next) {
     if (!professor) return res.status(404).json({ error: 'No such professor!' });
 
     const semesterId = await getCurrentSemester();
-
+    const week = await time.getCurrentWeek();
     const timeSlotId = time.getCurrentTimeSlotId();
     if (!timeSlotId) return res.status(404).json({ error: 'You have no classes right now!' });
     const timeSlot = await models.TimeSlot.findByPk(timeSlotId);
@@ -84,7 +82,7 @@ export default async function getCurrentClassAndSection(req, res, next) {
             {
               model: models.ClassItem,
               as: 'classItems',
-              where: { week: 3 },
+              where: { week },
             },
             {
               model: models.WeekDay,
@@ -132,8 +130,7 @@ export default async function getCurrentClassAndSection(req, res, next) {
           },
         ],
       });
-      const isToday = (date) => moment(date).startOf('day').valueOf() === moment(new Date(2020, 6, 31)).startOf('day').valueOf();
-      const todayMakeups = makeups.filter(({ newDate }) => isToday(newDate));
+      const todayMakeups = makeups.filter(({ newDate }) => time.isToday(newDate));
       const currentMakeup = todayMakeups
         .find(({ timeSlots: t }) => t.map(({ id }) => id).includes(timeSlotId));
       if (!currentMakeup) {
