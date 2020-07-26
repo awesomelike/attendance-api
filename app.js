@@ -14,6 +14,7 @@ import indexRouter from './routes/index';
 
 require('dotenv').config();
 require('./tasks/backup');
+require('./tasks/class');
 
 const app = express();
 

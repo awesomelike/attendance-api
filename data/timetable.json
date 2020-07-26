@@ -6709,6 +6709,7 @@
     "courseName": "System Analysis",
     "professorId": "U16037",
     "professorName": "Dragunov Andrei",
+    "rfid": "24120de0",
     "weekDay": "Tue",
     "timeslot": "16:00",
     "room": "B-201"
@@ -6719,6 +6720,7 @@
     "courseName": "System Analysis",
     "professorId": "U16037",
     "professorName": "Dragunov Andrei",
+    "rfid": "24120de0",
     "weekDay": "Tue",
     "timeslot": "16:30",
     "room": "B-201"
@@ -6729,6 +6731,7 @@
     "courseName": "System Analysis",
     "professorId": "U16037",
     "professorName": "Dragunov Andrei",
+    "rfid": "24120de0",
     "weekDay": "Tue",
     "timeslot": "17:00",
     "room": "B-201"
@@ -6739,6 +6742,7 @@
     "courseName": "System Analysis",
     "professorId": "U16037",
     "professorName": "Dragunov Andrei",
+    "rfid": "24120de0",
     "weekDay": "Wed",
     "timeslot": "10:30",
     "room": "B-201"
@@ -6749,6 +6753,7 @@
     "courseName": "System Analysis",
     "professorId": "U16037",
     "professorName": "Dragunov Andrei",
+    "rfid": "24120de0",
     "weekDay": "Wed",
     "timeslot": "11:00",
     "room": "B-201"
@@ -6759,6 +6764,7 @@
     "courseName": "System Analysis",
     "professorId": "U16037",
     "professorName": "Dragunov Andrei",
+    "rfid": "24120de0",
     "weekDay": "Wed",
     "timeslot": "11:30",
     "room": "B-201"
@@ -6769,6 +6775,7 @@
     "courseName": "System Analysis",
     "professorId": "U16037",
     "professorName": "Dragunov Andrei",
+    "rfid": "24120de0",
     "weekDay": "Thu",
     "timeslot": "14:00",
     "room": "B-202"
@@ -6779,6 +6786,7 @@
     "courseName": "System Analysis",
     "professorId": "U16037",
     "professorName": "Dragunov Andrei",
+    "rfid": "24120de0",
     "weekDay": "Thu",
     "timeslot": "14:30",
     "room": "B-202"
@@ -6789,6 +6797,7 @@
     "courseName": "System Analysis",
     "professorId": "U16037",
     "professorName": "Dragunov Andrei",
+    "rfid": "24120de0",
     "weekDay": "Thu",
     "timeslot": "15:00",
     "room": "B-202"
@@ -6799,6 +6808,7 @@
     "courseName": "System Analysis",
     "professorId": "U16037",
     "professorName": "Dragunov Andrei",
+    "rfid": "24120de0",
     "weekDay": "Tue",
     "timeslot": "14:00",
     "room": "B-210"
@@ -6809,6 +6819,7 @@
     "courseName": "System Analysis",
     "professorId": "U16037",
     "professorName": "Dragunov Andrei",
+    "rfid": "24120de0",
     "weekDay": "Tue",
     "timeslot": "14:30",
     "room": "B-210"
@@ -6819,6 +6830,7 @@
     "courseName": "System Analysis",
     "professorId": "U16037",
     "professorName": "Dragunov Andrei",
+    "rfid": "24120de0",
     "weekDay": "Tue",
     "timeslot": "15:00",
     "room": "B-210"
@@ -6829,6 +6841,7 @@
     "courseName": "System Analysis",
     "professorId": "U16037",
     "professorName": "Dragunov Andrei",
+    "rfid": "24120de0",
     "weekDay": "Fri",
     "timeslot": "16:00",
     "room": "A-202"
@@ -6839,6 +6852,7 @@
     "courseName": "System Analysis",
     "professorId": "U16037",
     "professorName": "Dragunov Andrei",
+    "rfid": "24120de0",
     "weekDay": "Fri",
     "timeslot": "16:30",
     "room": "A-202"
@@ -6849,6 +6863,7 @@
     "courseName": "System Analysis",
     "professorId": "U16037",
     "professorName": "Dragunov Andrei",
+    "rfid": "24120de0",
     "weekDay": "Fri",
     "timeslot": "17:00",
     "room": "A-202"
@@ -6859,6 +6874,7 @@
     "courseName": "System Analysis",
     "professorId": "U16037",
     "professorName": "Dragunov Andrei",
+    "rfid": "24120de0",
     "weekDay": "Mon",
     "timeslot": "14:30",
     "room": "B-209"
@@ -6869,6 +6885,7 @@
     "courseName": "System Analysis",
     "professorId": "U16037",
     "professorName": "Dragunov Andrei",
+    "rfid": "24120de0",
     "weekDay": "Mon",
     "timeslot": "15:00",
     "room": "B-209"
@@ -6879,6 +6896,7 @@
     "courseName": "System Analysis",
     "professorId": "U16037",
     "professorName": "Dragunov Andrei",
+    "rfid": "24120de0",
     "weekDay": "Mon",
     "timeslot": "15:30",
     "room": "B-209"
@@ -6889,6 +6907,7 @@
     "courseName": "System Analysis",
     "professorId": "U16037",
     "professorName": "Dragunov Andrei",
+    "rfid": "24120de0",
     "weekDay": "Tue",
     "timeslot": "12:00",
     "room": "A-202"
@@ -6899,6 +6918,7 @@
     "courseName": "System Analysis",
     "professorId": "U16037",
     "professorName": "Dragunov Andrei",
+    "rfid": "24120de0",
     "weekDay": "Tue",
     "timeslot": "12:30",
     "room": "A-202"
@@ -6909,6 +6929,7 @@
     "courseName": "System Analysis",
     "professorId": "U16037",
     "professorName": "Dragunov Andrei",
+    "rfid": "24120de0",
     "weekDay": "Tue",
     "timeslot": "13:00",
     "room": "A-202"
@@ -6919,6 +6940,7 @@
     "courseName": "System Analysis",
     "professorId": "U16037",
     "professorName": "Dragunov Andrei",
+    "rfid": "24120de0",
     "weekDay": "Wed",
     "timeslot": "15:30",
     "room": "B-209"
@@ -6929,6 +6951,7 @@
     "courseName": "System Analysis",
     "professorId": "U16037",
     "professorName": "Dragunov Andrei",
+    "rfid": "24120de0",
     "weekDay": "Wed",
     "timeslot": "16:00",
     "room": "B-209"
@@ -6939,6 +6962,7 @@
     "courseName": "System Analysis",
     "professorId": "U16037",
     "professorName": "Dragunov Andrei",
+    "rfid": "24120de0",
     "weekDay": "Wed",
     "timeslot": "16:30",
     "room": "B-209"
