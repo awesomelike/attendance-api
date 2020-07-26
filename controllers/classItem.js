@@ -134,7 +134,21 @@ export default {
         });
       }
       res.sendStatus(200);
-
+      const records = await classItem.getRecords({
+        attributes: ['id', 'studentId'],
+        include: [
+          {
+            model: models.Student,
+            as: 'student',
+            attributes: ['id'],
+          },
+        ],
+      });
+      models.Student.update({
+        inClass: false,
+      }, {
+        where: { id: records.map(({ student: { id } }) => id) },
+      });
       classItem.update({ classItemStatusId: FINISHED });
       const dangerZoneStudents = await executeMissedAtDangerZone(
         time.getCurrentWeek(),
