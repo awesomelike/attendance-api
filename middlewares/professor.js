@@ -1,6 +1,6 @@
 import { Op } from 'sequelize';
 import models from '../models';
-import time from '../util/time';
+import time, { TIME } from '../util/time';
 import { FINISHED } from '../constants/classItems';
 import { ACCEPTED } from '../constants/makeups';
 import { getCurrentSemester } from '../controllers/semester';
@@ -67,7 +67,7 @@ export default async function getCurrentClassAndSection(req, res, next) {
     const professor = await getProfessorByRfid(rfid);
     if (!professor) return res.status(404).json({ error: 'No such professor!' });
 
-    const semesterId = await getCurrentSemester();
+    const { id: semesterId } = await getCurrentSemester();
     const week = await time.getCurrentWeek();
     const timeSlotId = time.getCurrentTimeSlotId();
     if (!timeSlotId) return res.status(404).json({ error: 'You have no classes right now!' });
@@ -94,15 +94,16 @@ export default async function getCurrentClassAndSection(req, res, next) {
     });
     const currentClasses = await timeSlot.getClasses({
       where: {
-        weekDayId: (new Date(2020, 2, 30, 10, 35, 0)).getDay(),
+        weekDayId: TIME.getDay(),
       },
     });
 
     if (!currentClasses.length) return res.status(404).json({ error: 'No classes today!' });
-
     const classNow = currentClasses
-      .find((currentClass) => professorSections.map((section) => section.id)
-        .includes(currentClass.sectionId));
+      .find(({ sectionId }) => professorSections.map(({ id }) => id).includes(sectionId));
+
+    if (!classNow) return res.status(404).json({ error: 'No class found!' });
+
     let [currentClassItem] = await classNow.getClassItems({
       where: {
         week: await time.getCurrentWeek(),

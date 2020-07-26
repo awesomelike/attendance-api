@@ -8,8 +8,9 @@ const { Semester } = models;
 const setCache = async (callback) => {
   const semester = await Semester.findOne({ where: { endDate: { [Op.gte]: Date.now() } }, attributes: ['id', 'startDate', 'endDate'] });
   if (!semester) return callback(null);
-  cache.set('SEMESTER', semester.id);
-  callback(semester.id);
+  const data = { id: semester.id, startDate: semester.startDate, endDate: semester.endDate };
+  cache.set('SEMESTER', data);
+  callback(data);
 };
 
 appEmitter.on('started', async () => {
@@ -19,8 +20,8 @@ appEmitter.on('started', async () => {
 export const getCurrentSemester = () => new Promise((resolve) => {
   const value = cache.get('SEMESTER');
   if (!value) {
-    setCache((semesterId) => {
-      if (!semesterId) resolve(null);
+    setCache((semester) => {
+      if (!semester) resolve(null);
       console.log('Cache has been set');
       resolve(cache.get('SEMESTER'));
     });
