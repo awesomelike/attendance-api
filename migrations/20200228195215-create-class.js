@@ -46,7 +46,7 @@ module.exports = {
         defaultValue: Sequelize.fn('now'),
       },
     });
-    await queryInterface.addConstraint('Classes', ['sectionId', 'roomId', 'weekDayId'], {
+    await queryInterface.addConstraint('Classes', ['sectionId', 'roomId', 'weekDayId', 'semesterId'], {
       type: 'unique',
       name: 'unique_constraint_classes',
     });

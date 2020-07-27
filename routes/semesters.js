@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import semester from '../controllers/semester';
-import timetable from '../controllers/import';
+import { storeStudents, storeTimetable } from '../controllers/import';
 import auth from '../middlewares/auth';
 import { check, validate } from '../util/validation/semester';
 import { ADMIN, ACADEMIC_AFFAIRS } from '../data/seed/roles';
@@ -11,7 +11,7 @@ const router = Router();
 
 router.get('/', auth, semester.getAll);
 router.get('/:id', auth, semester.get);
-router.get('/:id/importTimetable', auth, checkTimetable, validateTimetable, timetable.handleImport);
+router.get('/:id/importTimetable', auth, checkTimetable, validateTimetable, storeStudents, storeTimetable);
 router.post('/', auth, allowRoles([ADMIN, ACADEMIC_AFFAIRS]), check, validate, semester.create);
 
 export default router;
