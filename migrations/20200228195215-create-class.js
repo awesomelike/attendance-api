@@ -28,6 +28,13 @@ module.exports = {
           key: 'id',
         },
       },
+      semesterId: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Semesters',
+          key: 'id',
+        },
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

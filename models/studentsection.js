@@ -3,8 +3,6 @@ module.exports = (sequelize, DataTypes) => {
     studentId: DataTypes.INTEGER,
     sectionId: DataTypes.INTEGER,
   }, { timestamps: false });
-  StudentSection.associate = () => {
-    // associations can be defined here
-  };
+  StudentSection.associate = () => {};
   return StudentSection;
 };

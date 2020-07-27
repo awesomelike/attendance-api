@@ -7,6 +7,10 @@ module.exports = (sequelize, DataTypes) => {
   }, {});
   Semester.associate = (models) => {
     Semester.hasMany(models.Section, { as: 'sections', foreignKey: 'semesterId' });
+    Semester.hasMany(models.Class, { as: 'classes', foreignKey: 'semesterId' });
+    Semester.hasMany(models.ClassItem, { as: 'classItems', foreignKey: 'semesterId' });
+    Semester.hasMany(models.Makeup, { as: 'makeups', foreignKey: 'semesterId' });
+    Semester.hasMany(models.Record, { as: 'records', foreignKey: 'semesterId' });
   };
   return Semester;
 };

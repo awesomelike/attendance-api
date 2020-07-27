@@ -48,6 +48,13 @@ module.exports = {
     resolvedAt: {
       type: Sequelize.DATE,
     },
+    semesterId: {
+      type: Sequelize.INTEGER,
+      references: {
+        model: 'Semesters',
+        key: 'id',
+      },
+    },
     createdAt: {
       allowNull: false,
       type: Sequelize.DATE,

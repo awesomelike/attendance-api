@@ -3,8 +3,6 @@ module.exports = (sequelize, DataTypes) => {
     timeSlotId: DataTypes.INTEGER,
     classId: DataTypes.INTEGER,
   }, { timestamps: false });
-  ClassTimeSlot.associate = () => {
-    // associations can be defined here
-  };
+  ClassTimeSlot.associate = () => {};
   return ClassTimeSlot;
 };
