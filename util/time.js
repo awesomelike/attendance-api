@@ -15,13 +15,13 @@ export const getSemesterTimeOffset = (
   .add(parseTime(classObject.timeSlots[0].startTime).minute, 'minutes')
   .add(week - 1, 'weeks');
 
-// export const TIME = new Date(2019, 8, 23, 10, 30, 0);
+export const TIME = new Date(2019, 8, 23, 10, 30, 0);
 // export const TIME = new Date(2019, 8, 27, 9, 0, 0);
 
 // export const TIME = new Date(2019, 8, 24, 16, 0, 0);
 // export const TIME = new Date(2019, 8, 24, 14, 0, 0);
 
-export const TIME = new Date(2019, 8, 23, 12, 0, 0);
+// export const TIME = new Date(2019, 8, 23, 12, 0, 0);
 
 const dynamicGenerator = () => {
   // const timeNow = new Date();
@@ -63,6 +63,7 @@ export default {
         .then(({ startDate: semesterStartDate }) => {
           console.log('startDate:', moment(semesterStartDate).format('DD.MM.YYYY'));
           const week = moment(TIME).week() - moment(semesterStartDate).week() + 1;
+          console.log('week', week);
           resolve(week);
         })
         .catch((error) => reject(error));
