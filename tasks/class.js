@@ -4,7 +4,6 @@ import sequelize, { Op } from 'sequelize';
 import models from '../models';
 import { parseTime, TIME } from '../util/time';
 
-
 const { ClassItem, Student } = models;
 
 const startedClasses = (now) => ClassItem.findAll({

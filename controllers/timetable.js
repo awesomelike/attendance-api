@@ -139,8 +139,8 @@ const storeTimetable = (req, res) => new Promise(() => {
             const classId = dbClasses
               .find((obj) => obj.weekDayId === weekDays
                 .find((wd) => wd.key === inclass.weekDay).id
-                    && obj.section.course.courseNumber === inclass.courseNumber
-                    && obj.section.sectionNumber === inclass.sectionNumber).id;
+                  && obj.section.course.courseNumber === inclass.courseNumber
+                  && obj.section.sectionNumber === inclass.sectionNumber).id;
             const timeSlotId = timeSlots
               .find((timeslot) => timeslot.startTime === inclass.timeslot).id;
             classTimeSlots.push({ timeSlotId, classId });
