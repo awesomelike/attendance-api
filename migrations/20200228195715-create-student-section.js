@@ -21,16 +21,6 @@ module.exports = {
           key: 'id',
         },
       },
-      createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE,
-        defaultValue: Sequelize.fn('now'),
-      },
-      updatedAt: {
-        allowNull: false,
-        type: Sequelize.DATE,
-        defaultValue: Sequelize.fn('now'),
-      },
     });
     await queryInterface.addConstraint('StudentSections', ['studentId', 'sectionId'], {
       type: 'unique',

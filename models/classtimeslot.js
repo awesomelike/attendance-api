@@ -2,7 +2,7 @@ module.exports = (sequelize, DataTypes) => {
   const ClassTimeSlot = sequelize.define('ClassTimeSlot', {
     timeSlotId: DataTypes.INTEGER,
     classId: DataTypes.INTEGER,
-  }, {});
+  }, { timestamps: false });
   ClassTimeSlot.associate = () => {
     // associations can be defined here
   };
