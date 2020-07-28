@@ -45,6 +45,7 @@ const storeTimetable = (req, res) => new Promise(() => {
     .map((uid) => professors.find((professor) => professor.uid === uid));
   const uniqueRooms = unique(rooms, ['label']);
   // Make an array of tasks/promises
+
   const insertProfessorsAndCourses = [
     // models.sequelize.getQueryInterface().bulkInsert('Professors', uniqueProfessors, {}),
     // models.sequelize.getQueryInterface().bulkInsert('Courses', uniqueCourses, {}),
@@ -147,6 +148,7 @@ const storeTimetable = (req, res) => new Promise(() => {
           });
         }
         await models.ClassTimeSlot.bulkCreate(classTimeSlots, { updateOnDuplicate: ['timeSlotId', 'classId'] });
+
         const semester = await models.Semester.findByPk(2);
         const classItems = [];
         const classesWithTimeSlots = await models.Class.findAll({
@@ -173,6 +175,7 @@ const storeTimetable = (req, res) => new Promise(() => {
         });
         // models.sequelize.getQueryInterface().bulkInsert('ClassItems', classItems, {})
         await models.ClassItem.bulkCreate(classItems);
+
         const students = await models.Student.findAll();
         const dbSections = await models.Section.findAll();
         const dbCourses = await models.Course.findAll();

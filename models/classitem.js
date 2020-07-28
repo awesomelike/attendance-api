@@ -5,12 +5,14 @@ module.exports = (sequelize, DataTypes) => {
     plannedDate: DataTypes.DATE,
     date: DataTypes.DATE,
     classItemStatusId: DataTypes.INTEGER,
+    semesterId: DataTypes.INTEGER,
   }, {});
   ClassItem.associate = (models) => {
     ClassItem.belongsTo(models.Class, { as: 'class', foreignKey: 'classId' });
     ClassItem.belongsTo(models.ClassItemStatus, { as: 'status', foreignKey: 'classItemStatusId' });
     ClassItem.hasMany(models.Record, { as: 'records', foreignKey: 'classItemId' });
     ClassItem.hasOne(models.Makeup, { as: 'makeup', foreignKey: 'classItemId' });
+    ClassItem.belongsTo(models.Semester, { as: 'semester', foreignKey: 'semesterId' });
   };
   return ClassItem;
 };

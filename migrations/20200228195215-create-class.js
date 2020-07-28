@@ -28,6 +28,13 @@ module.exports = {
           key: 'id',
         },
       },
+      semesterId: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Semesters',
+          key: 'id',
+        },
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
@@ -39,7 +46,7 @@ module.exports = {
         defaultValue: Sequelize.fn('now'),
       },
     });
-    await queryInterface.addConstraint('Classes', ['sectionId', 'roomId', 'weekDayId'], {
+    await queryInterface.addConstraint('Classes', ['sectionId', 'roomId', 'weekDayId', 'semesterId'], {
       type: 'unique',
       name: 'unique_constraint_classes',
     });

@@ -28,7 +28,7 @@ app.set('views', join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
 app.use(logger('dev'));
-app.use(json());
+app.use(json({ limit: '10mb' }));
 app.use(urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(json2xls.middleware);

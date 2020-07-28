@@ -35,6 +35,13 @@ module.exports = {
         type: Sequelize.INTEGER,
         defaultValue: 0,
       },
+      semesterId: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Semesters',
+          key: 'id',
+        },
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

@@ -8,11 +8,11 @@ export const parseTime = (time) => ({
 });
 
 export const getSemesterTimeOffset = (
-  semesterStartDate, classObject, week,
+  semesterStartDate, { weekDayId, timeSlots: ts }, week,
 ) => moment(semesterStartDate)
-  .add(classObject.weekDayId - 1, 'days')
-  .add(parseTime(classObject.timeSlots[0].startTime).hour, 'hours')
-  .add(parseTime(classObject.timeSlots[0].startTime).minute, 'minutes')
+  .add(weekDayId - 1, 'days')
+  .add(parseTime(ts[0].startTime).hour, 'hours')
+  .add(parseTime(ts[0].startTime).minute, 'minutes')
   .add(week - 1, 'weeks');
 
 export const TIME = new Date(2019, 8, 23, 10, 30, 0);

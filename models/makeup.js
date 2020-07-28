@@ -7,6 +7,7 @@ module.exports = (sequelize, DataTypes) => {
     makeupStatusId: DataTypes.INTEGER,
     resolvedById: DataTypes.INTEGER,
     resolvedAt: DataTypes.DATE,
+    semesterId: DataTypes.INTEGER,
   }, {});
   Makeup.associate = (models) => {
     Makeup.belongsTo(models.ClassItem, { as: 'classItem', foreignKey: 'classItemId' });
@@ -19,6 +20,7 @@ module.exports = (sequelize, DataTypes) => {
       through: models.MakeupTimeSlot,
       foreignKey: 'makeupId',
     });
+    Makeup.belongsTo(models.Semester, { as: 'semester', foreignKey: 'semesterId' });
   };
   return Makeup;
 };
