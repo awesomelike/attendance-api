@@ -2,11 +2,12 @@ import { Op } from 'sequelize';
 import models from '../models';
 import appEmitter from '../events/app';
 import cache from '../cache';
+import makeOptions from '../util/queryOptions';
 
 const { Semester } = models;
 
 const setCache = async (callback) => {
-  const semester = await Semester.findOne({ where: { endDate: { [Op.gte]: Date.now() } }, attributes: ['id', 'startDate', 'endDate'] });
+  const semester = await Semester.findOne({ where: { endDate: { [Op.gte]: Date.now() } }, attributes: ['id', 'startDate', 'endDate'], raw: true });
   if (!semester) return callback(null);
   const data = { id: semester.id, startDate: semester.startDate, endDate: semester.endDate };
   cache.set('SEMESTER', data);
@@ -29,45 +30,52 @@ export const getCurrentSemester = () => new Promise((resolve) => {
   resolve(value);
 });
 
-const find = (where, include, res, next) => {
-  Semester.findAll({
-    where,
-    include,
-  })
-    .then((semesters) => next(semesters))
-    .catch((error) => res.status(502).json(error));
-};
+const include = [
+  {
+    model: models.Section,
+    as: 'sections',
+    include: [
+      {
+        model: models.Course,
+        as: 'course',
+      }, {
+        model: models.Professor,
+        as: 'professor',
+        attributes: ['id', 'name', 'uid'],
+      },
+    ],
+  },
+];
+
+// eslint-disable-next-line no-param-reassign
+const setStatus = ({ dataValues }) => { dataValues.status = new Date(dataValues.endDate).getTime() > Date.now() ? 'Ongoing' : 'Finished'; };
 
 export default {
-  getAll(req, res) {
-    if (req.query.raw) {
-      return find(null, null, res, (semesters) => res.status(200).json(semesters));
+  async getAll(req, res) {
+    try {
+      const semesters = await Semester.findAll(makeOptions(req, { order: [['id', 'DESC']] }));
+      semesters.forEach(setStatus);
+      res.status(200).json(semesters);
+    } catch (error) {
+      res.status(502).json(error);
     }
-    find(null, [
-      {
-        model: models.Section,
-        as: 'sections',
-        include: [
-          {
-            model: models.Course,
-            as: 'course',
-          }, {
-            model: models.Professor,
-            as: 'professor',
-            attributes: ['id', 'name', 'uid'],
-          },
-        ],
-      },
-    ], res, (semesters) => res.status(200).json(semesters));
   },
-  get(req, res) {
-    Semester.findByPk(req.params.id)
-      .then((semester) => res.status(200).json(semester))
-      .catch((error) => res.status(502).json(error));
+  async get(req, res) {
+    try {
+      const semester = await Semester.findByPk(req.params.id, { include });
+      setStatus(semester);
+      res.status(200).json(semester);
+    } catch (error) {
+      res.status(502).json(error);
+    }
   },
-  create(req, res) {
-    Semester.create(req.semester)
-      .then((semester) => res.status(200).json(semester))
-      .catch((error) => res.status(502).json(error));
+  async create(req, res) {
+    try {
+      const semester = await Semester.create(req.semester);
+      res.status(200).json(semester);
+    } catch (error) {
+      console.log(error);
+      res.status(502).json(error.message);
+    }
   },
 };

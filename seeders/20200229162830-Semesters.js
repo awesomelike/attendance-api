@@ -16,6 +16,8 @@ module.exports = {
       id: 3,
       year: 2020,
       season: 'Spring',
+      startDate: new Date(2020, 0, 1),
+      endDate: new Date(2020, 4, 15),
     },
   ]),
   down: (queryInterface) => queryInterface.bulkDelete('Semesters', null, {}),

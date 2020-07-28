@@ -1,4 +1,6 @@
 import { checkSchema, validationResult } from 'express-validator/check';
+import { Op } from 'sequelize';
+import { Semester } from '../../models';
 
 export const check = checkSchema({
   year: {
@@ -13,6 +15,17 @@ export const check = checkSchema({
   },
   startDate: {
     isInt: true,
+  },
+  endDate: {
+    isInt: true,
+    custom: {
+      options: async (value, { req }) => {
+        const isGreater = value > req.body.startDate;
+        const semester = await Semester.findOne({ where: { endDate: { [Op.gte]: Date.now() } }, attributes: ['id'], raw: true });
+        return isGreater && !semester;
+      },
+      errorMessage: 'There is already an ongoing semester or invalid data provided',
+    },
   },
 });
 
