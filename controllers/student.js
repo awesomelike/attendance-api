@@ -1,8 +1,7 @@
-import { Op } from 'sequelize';
 import models from '../models';
-import findWithPagination, { needsPagination } from '../util/pagination';
 import bot from '../bot/utils/sender';
 import cache from '../cache';
+import makeOptions from '../util/queryOptions';
 
 const { Student } = models;
 
@@ -54,44 +53,27 @@ const include = [
   },
 ];
 
-function find(where, res, next) {
-  Student.findAll({
-    where,
-    include,
-  })
-    .then((items) => next(items))
-    .catch((error) => res.status(502).json(error));
-}
-
 export default {
-  get(req, res) {
-    Student.findByPk(req.params.id, { include })
-      .then((student) => res.status(200).json(student))
-      .catch((error) => res.status(502).json(error));
+  async get(req, res) {
+    try {
+      const student = await Student.findByPk(req.params.id, { include });
+      res.status(200).json(student);
+    } catch (error) {
+      console.log(error);
+      res.status(502).json(error.message);
+    }
   },
   async getAll(req, res) {
-    const where = {};
-    if (Object.keys(req.query).length > 0) {
-      Object.keys(req.query).forEach((key) => {
-        if (key !== 'page' && key !== 'size') {
-          if (['name', 'uid', 'rfid'].includes(key)) {
-            where[key] = {
-              [Op.like]: `%${req.query[key]}%`,
-            };
-          } else {
-            where[key] = Number(req.query.key);
-          }
-        }
-      });
-      if (needsPagination(req)) {
-        findWithPagination(Student, include, {
-          page: parseInt(req.query.page, 10),
-          size: parseInt(req.query.size, 10),
-        }, where, res, (students) => {
-          res.status(200).json(students);
-        });
-      } else res.status(200).json(await Student.findAll({ where }));
-    } else find(null, res, (students) => res.status(200).json(students));
+    try {
+      const students = await Student.findAll(makeOptions(req, {
+        include,
+        likeProps: ['name', 'uid', 'rfid'],
+      }));
+      res.status(200).json(students);
+    } catch (error) {
+      console.log(error);
+      res.status(502).json(error.message);
+    }
   },
 
   async handleRfid(req, res) {

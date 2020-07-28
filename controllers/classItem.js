@@ -1,10 +1,10 @@
 import moment from 'moment';
 import models from '../models';
-import findWithPagination, { needsPagination } from '../util/pagination';
 import { GOING_ON, FINISHED } from '../constants/classItems';
 import { executeMissedAtDangerZone } from '../util/sql/missedClasses';
 import { sendEmail, missedClassesNotification } from '../tasks/email';
 import time from '../util/time';
+import makeOptions from '../util/queryOptions';
 
 const { ClassItem } = models;
 
@@ -43,15 +43,6 @@ const includeWithCourse = [
   },
 ];
 
-function find(where, res, next) {
-  ClassItem.findAll({
-    where,
-    include: includeWithStudents,
-  })
-    .then((classItems) => next(classItems))
-    .catch((error) => res.status(502).json(error));
-}
-
 export function isTaughtBy(classItemId, professorId) {
   return new Promise((resolve, reject) => {
     ClassItem.findByPk(classItemId, { include: includeWithCourse })
@@ -82,13 +73,15 @@ function notifyStudents(students) {
 }
 
 export default {
-  getAll(req, res) {
-    if (needsPagination(req)) {
-      findWithPagination(ClassItem, includeWithStudents, {
-        page: parseInt(req.query.page, 10),
-        size: parseInt(req.query.size, 10),
-      }, null, res, (classItems) => res.status(200).json(classItems));
-    } else find(null, res, (classItems) => res.status(200).json(classItems));
+  async getAll(req, res) {
+    try {
+      const classItems = await ClassItem.findAll(makeOptions(req, {
+        include: includeWithStudents,
+      }));
+      res.status(200).json(classItems);
+    } catch (error) {
+      res.status(502).json(error);
+    }
   },
   async get(req, res) {
     try {
@@ -97,11 +90,10 @@ export default {
       });
       if (classItemWithRecords) {
         if (req.query.format === 'excel') {
-          // Later when we will work with real data, will change updatedAt to attendedAt: DONE
           const data = classItemWithRecords.records.map(({ student, isAttended, attendedAt }) => ({
             Name: student.name,
             Attended: isAttended,
-            Time: moment(attendedAt).format('DD/MM/YYYY HH:mm'),
+            Time: moment(attendedAt).format('HH:mm DD.MM.YYYY'),
           }));
           return res.xls(`ClassReport_${classItemWithRecords.id}.xlsx`, data);
         }

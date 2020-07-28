@@ -1,6 +1,5 @@
 import { sign } from 'jsonwebtoken';
 import models from '../models';
-import findWithPagination, { needsPagination } from '../util/pagination';
 import { PLANNED, GOING_ON } from '../constants/classItems';
 import { getPlannedLectures, getGivenLectures } from '../util/sql/lecturesReport';
 import makeOptions from '../util/queryOptions';
@@ -32,15 +31,6 @@ const include = [{
   ],
 }];
 
-function find(where, res, next) {
-  Professor.findAll({
-    where,
-    include,
-  })
-    .then((items) => next(items))
-    .catch((error) => res.status(502).json(error));
-}
-
 function insertDefaultRecords(classItemId, students) {
   const recordsData = students.map(({ id }) => ({
     classItemId,
@@ -71,17 +61,19 @@ function insertDefaultRecords(classItemId, students) {
 }
 
 export default {
-  getAll(req, res) {
-    if (needsPagination(req)) {
-      findWithPagination(Professor, include, {
-        page: parseInt(req.query.page, 10),
-        size: parseInt(req.query.size, 10),
-      }, null, res, (professors) => res.status(200).json(professors));
-    } else find(null, res, (professors) => res.status(200).json(professors));
+  async getAll(req, res) {
+    try {
+      const professors = await Professor.findAll(makeOptions(req, { include }));
+      res.status(200).json(professors);
+    } catch (error) {
+      console.log(error);
+      res.status(502).json(error.message);
+    }
   },
   get(req, res) {
     Professor.findByPk(req.params.id, { include })
-      .then((professor) => res.status(200).json(professor));
+      .then((professor) => res.status(200).json(professor))
+      .catch((error) => res.status(502).json(error.message));
   },
   async getSections(req, res) {
     const options = makeOptions(req, { include: [{ model: models.Course, as: 'course' }] });

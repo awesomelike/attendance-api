@@ -1,6 +1,6 @@
 
 import models from '../models';
-import findWithPagination, { needsPagination } from '../util/pagination';
+import makeOptions from '../util/queryOptions';
 
 const { Record } = models;
 
@@ -34,12 +34,13 @@ const include = [
 ];
 
 export default {
-  getAll(req, res) {
-    if (needsPagination(req)) {
-      findWithPagination(Record, include, {
-        page: parseInt(req.query.page, 10),
-        size: parseInt(req.query.size, 10),
-      }, null, res, (records) => res.status(200).json(records));
+  async getAll(req, res) {
+    try {
+      const records = await Record.findAll(makeOptions(req, { include }));
+      res.status(200).json(records);
+    } catch (error) {
+      console.log(error);
+      res.status(502).json(error.message);
     }
   },
   attend(req, res) {
