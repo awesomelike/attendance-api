@@ -36,7 +36,6 @@ const startedClasses = (now) => ClassItem.findAll({
 const finishedClasses = (now) => {
   const clonedNow = now.clone();
   const date = clonedNow.startOf('day').format('YYYY-MM-DD');
-  console.log(date);
   return new Promise((resolve) => {
     ClassItem.findAll({
       where: sequelize.where(sequelize.fn('DATE', sequelize.col('plannedDate')), date),

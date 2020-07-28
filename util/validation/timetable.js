@@ -42,6 +42,7 @@ export const checkTimetable = checkSchema({
         }
         return true;
       },
+      errorMessage: 'Column names do not match reference names',
     },
   },
   students: {
@@ -53,6 +54,7 @@ export const checkTimetable = checkSchema({
         }
         return true;
       },
+      errorMessage: 'Column names do not match reference names',
     },
   },
 });
@@ -72,6 +74,8 @@ export function validateTimetable(req, res, next) {
       rfid: student.rfid || random(8),
       schoolYear: student['School Year'],
       department: student['Dept.'],
+      'Course No': student['Course No'],
+      'Class No': student['Class No'],
     })),
   };
   next();

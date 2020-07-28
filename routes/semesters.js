@@ -11,7 +11,7 @@ const router = Router();
 
 router.get('/', auth, semester.getAll);
 router.get('/:id', auth, semester.get);
-router.get('/:id/importTimetable', auth, checkTimetable, validateTimetable, storeStudents, storeTimetable);
+router.post('/:id/importTimetable', auth, checkTimetable, validateTimetable, storeStudents, storeTimetable);
 router.post('/', auth, allowRoles([ADMIN, ACADEMIC_AFFAIRS]), check, validate, semester.create);
 
 export default router;

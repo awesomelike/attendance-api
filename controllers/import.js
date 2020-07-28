@@ -25,6 +25,8 @@ export const storeStudents = async (req, res, next) => {
 export const storeTimetable = async (req, res) => {
   try {
     const { timetable, students: studentsTimetable } = req.timetable;
+    console.log('timetable length: ', timetable.length);
+    console.log('students length', studentsTimetable.length);
     const semesterId = parseInt(req.params.id, 10);
     let courses = [];
     let professors = [];
@@ -45,6 +47,7 @@ export const storeTimetable = async (req, res) => {
         label: object.Classroom,
       });
     });
+
     const uniqueCourses = unique(courses, ['courseNumber']);
     const uniqueProfessors = unique(professors, ['uid']);
     const uniqueRooms = unique(rooms, ['label']);
@@ -58,19 +61,20 @@ export const storeTimetable = async (req, res) => {
     await Promise.all(insertProfessorsCoursesRooms);
     professors = await models.Professor.findAll({ attributes: ['id', 'uid'], raw: true });
     courses = await models.Course.findAll({ raw: true });
+
     for (let i = 0; i < courses.length; i += 1) {
       const course = courses[i];
       const particularSections = timetable
-        .filter(({ courseNumber }) => courseNumber === course.courseNumber);
+        .filter((t) => t['Course No.'] === course.courseNumber);
       for (let j = 0; j < particularSections.length; j += 1) {
         const particularSection = particularSections[j];
         const particularClasses = particularSections
-          .filter(({ sectionNumber }) => particularSection.sectionNumber === sectionNumber);
+          .filter((s) => particularSection['Class No'] === s['Class No']);
         sections.push({
           courseId: course.id,
-          sectionNumber: particularSection.sectionNumber,
+          sectionNumber: particularSection['Class No'],
           professorId: professors
-            .find(({ uid }) => uid === particularSection.professorId).id,
+            .find(({ uid }) => uid === particularSection['Prof.ID']).id,
           semesterId,
           classes: particularClasses,
         });
@@ -83,7 +87,6 @@ export const storeTimetable = async (req, res) => {
       courseId, sectionNumber, professorId, semesterId: semId,
     }));
     await models.Section.bulkCreate(sectionsToInsert, { updateOnDuplicate: ['sectionNumber'] });
-
     const allSections = await models.Section.findAll({
       where: { semesterId },
       attributes: ['id', 'sectionNumber', 'courseId'],
@@ -94,22 +97,27 @@ export const storeTimetable = async (req, res) => {
           attributes: ['courseNumber'],
         },
       ],
+      raw: true,
     });
+
     const weekDays = await models.WeekDay.findAll({ raw: true });
     rooms = await models.Room.findAll({ raw: true });
+    // console.log(allSections);
+    // console.log('uniqueSections:', uniqueSections.slice(0, 10));
+    // console.log('classes prop', uniqueSections[0].classes);
     const classesToInsert = [];
     for (let i = 0; i < uniqueSections.length; i += 1) {
       const { classes } = uniqueSections[i];
-      const uniqueClasses = unique(classes, ['courseNumber', 'sectionNumber', 'weekDay']);
+      const uniqueClasses = unique(classes, ['Course No.', 'Class No', 'Lecture day']);
       for (let j = 0; j < uniqueClasses.length; j += 1) {
         const item = uniqueClasses[j];
         classesToInsert.push({
           sectionId: allSections
-            .find(({ sectionNumber, course }) => sectionNumber === item.sectionNumber
-            && course.courseNumber === item.courseNumber).id,
+            .find((s) => s.sectionNumber === item['Class No']
+            && s['course.courseNumber'] === item['Course No.']).id,
           weekDayId: weekDays
-            .find((weekDay) => weekDay.key === item.weekDay).id,
-          roomId: rooms.find(({ label }) => label === item.room).id,
+            .find((weekDay) => weekDay.key === item['Lecture day']).id,
+          roomId: rooms.find(({ label }) => label === item.Classroom).id,
           semesterId,
         });
       }
@@ -135,12 +143,15 @@ export const storeTimetable = async (req, res) => {
       include: classInclude,
       where: { semesterId },
     });
+    // console.log(dbClasses.slice(0, 10));
+    // console.log(uniqueSections.slice(0, 2));
+    // console.log(uniqueSections[0].classes);
     const timeSlots = await models.TimeSlot.findAll({ raw: true });
     const classTimeSlots = [];
     for (let i = 0; i < uniqueSections.length; i += 1) {
       const { classes } = uniqueSections[i];
       classes.forEach(({
-        weekDay, courseNumber, sectionNumber, timeslot,
+        'Lecture day': weekDay, 'Course No.': courseNumber, 'Class No': sectionNumber, 'Lecture time': timeslot,
       }) => {
         const classId = dbClasses
           .find(({ weekDayId, section }) => weekDayId === weekDays
@@ -181,16 +192,18 @@ export const storeTimetable = async (req, res) => {
         }
       }
     });
-    await models.ClassItem.bulkCreate(classItems); // UPDATE_ON_DUPLICATE???
+    await models.ClassItem.bulkCreate(classItems, { updateOnDuplicate: ['plannedDate', 'week'] }); // UPDATE_ON_DUPLICATE???
 
-    const students = await models.Student.findAll();
+    const students = await models.Student.findAll({ raw: true });
+    console.log('students', students.slice(0, 5));
+    console.log('students timetable', studentsTimetable.slice(0, 5));
     const studentSections = [];
     for (let i = 0; i < students.length; i += 1) {
       const particularStudents = studentsTimetable
-        .filter((st) => st['Student ID'] === students[i].uid);
+        .filter((st) => st.uid === students[i].uid);
       for (let j = 0; j < particularStudents.length; j += 1) {
         studentSections.push({
-          studentId: students.find((student) => particularStudents[j]['Student ID'] === student.uid).id,
+          studentId: students.find((student) => particularStudents[j].uid === student.uid).id,
           sectionId: allSections
             .find(({ courseId, sectionNumber }) => courseId === courses
               .find((course) => course.courseNumber === particularStudents[j]['Course No']).id
@@ -198,10 +211,11 @@ export const storeTimetable = async (req, res) => {
         });
       }
     }
+    console.log(studentSections.slice(0, 5));
     await models.StudentSection.bulkCreate(studentSections, { updateOnDuplicate: ['studentId', 'sectionId'] });
     res.sendStatus(200);
   } catch (error) {
-    console.log(error);
+    console.log(error.message);
     res.status(502).json(error.message);
   }
 };
