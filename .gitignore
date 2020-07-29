@@ -6,7 +6,7 @@ yarn-debug.log*
 yarn-error.log*
 
 # File upload folder
-images/
+storage/
 
 # DB Backup folder
 backup/
@@ -67,3 +67,4 @@ typings/
 .next
 
 backups
+test.js
