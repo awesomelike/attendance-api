@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
     Semester.hasMany(models.ClassItem, { as: 'classItems', foreignKey: 'semesterId' });
     Semester.hasMany(models.Makeup, { as: 'makeups', foreignKey: 'semesterId' });
     Semester.hasMany(models.Record, { as: 'records', foreignKey: 'semesterId' });
+    Semester.hasMany(models.TimetableVersion, { as: 'versions', foreignKey: 'semesterId' });
   };
   return Semester;
 };

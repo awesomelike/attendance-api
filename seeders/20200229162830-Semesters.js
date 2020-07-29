@@ -11,7 +11,7 @@ module.exports = {
       year: 2019,
       season: 'Fall',
       startDate: new Date(2019, 8, 9),
-      endDate: new Date(2020, 6, 31),
+      endDate: new Date(2020, 5, 31),
     }, {
       id: 3,
       year: 2020,

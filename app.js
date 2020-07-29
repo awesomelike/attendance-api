@@ -8,6 +8,7 @@ import json2xls from 'json2xls';
 import socketIO from 'socket.io';
 import { createServer } from 'http';
 import authSocket from 'socketio-auth';
+import fileUpload from 'express-fileupload';
 import { socketAuth } from './middlewares/auth';
 import indexRouter from './routes/index';
 // import './bot/bot';
@@ -31,10 +32,12 @@ app.use(logger('dev'));
 app.use(json({ limit: '10mb' }));
 app.use(urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(fileUpload({ limits: { fileSize: 5 * 1024 * 1024 }, abortOnLimit: true }));
 app.use(json2xls.middleware);
 app.use(cors());
 app.use(express.static(join(__dirname, 'public')));
 app.use('/assets', express.static(join(__dirname, 'assets')));
+app.use('/storage', express.static(join(__dirname, 'storage')));
 app.use(express.static(join(__dirname, '../academic_affairs_client/dist')));
 
 // Append Socket.IO to the res object

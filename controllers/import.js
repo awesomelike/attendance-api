@@ -1,3 +1,5 @@
+import { extname } from 'path';
+import moment from 'moment';
 import models from '../models';
 import random from '../util/random';
 import { getSemesterTimeOffset } from '../util/time';
@@ -210,5 +212,58 @@ export const storeTimetable = async (req, res) => {
   } catch (error) {
     console.log(error.message);
     res.status(502).json(error.message);
+  }
+};
+
+export const filter = (req, res, next) => {
+  if (!req.files) return res.status(400).json({ error: 'No files provied' });
+  const { timetable, students } = req.files;
+
+  const isValid = (mimetype) => mimetype === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || mimetype === 'application/vnd.ms-excel';
+
+  if (timetable) {
+    if (!isValid(timetable.mimetype)) return res.status(400).json({ error: 'Invalid mimetype!' });
+  }
+  if (students) {
+    if (!isValid(students.mimetype)) return res.status(400).json({ error: 'Invalid mimetype!' });
+  }
+  next();
+};
+
+const getLastVersion = (semesterId) => models.TimetableVersion.max('version', { where: { semesterId } });
+
+export const upload = async (req, res) => {
+  try {
+    const semesterId = parseInt(req.params.id, 10);
+    const semester = await models.Semester.findByPk(semesterId, { raw: true });
+    if (!semester) { throw new Error('No semester found'); }
+    const { timetable, students } = req.files;
+    if (!timetable && !students) { throw new Error('No files provied!'); }
+
+    const { year, season } = semester;
+    const lastVersion = await getLastVersion(semesterId);
+    const newVersion = lastVersion ? lastVersion + 1 : 1;
+
+    const fileName = (type, name) => `/storage/${season}${year}_v${newVersion}_${type}_${moment().format('DD-MM-YYYY')}${extname(name)}`;
+
+    const timetableVersion = { semesterId, version: newVersion };
+    if (timetable) {
+      const path = fileName('Timetable', timetable.name);
+      timetable.mv(`.${path}`, (error) => {
+        if (error) { throw new Error(error); }
+      });
+      timetableVersion.fileTimetable = path;
+    }
+    if (students) {
+      const path = fileName('Students', students.name);
+      students.mv(`.${path}`, (error) => {
+        if (error) { throw new Error(error); }
+      });
+      timetableVersion.fileStudents = path;
+    }
+    const created = await models.TimetableVersion.create(timetableVersion);
+    res.status(200).json(created);
+  } catch (error) {
+    res.status(502).json({ error: error.message });
   }
 };

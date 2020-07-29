@@ -3,6 +3,7 @@ import models from '../models';
 import appEmitter from '../events/app';
 import cache from '../cache';
 import makeOptions from '../util/queryOptions';
+import versionAttr from '../util/versionAttr';
 
 const { Semester } = models;
 
@@ -75,6 +76,22 @@ export default {
       res.status(200).json(semester);
     } catch (error) {
       console.log(error);
+      res.status(502).json(error.message);
+    }
+  },
+  async getVersions(req, res) {
+    try {
+      const semesters = await Semester.findByPk(req.params.id, {
+        include: [
+          {
+            model: models.TimetableVersion,
+            as: 'versions',
+            attributes: versionAttr,
+          },
+        ],
+      });
+      res.status(200).json(semesters);
+    } catch (error) {
       res.status(502).json(error.message);
     }
   },
