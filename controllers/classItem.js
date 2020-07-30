@@ -93,7 +93,7 @@ export default {
           const data = classItemWithRecords.records.map(({ student, isAttended, attendedAt }) => ({
             Name: student.name,
             Attended: isAttended,
-            Time: moment(attendedAt).format('HH:mm DD.MM.YYYY'),
+            Time: moment(attendedAt).format('DD.MM.YYYY HH:mm'),
           }));
           return res.xls(`ClassReport_${classItemWithRecords.id}.xlsx`, data);
         }
