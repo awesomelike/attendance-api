@@ -3,6 +3,12 @@ import moment from 'moment';
 import models from '../models';
 import random from '../util/random';
 import { getSemesterTimeOffset } from '../util/time';
+import { setNames } from './semester';
+import versionAttr from '../util/versionAttr';
+
+require('dotenv').config();
+
+const baseURL = process.env.BASE_URL;
 
 const unique = (arr, keyProps) => {
   const kvArray = arr.map((entry) => {
@@ -17,23 +23,53 @@ export const storeStudents = async (req, res, next) => {
   try {
     const { students } = req.timetable;
     const uniqueStudents = unique(students, ['uid']);
-    await models.Student.bulkCreate(uniqueStudents, { returning: true, updateOnDuplicate: ['name'] });
+    await models.Student.bulkCreate(uniqueStudents, { returning: true, updateOnDuplicate: ['name', 'schoolYear'] });
     next();
   } catch (error) {
     res.status(502).json(error);
   }
 };
 
+const storeStudentsSections = (
+  semesterId,
+  studentsTimetable,
+  students,
+  sections,
+  courses,
+) => new Promise((resolve, reject) => {
+  const studentSections = [];
+  for (let i = 0; i < students.length; i += 1) {
+    const particularStudents = studentsTimetable
+      .filter((st) => st.uid === students[i].uid);
+    for (let j = 0; j < particularStudents.length; j += 1) {
+      studentSections.push({
+        studentId: students.find((student) => particularStudents[j].uid === student.uid).id,
+        sectionId: sections
+          .find(({ courseId, sectionNumber }) => courseId === courses
+            .find((course) => course.courseNumber === particularStudents[j]['Course No']).id
+                && sectionNumber === particularStudents[j]['Class No']).id,
+        semesterId,
+      });
+    }
+  }
+  models.StudentSection.destroy({ where: { semesterId } })
+    .then(() => models.StudentSection.bulkCreate(studentSections, { updateOnDuplicate: ['studentId', 'sectionId'] }))
+    .then(() => resolve(true))
+    .catch((error) => reject(error));
+});
+
 export const storeTimetable = async (req, res) => {
   try {
     const { timetable, students: studentsTimetable } = req.timetable;
     console.log('timetable length: ', timetable.length);
     console.log('students length', studentsTimetable.length);
+
     const semesterId = parseInt(req.params.id, 10);
     let courses = [];
     let professors = [];
     let rooms = [];
     const sections = [];
+
     timetable.forEach((object) => {
       courses.push({
         courseNumber: object['Course No.'],
@@ -61,6 +97,7 @@ export const storeTimetable = async (req, res) => {
     ];
 
     await Promise.all(insertProfessorsCoursesRooms);
+
     professors = await models.Professor.findAll({ attributes: ['id', 'uid'], raw: true });
     courses = await models.Course.findAll({ raw: true });
 
@@ -158,9 +195,10 @@ export const storeTimetable = async (req, res) => {
               && section.sectionNumber === sectionNumber).id;
         const timeSlotId = timeSlots
           .find((t) => t.startTime === timeslot).id;
-        classTimeSlots.push({ timeSlotId, classId });
+        classTimeSlots.push({ timeSlotId, classId, semesterId });
       });
     }
+    await models.ClassTimeSlot.destroy({ where: { semesterId } });
     await models.ClassTimeSlot.bulkCreate(classTimeSlots, { updateOnDuplicate: ['timeSlotId', 'classId'] });
 
     const semester = await models.Semester.findByPk(semesterId);
@@ -193,27 +231,30 @@ export const storeTimetable = async (req, res) => {
     await models.ClassItem.bulkCreate(classItems, { updateOnDuplicate: ['plannedDate', 'week'] }); // UPDATE_ON_DUPLICATE???
 
     const students = await models.Student.findAll({ raw: true });
-    const studentSections = [];
-    for (let i = 0; i < students.length; i += 1) {
-      const particularStudents = studentsTimetable
-        .filter((st) => st.uid === students[i].uid);
-      for (let j = 0; j < particularStudents.length; j += 1) {
-        studentSections.push({
-          studentId: students.find((student) => particularStudents[j].uid === student.uid).id,
-          sectionId: allSections
-            .find(({ courseId, sectionNumber }) => courseId === courses
-              .find((course) => course.courseNumber === particularStudents[j]['Course No']).id
-                && sectionNumber === particularStudents[j]['Class No']).id,
-        });
-      }
-    }
-    await models.StudentSection.bulkCreate(studentSections, { updateOnDuplicate: ['studentId', 'sectionId'] });
+    await storeStudentsSections(semesterId, studentsTimetable, students, allSections, courses);
+    // const studentSections = [];
+    // for (let i = 0; i < students.length; i += 1) {
+    //   const particularStudents = studentsTimetable
+    //     .filter((st) => st.uid === students[i].uid);
+    //   for (let j = 0; j < particularStudents.length; j += 1) {
+    //     studentSections.push({
+    //       studentId: students.find((student) => particularStudents[j].uid === student.uid).id,
+    //       sectionId: allSections
+    //         .find(({ courseId, sectionNumber }) => courseId === courses
+    //           .find((course) => course.courseNumber === particularStudents[j]['Course No']).id
+    //             && sectionNumber === particularStudents[j]['Class No']).id,
+    //     });
+    //   }
+    // }
+    // await models.StudentSection.destroy({ where: { semesterId } });
+    // await models.StudentSection.bulkCreate(studentSections, { updateOnDuplicate: ['studentId', 'sectionId'] });
     res.sendStatus(200);
   } catch (error) {
     console.log(error.message);
     res.status(502).json(error.message);
   }
 };
+
 
 export const filter = (req, res, next) => {
   if (!req.files) return res.status(400).json({ error: 'No files provied' });
@@ -246,7 +287,12 @@ export const upload = async (req, res) => {
 
     const fileName = (type, name) => `/storage/${season}${year}_v${newVersion}_${type}_${moment().format('DD-MM-YYYY')}${extname(name)}`;
 
-    const timetableVersion = { semesterId, version: newVersion };
+    const timetableVersion = {
+      semesterId,
+      version: newVersion,
+      addedById: req.account.id,
+    };
+
     if (timetable) {
       const path = fileName('Timetable', timetable.name);
       timetable.mv(`.${path}`, (error) => {
@@ -261,7 +307,20 @@ export const upload = async (req, res) => {
       });
       timetableVersion.fileStudents = path;
     }
-    const created = await models.TimetableVersion.create(timetableVersion);
+
+    const { id } = await models.TimetableVersion.create(timetableVersion);
+    const created = await models.TimetableVersion.findByPk(id, {
+      attributes: versionAttr,
+      include: [
+        {
+          model: models.Account,
+          as: 'addedBy',
+        },
+      ],
+    });
+
+    setNames(created);
+
     res.status(200).json(created);
   } catch (error) {
     res.status(502).json({ error: error.message });

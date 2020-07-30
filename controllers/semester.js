@@ -1,4 +1,5 @@
 import { Op } from 'sequelize';
+import { basename } from 'path';
 import models from '../models';
 import appEmitter from '../events/app';
 import cache from '../cache';
@@ -33,6 +34,11 @@ export const getCurrentSemester = () => new Promise((resolve) => {
 
 const include = [
   {
+    model: models.TimetableVersion,
+    as: 'versions',
+    attributes: ['id'],
+  },
+  {
     model: models.Section,
     as: 'sections',
     include: [
@@ -50,11 +56,20 @@ const include = [
 
 // eslint-disable-next-line no-param-reassign
 const setStatus = ({ dataValues }) => { dataValues.status = new Date(dataValues.endDate).getTime() > Date.now() ? 'Ongoing' : 'Finished'; };
-
+export const setNames = ({ dataValues }) => {
+  if (dataValues.fileStudents) {
+    // eslint-disable-next-line no-param-reassign
+    dataValues.fileStudentsName = basename(dataValues.fileStudents);
+  }
+  if (dataValues.fileTimetable) {
+    // eslint-disable-next-line no-param-reassign
+    dataValues.fileTimetableName = basename(dataValues.fileTimetable);
+  }
+};
 export default {
   async getAll(req, res) {
     try {
-      const semesters = await Semester.findAll(makeOptions(req, { order: [['id', 'DESC']] }));
+      const semesters = await Semester.findAll(makeOptions(req, { order: [['id', 'DESC']], include }));
       semesters.forEach(setStatus);
       res.status(200).json(semesters);
     } catch (error) {
@@ -75,22 +90,54 @@ export default {
       const semester = await Semester.create(req.semester);
       res.status(200).json(semester);
     } catch (error) {
+      if (error.code === 'ER_DUP_ENTRY') return res.status(400).json({ error: 'This semester already exists!' });
       console.log(error);
+      res.status(502).json(error.message);
+    }
+  },
+  async delete(req, res) {
+    try {
+      const semester = await Semester.findByPk(req.params.id, {
+        attributes: ['id'],
+        include: [
+          {
+            model: models.TimetableVersion,
+            as: 'versions',
+            attributes: ['id'],
+          },
+        ],
+      });
+      if (!semester) { throw new Error('Semester does not exist'); }
+      if (semester.versions.length) { throw new Error('This already has a timetable!'); }
+      await models.Semester.destroy({ where: { id: req.params.id } });
+      res.sendStatus(200);
+    } catch (error) {
       res.status(502).json(error.message);
     }
   },
   async getVersions(req, res) {
     try {
-      const semesters = await Semester.findByPk(req.params.id, {
+      const semester = await Semester.findByPk(req.params.id, {
+        order: [[{ model: models.TimetableVersion, as: 'versions' }, 'createdAt', 'DESC']],
         include: [
           {
             model: models.TimetableVersion,
             as: 'versions',
             attributes: versionAttr,
+            include: [
+              {
+                model: models.Account,
+                as: 'addedBy',
+              },
+            ],
           },
         ],
       });
-      res.status(200).json(semesters);
+      if (!semester) return res.status(400).json({ error: 'No semester found!' });
+
+      semester.versions.forEach(setNames);
+
+      res.status(200).json(semester);
     } catch (error) {
       res.status(502).json(error.message);
     }

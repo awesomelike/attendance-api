@@ -9,5 +9,6 @@ export default [
   'fileTimetable',
   [Sequelize.fn('CONCAT', process.env.BASE_URL, Sequelize.col('fileStudents')), 'fileStudents'],
   [Sequelize.fn('CONCAT', process.env.BASE_URL, Sequelize.col('fileTimetable')), 'fileTimetable'],
+  'addedById',
   'createdAt',
 ];

@@ -21,6 +21,13 @@ module.exports = {
           key: 'id',
         },
       },
+      semesterId: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Semesters',
+          key: 'id',
+        },
+      },
     });
     await queryInterface.addConstraint('StudentSections', ['studentId', 'sectionId'], {
       type: 'unique',

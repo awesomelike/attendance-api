@@ -10,6 +10,7 @@ module.exports = (sequelize, DataTypes) => {
   Account.associate = (models) => {
     Account.belongsTo(models.Role, { as: 'role', foreignKey: 'roleId' });
     Account.hasOne(models.Professor, { as: 'professor', foreignKey: 'accountId' });
+    Account.hasMany(models.TimetableVersion, { as: 'timetableVersions', foreignKey: 'accountId' });
   };
   return Account;
 };

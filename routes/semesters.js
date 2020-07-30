@@ -17,5 +17,6 @@ router.post('/:id/importTimetable', auth, checkTimetable, validateTimetable, sto
 router.post('/:id/uploadFiles', auth, allowRoles([ADMIN, ACADEMIC_AFFAIRS]), filter, upload);
 router.get('/:id/versions', auth, allowRoles([ADMIN, ACADEMIC_AFFAIRS]), semester.getVersions);
 router.post('/', auth, allowRoles([ADMIN, ACADEMIC_AFFAIRS]), check, validate, semester.create);
+router.delete('/:id', auth, allowRoles([ADMIN, ACADEMIC_AFFAIRS]), semester.delete);
 
 export default router;

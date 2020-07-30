@@ -1,7 +1,8 @@
 module.exports = (sequelize, DataTypes) => {
   const ClassTimeSlot = sequelize.define('ClassTimeSlot', {
-    timeSlotId: DataTypes.INTEGER,
     classId: DataTypes.INTEGER,
+    timeSlotId: DataTypes.INTEGER,
+    semesterId: DataTypes.INTEGER,
   }, { timestamps: false });
   ClassTimeSlot.associate = () => {};
   return ClassTimeSlot;

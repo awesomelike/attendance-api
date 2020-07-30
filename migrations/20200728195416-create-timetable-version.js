@@ -13,15 +13,22 @@ module.exports = {
         key: 'id',
       },
     },
+    version: {
+      type: Sequelize.INTEGER,
+      defaultValue: 1,
+    },
     fileStudents: {
       type: Sequelize.STRING,
     },
     fileTimetable: {
       type: Sequelize.STRING,
     },
-    version: {
+    addedById: {
       type: Sequelize.INTEGER,
-      defaultValue: 1,
+      references: {
+        model: 'Accounts',
+        key: 'id',
+      },
     },
     createdAt: {
       allowNull: false,
