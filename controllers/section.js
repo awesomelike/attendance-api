@@ -1,5 +1,5 @@
 import models from '../models';
-import findWithPagination, { needsPagination } from '../util/pagination';
+import makeOptions from '../util/queryOptions';
 
 const { Section } = models;
 
@@ -14,23 +14,15 @@ const include = [
   },
 ];
 
-function find(where, res, next) {
-  Section.findAll({
-    where,
-    include,
-  })
-    .then((sections) => next(sections))
-    .catch((error) => res.status(502).json(error));
-}
-
 export default {
-  getAll(req, res) {
-    if (needsPagination(req)) {
-      findWithPagination(Section, include, {
-        page: Number(req.query.page),
-        size: Number(req.query.size),
-      }, null, res, (sections) => res.status(200).json(sections));
-    } else find(null, res, (sections) => res.status(200).json(sections));
+  async getAll(req, res) {
+    try {
+      const sections = await Section.findAll(makeOptions(req, { include }));
+      res.status(200).json(sections);
+    } catch (error) {
+      console.log(error);
+      res.status(502).json(error.message);
+    }
   },
   async get(req, res) {
     try {

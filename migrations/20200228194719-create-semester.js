@@ -9,15 +9,19 @@ module.exports = {
       },
       year: {
         type: Sequelize.INTEGER,
+        allowNull: false,
       },
       season: {
         type: Sequelize.STRING(32),
+        allowNull: false,
       },
       startDate: {
         type: Sequelize.DATEONLY,
+        allowNull: false,
       },
       endDate: {
         type: Sequelize.DATEONLY,
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,

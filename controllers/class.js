@@ -1,5 +1,5 @@
 import models from '../models';
-import findWithPagination, { needsPagination } from '../util/pagination';
+import makeOptions from '../util/queryOptions';
 
 const { Class } = models;
 
@@ -19,23 +19,15 @@ const include = [
   },
 ];
 
-function find(where, res, next) {
-  Class.findAll({
-    where,
-    include,
-  })
-    .then((classes) => next(classes))
-    .catch((error) => res.status(502).json(error));
-}
-
 export default {
-  getAll(req, res) {
-    if (needsPagination(req)) {
-      findWithPagination(Class, include, {
-        page: Number(req.query.page),
-        size: Number(req.query.size),
-      }, null, res, (classes) => res.status(200).json(classes));
-    } else find(null, res, (classes) => res.status(200).json(classes));
+  async getAll(req, res) {
+    try {
+      const classes = await Class.findAll(makeOptions(req, { include }));
+      res.status(200).json(classes);
+    } catch (error) {
+      console.log(error);
+      res.status(502).json(error.message);
+    }
   },
   get(req, res) {
     Class.findByPk(req.params.id)
