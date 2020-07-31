@@ -18,6 +18,9 @@ const setCache = async (callback) => {
 
 appEmitter.on('started', async () => {
   setCache(() => console.log('Cache has been initialized'));
+  setInterval(() => {
+    setCache(() => console.log('Cache has been updated'));
+  }, 60 * 1000);
 });
 
 export const getCurrentSemester = () => new Promise((resolve) => {

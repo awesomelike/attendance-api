@@ -57,13 +57,12 @@ export default {
       return undefined;
     }
   },
-  async getCurrentWeek() {
+  async getCurrentWeek(date) {
     return new Promise((resolve, reject) => {
       getCurrentSemester()
         .then(({ startDate: semesterStartDate }) => {
-          console.log('startDate:', moment(semesterStartDate).format('DD.MM.YYYY'));
-          const week = moment(TIME).week() - moment(semesterStartDate).week() + 1;
-          console.log('week', week);
+          // const week = moment(TIME).week() - moment(semesterStartDate).week() + 1;
+          const week = moment(date).week() - moment(semesterStartDate).week() + 1;
           resolve(week);
         })
         .catch((error) => reject(error));
