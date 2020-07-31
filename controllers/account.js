@@ -41,9 +41,7 @@ export default {
         await models.Professor.update({
           accountId: account.id,
         }, {
-          where: {
-            id: req.newAccount.professorId,
-          },
+          where: { id: req.newAccount.professorId },
         });
       }
       const createdAccount = await Account.findByPk(account.id, options);

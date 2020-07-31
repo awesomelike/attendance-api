@@ -6,7 +6,7 @@ async function findAccount(where, res, next) {
   try {
     const account = await models.Account.findOne({
       where,
-      attributes: ['id', 'username', 'password', 'roleId'],
+      attributes: ['id', 'username', 'password', 'roleId', 'accountStatus'],
       include: [
         {
           model: models.Role,
@@ -39,6 +39,9 @@ export default {
       };
 
       if (account.professor) toEncode.professorId = account.professor.id;
+      if (account.accountStatus === 0) {
+        return res.status(401).json({ error: 'This account is deactivated!' });
+      }
 
       if (compareSync(req.body.password, account.password)) {
         sign(toEncode, process.env.JWT_KEY, { expiresIn: '12h' },

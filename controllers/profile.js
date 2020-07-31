@@ -40,6 +40,7 @@ export default {
     }
   },
   getMakeups(req, res) {
+    console.log(req.account);
     models.Professor.findByPk(req.account.professorId, {
       include: [
         {
@@ -50,7 +51,7 @@ export default {
       ],
     })
       .then((result) => res.status(200).json(result.makeups))
-      .catch((error) => res.status(502).json(error));
+      .catch((error) => { console.log(error); res.status(502).json(error.message); });
   },
   updateProfile(req, res) {
     Account.update(req.validatedAccount, { where: { id: req.account.id } })
