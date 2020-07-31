@@ -88,21 +88,23 @@ export default {
       const classItemWithRecords = await ClassItem.findByPk(req.params.id, {
         include: includeWithStudents,
       });
-      if (classItemWithRecords) {
-        if (req.query.format === 'excel') {
-          const data = classItemWithRecords.records.map(({ student, isAttended, attendedAt }) => ({
-            Name: student.name,
-            Attended: isAttended,
-            Time: moment(attendedAt).format('DD.MM.YYYY HH:mm'),
-          }));
-          return res.xls(`ClassReport_${classItemWithRecords.id}.xlsx`, data);
-        }
-        res.status(200).json(classItemWithRecords);
-      } else res.sendStatus(404);
+      res.status(200).json(classItemWithRecords);
     } catch (error) {
       console.log(error);
       res.status(502).json(error.message);
     }
+  },
+  async getExcel(req, res) {
+    const classItemWithRecords = await ClassItem.findByPk(req.params.id, {
+      include: includeWithStudents,
+    });
+    const data = classItemWithRecords.records.map(({ student, isAttended, attendedAt }) => ({
+      ID: student.uid,
+      Name: student.name,
+      Attended: isAttended,
+      Time: attendedAt ? moment(attendedAt).format('DD.MM.YYYY HH:mm') : '-',
+    }));
+    return res.xls(`ClassReport_${classItemWithRecords.id}.xlsx`, data);
   },
   async finishClass(req, res) {
     try {

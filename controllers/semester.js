@@ -69,7 +69,10 @@ export const setNames = ({ dataValues }) => {
 export default {
   async getAll(req, res) {
     try {
-      const semesters = await Semester.findAll(makeOptions(req, { order: [['id', 'DESC']], include }));
+      const semesters = await Semester.findAll(makeOptions(req, {
+        order: [['id', 'DESC']],
+        include,
+      }));
       semesters.forEach(setStatus);
       res.status(200).json(semesters);
     } catch (error) {
@@ -89,6 +92,7 @@ export default {
     try {
       const semester = await Semester.create(req.semester);
       res.status(200).json(semester);
+      setCache(() => console.log('Cache updated!'));
     } catch (error) {
       if (error.code === 'ER_DUP_ENTRY') return res.status(400).json({ error: 'This semester already exists!' });
       console.log(error);

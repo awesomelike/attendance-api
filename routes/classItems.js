@@ -9,6 +9,7 @@ const router = Router();
 
 router.get('/', auth, allowRoles([ADMIN, ACADEMIC_AFFAIRS, PROFESSOR]), classItem.getAll);
 router.get('/:id', auth, allowRoles([ADMIN, ACADEMIC_AFFAIRS, PROFESSOR]), classItem.get);
+router.get('/:id/excel', classItem.getExcel);
 router.get('/:id/rfid', authAttendance, classItem.get);
 router.post('/:id', checkProfessorRfid, validateRfid, classItem.finishClass);
 
