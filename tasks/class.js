@@ -102,8 +102,8 @@ const ClassJob = new CronJob('* * * * *', async () => {
     const startedStudents = flatten(started);
     const finishedStudents = flatten(finished);
 
-    console.log('started', startedStudents);
-    console.log('finished', finishedStudents);
+    // console.log('started', startedStudents);
+    // console.log('finished', finishedStudents);
 
     await Student.update({ inClass: false }, { where: { id: finishedStudents } });
     await Student.update({ inClass: true }, { where: { id: startedStudents } });

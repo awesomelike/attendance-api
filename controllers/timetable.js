@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { Op } from 'sequelize';
+import sequelize, { Op } from 'sequelize';
 import models from '../models';
 import timetable from '../data/timetable.json';
 import studentsTimetable from '../data/students.json';
@@ -84,7 +84,6 @@ const storeTimetable = (req, res) => new Promise(() => {
           courseId, sectionNumber, professorId, semesterId,
         }));
 
-        // models.sequelize.getQueryInterface().bulkInsert('Sections', sectionsToInsert, {})
         await models.Section.bulkCreate(sectionsToInsert, { updateOnDuplicate: ['sectionNumber'] });
         const allSections = await models.Section.findAll({
           include: [
@@ -309,7 +308,6 @@ export default {
         phoneNumber: mobile.phoneNumber,
       });
     });
-    // models.sequelize.getQueryInterface().bulkInsert('TelegramAccounts', telegramAccounts, {})
     await models.TelegramAccount.bulkCreate(telegramAccounts);
     console.log('Telegram accounts inserted!');
     res.sendStatus(200);
@@ -317,9 +315,7 @@ export default {
   getProfessorTimetable(req, res) {
     const { id } = req.params;
     models.Professor.findOne({
-      where: {
-        id,
-      },
+      where: { id },
       attributes: { exclude: ['createdAt', 'updatedAt'] },
       include: [
         {
@@ -360,9 +356,7 @@ export default {
   getDayTimetable(req, res) {
     const { weekDayId } = req.params;
     models.WeekDay.findAll({
-      where: {
-        id: weekDayId,
-      },
+      where: { id: weekDayId },
       attributes: { exclude: ['createdAt', 'updatedAt'] },
       include: [
         {
@@ -389,9 +383,7 @@ export default {
             {
               model: models.TimeSlot,
               as: 'timeSlots',
-              through: {
-                attributes: [],
-              },
+              through: { attributes: [] },
             },
           ],
         },
@@ -400,19 +392,57 @@ export default {
       .then((result) => res.status(200).json(result))
       .catch((error) => res.status(502).json(error));
   },
-  async getDateTimetable(req, res) {
+  async getProfTimetableByDate(req, res) {
+    const professorId = parseInt(req.params.id, 10);
+    const date = moment(parseInt(req.params.date, 10)).startOf('day').format('YYYY-MM-DD');
+
     models.ClassItem.findAll({
-      attributes: { exclude: ['createdAt', 'updatedAt'] },
+      where: sequelize.where(sequelize.fn('DATE', sequelize.col('plannedDate')), date),
+      include: [
+        {
+          model: models.Class,
+          as: 'class',
+          attributes: { exclude: ['createdAt', 'updatedAt'] },
+          include: [
+            {
+              model: models.WeekDay,
+              as: 'weekDay',
+            },
+            {
+              model: models.Section,
+              as: 'section',
+              include: [
+                {
+                  model: models.Professor,
+                  as: 'professor',
+                  where: { id: professorId },
+                },
+                {
+                  model: models.Course,
+                  as: 'course',
+                  attributes: { exclude: ['createdAt', 'updatedAt'] },
+                },
+              ],
+            },
+            {
+              model: models.TimeSlot,
+              as: 'timeSlots',
+              through: { attributes: [] },
+            },
+          ],
+        },
+      ],
     })
+      .then((finalResult) => res.status(200).json(finalResult.filter((r) => !!r.class.section)))
+      .catch((error) => res.status(502).json(error));
+  },
+  async getDateTimetable(req, res) {
+    models.ClassItem.findAll({ attributes: { exclude: ['createdAt', 'updatedAt'] } })
       .then((result) => {
         const neededClasses = result
-          .filter(({ date }) => moment(date).startOf('day').valueOf() === moment(Number(req.params.date)).startOf('day').valueOf());
+          .filter(({ plannedDate }) => moment(plannedDate).startOf('day').valueOf() === moment(parseInt(req.params.date, 10)).startOf('day').valueOf());
         models.ClassItem.findAll({
-          where: {
-            id: {
-              [Op.in]: neededClasses.map(({ id }) => id),
-            },
-          },
+          where: { id: { [Op.in]: neededClasses.map(({ id }) => id) } },
           include: [
             {
               model: models.Class,
@@ -443,9 +473,7 @@ export default {
                 {
                   model: models.TimeSlot,
                   as: 'timeSlots',
-                  through: {
-                    attributes: [],
-                  },
+                  through: { attributes: [] },
                 },
               ],
             },

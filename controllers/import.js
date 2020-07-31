@@ -8,8 +8,6 @@ import versionAttr from '../util/versionAttr';
 
 require('dotenv').config();
 
-const baseURL = process.env.BASE_URL;
-
 const unique = (arr, keyProps) => {
   const kvArray = arr.map((entry) => {
     const key = keyProps.map((k) => entry[k]).join('|');
@@ -186,7 +184,10 @@ export const storeTimetable = async (req, res) => {
     for (let i = 0; i < uniqueSections.length; i += 1) {
       const { classes } = uniqueSections[i];
       classes.forEach(({
-        'Lecture day': weekDay, 'Course No.': courseNumber, 'Class No': sectionNumber, 'Lecture time': timeslot,
+        'Lecture day': weekDay,
+        'Course No.': courseNumber,
+        'Class No': sectionNumber,
+        'Lecture time': timeslot,
       }) => {
         const classId = dbClasses
           .find(({ weekDayId, section }) => weekDayId === weekDays
@@ -199,7 +200,9 @@ export const storeTimetable = async (req, res) => {
       });
     }
     await models.ClassTimeSlot.destroy({ where: { semesterId } });
-    await models.ClassTimeSlot.bulkCreate(classTimeSlots, { updateOnDuplicate: ['timeSlotId', 'classId'] });
+    await models.ClassTimeSlot.bulkCreate(classTimeSlots, {
+      updateOnDuplicate: ['timeSlotId', 'classId'],
+    });
 
     const semester = await models.Semester.findByPk(semesterId);
     const classItems = [];
@@ -216,6 +219,7 @@ export const storeTimetable = async (req, res) => {
 
     // eslint-disable-next-line no-shadow
     classesWithTimeSlots.forEach(({ id, weekDayId, timeSlots }) => {
+      if (!timeSlots.length) console.log(id);
       for (let week = 1; week <= 16; week += 1) {
         if (week !== 8 && week !== 16) {
           classItems.push({
@@ -232,29 +236,13 @@ export const storeTimetable = async (req, res) => {
 
     const students = await models.Student.findAll({ raw: true });
     await storeStudentsSections(semesterId, studentsTimetable, students, allSections, courses);
-    // const studentSections = [];
-    // for (let i = 0; i < students.length; i += 1) {
-    //   const particularStudents = studentsTimetable
-    //     .filter((st) => st.uid === students[i].uid);
-    //   for (let j = 0; j < particularStudents.length; j += 1) {
-    //     studentSections.push({
-    //       studentId: students.find((student) => particularStudents[j].uid === student.uid).id,
-    //       sectionId: allSections
-    //         .find(({ courseId, sectionNumber }) => courseId === courses
-    //           .find((course) => course.courseNumber === particularStudents[j]['Course No']).id
-    //             && sectionNumber === particularStudents[j]['Class No']).id,
-    //     });
-    //   }
-    // }
-    // await models.StudentSection.destroy({ where: { semesterId } });
-    // await models.StudentSection.bulkCreate(studentSections, { updateOnDuplicate: ['studentId', 'sectionId'] });
+
     res.sendStatus(200);
   } catch (error) {
     console.log(error.message);
     res.status(502).json(error.message);
   }
 };
-
 
 export const filter = (req, res, next) => {
   if (!req.files) return res.status(400).json({ error: 'No files provied' });
@@ -323,6 +311,7 @@ export const upload = async (req, res) => {
 
     res.status(200).json(created);
   } catch (error) {
+    console.log(error);
     res.status(502).json({ error: error.message });
   }
 };

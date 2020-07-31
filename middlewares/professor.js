@@ -159,7 +159,7 @@ export default async function getCurrentClassAndSection(req, res, next) {
     };
     next();
   } catch (error) {
-    console.log(error.message);
+    console.log(error);
     res.status(502).json(error.message);
   }
 }
