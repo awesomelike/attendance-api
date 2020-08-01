@@ -42,16 +42,18 @@ function insertDefaultRecords(classItemId, students) {
     models.Record.bulkCreate(recordsData)
       .then(() => {
         models.ClassItem.findByPk(classItemId, {
-          include: [{
-            model: models.Record,
-            as: 'records',
-            include: [
-              {
-                model: models.Student,
-                as: 'student',
-              },
-            ],
-          }],
+          include: [
+            {
+              model: models.Record,
+              as: 'records',
+              include: [
+                {
+                  model: models.Student,
+                  as: 'student',
+                },
+              ],
+            },
+          ],
         })
           .then(({ records }) => resolve(records))
           .catch((error) => { throw new Error(error); });
@@ -66,7 +68,8 @@ export default {
       const unassinged = req.query.unassigned;
       const options = makeOptions(req, {
         include: unassinged ? [] : include,
-        where: unassinged ? { accountId: null } : null,
+        where: unassinged ? { accountId: null } : {},
+        ignoreProps: ['unassigned'],
       });
       const professors = await Professor.findAll(options);
       res.status(200).json(professors);
@@ -124,9 +127,7 @@ export default {
           currentSection.students,
         );
         await currentClassItem.update({ classItemStatusId: GOING_ON, date: Date.now() });
-        await models.Student.update({
-          inClass: true,
-        }, {
+        await models.Student.update({ inClass: true }, {
           where: { id: currentSection.students.map(({ id }) => id) },
         });
       }

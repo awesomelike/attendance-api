@@ -61,8 +61,8 @@ export default {
     return new Promise((resolve, reject) => {
       getCurrentSemester()
         .then(({ startDate: semesterStartDate }) => {
-          // const week = moment(TIME).week() - moment(semesterStartDate).week() + 1;
-          const week = moment(date).week() - moment(semesterStartDate).week() + 1;
+          const week = moment(date || TIME).week() - moment(semesterStartDate).week() + 1; // FOR STARTING CLASS
+          // const week = moment(date).week() - moment(semesterStartDate).week() + 1; //FOR OTHER
           resolve(week);
         })
         .catch((error) => reject(error));

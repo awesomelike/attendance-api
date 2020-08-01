@@ -19,6 +19,12 @@ async function findAccount(where, res, next) {
           attributes: ['id'],
           required: false,
         },
+        {
+          model: models.Assistant,
+          as: 'assistant',
+          attributes: ['id', 'professorId'],
+          required: false,
+        },
       ],
     }, { raw: true });
     if (account) {
@@ -39,6 +45,7 @@ export default {
       };
 
       if (account.professor) toEncode.professorId = account.professor.id;
+      if (account.assistant) { toEncode.professorId = account.assistant.professorId; }
       if (account.accountStatus === 0) {
         return res.status(401).json({ error: 'This account is deactivated!' });
       }

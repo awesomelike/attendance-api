@@ -1,7 +1,7 @@
 import models from '../models';
 import executeMissedClasses from '../util/sql/missedClasses';
 import { idOf } from '../util/id';
-import { PROFESSOR } from '../data/seed/roles';
+import { PROFESSOR, ASSISTANT } from '../data/seed/roles';
 
 const { Course } = models;
 
@@ -23,7 +23,7 @@ function find(where, res, next) {
 
 export default {
   async getAll(req, res) {
-    if (idOf(PROFESSOR) === req.account.roleId) {
+    if (idOf(PROFESSOR) === req.account.roleId || idOf(ASSISTANT) === req.account.roleId) {
       console.log(req.account);
       const professorCourses = await Course.findAll({
         include: [
@@ -65,7 +65,7 @@ export default {
   },
   async getMissedClasses(req, res) {
     try {
-      const data = await executeMissedClasses(req.query.week);
+      const data = await executeMissedClasses(req.query.week, req.account.professorId);
       if (req.query.format === 'excel') return res.xls(`Report_Misses_Until_Week${req.params.week}.xlsx`, data);
       res.status(200).json(data);
     } catch (error) {
@@ -74,25 +74,19 @@ export default {
   },
   getSemesterReport(req, res) {
     Course.findOne({
-      where: {
-        id: parseInt(req.query.courseId, 10),
-      },
+      where: { id: parseInt(req.query.courseId, 10) },
       attributes: ['id', 'name', 'courseNumber'],
       include: [
         {
           model: models.Section,
           as: 'sections',
           attributes: ['id', 'sectionNumber'],
-          where: {
-            id: parseInt(req.query.sectionId, 10),
-          },
+          where: { id: parseInt(req.query.sectionId, 10) },
           include: [
             {
               model: models.Professor,
               as: 'professor',
-              where: {
-                id: parseInt(req.query.professorId, 10),
-              },
+              where: { id: parseInt(req.query.professorId, 10) },
               attributes: { include: ['id', 'uid', 'name'] },
             },
             {
