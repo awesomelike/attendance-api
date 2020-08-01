@@ -5,30 +5,30 @@ export const executeMissedAtDangerZone = (
   currentWeek,
   courseId,
 ) => models.sequelize.query(`SELECT
-  courses.name AS CourseName,
-  courses.id as CourseId,
-  students.id,
-  students.uid AS StudentID,
-  students.name AS Name,
-  professors.name AS Professor,
-  COUNT(records.isAttended) AS MissedClasses
-  FROM courses
-  JOIN sections
-  ON courses.id=sections.courseId
-  JOIN classes
-  ON sections.id=classes.sectionId
-  JOIN classitems
-  ON classes.id=classitems.classId
-  JOIN records
-  ON classitems.id=records.classItemId
-  JOIN students
-  ON students.id=records.studentId
-  JOIN professors
-  ON professors.id=sections.professorId
-  WHERE records.isAttended=0 AND classitems.week<=:week AND CourseId=:courseId
-  GROUP BY
-  records.studentId, courses.id
-  HAVING MissedClasses=3 OR MissedClasses=4 OR MissedClasses=7 OR MissedClasses=8`, {
+courses.name AS CourseName,
+courses.id as CourseId,
+students.id,
+students.uid AS StudentID,
+students.name AS Name,
+professors.name AS Professor,
+COUNT(records.isAttended) AS MissedClasses
+FROM courses
+JOIN sections
+ON courses.id=sections.courseId
+JOIN classes
+ON sections.id=classes.sectionId
+JOIN classitems
+ON classes.id=classitems.classId
+JOIN records
+ON classitems.id=records.classItemId
+JOIN students
+ON students.id=records.studentId
+JOIN professors
+ON professors.id=sections.professorId
+WHERE records.isAttended=0 AND classitems.week<=:week AND CourseId=:courseId
+GROUP BY
+records.studentId, courses.id
+HAVING MissedClasses=3 OR MissedClasses=4 OR MissedClasses=7 OR MissedClasses=8`, {
   replacements: {
     week: parseInt(currentWeek, 10),
     courseId: parseInt(courseId, 10),
@@ -36,30 +36,32 @@ export const executeMissedAtDangerZone = (
   type: QueryTypes.SELECT,
 });
 
-export default (week) => models.sequelize.query('SELECT\n'
+export default (week, professorId) => models.sequelize.query('SELECT\n'
   + 'courses.name AS CourseName,\n'
   + 'students.uid AS StudentID,\n'
   + 'students.name AS Name,\n'
   + 'professors.name AS Professor,\n'
   + 'COUNT(records.isAttended) AS MissedClasses\n'
 + 'FROM courses\n'
-+ 'JOIN sections\n'
++ 'LEFT JOIN sections\n'
 + 'ON courses.id=sections.courseId\n'
-+ 'JOIN classes\n'
++ 'LEFT JOIN classes\n'
 + 'ON sections.id=classes.sectionId\n'
-+ 'JOIN classitems\n'
++ 'LEFT JOIN classitems\n'
 + 'ON classes.id=classitems.classId\n'
-+ 'JOIN records\n'
++ 'LEFT JOIN records\n'
 + 'ON classitems.id=records.classItemId\n'
-+ 'JOIN students\n'
++ 'LEFT JOIN students\n'
 + 'ON students.id=records.studentId\n'
-+ 'JOIN professors\n'
++ 'LEFT JOIN professors\n'
 + 'ON professors.id=sections.professorId\n'
 + 'WHERE records.isAttended=0 AND classitems.week <= :week\n'
++ `${professorId ? 'AND professors.id=:professorId\n' : ''}`
 + 'GROUP BY\n'
 + 'records.studentId, courses.id\n', {
   replacements: {
     week: parseInt(week, 10),
+    professorId,
   },
   type: QueryTypes.SELECT,
 });

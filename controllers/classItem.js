@@ -144,12 +144,17 @@ export default {
         where: { id: records.map(({ student: { id } }) => id) },
       });
       classItem.update({ classItemStatusId: FINISHED });
-      const dangerZoneStudents = await executeMissedAtDangerZone(
-        time.getCurrentWeek(),
-        classItem.class.section.course.name,
-      );
-      console.log(classItem.class.section.course.name);
-      notifyStudents(dangerZoneStudents);
+
+      try {
+        const dangerZoneStudents = await executeMissedAtDangerZone(
+          time.getCurrentWeek(),
+          classItem.class.section.course.name,
+        );
+        console.log(classItem.class.section.course.name);
+        notifyStudents(dangerZoneStudents);
+      } catch (error) {
+        console.log('notifyStudents error');
+      }
     } catch (error) {
       console.log(error.message);
       res.status(502).json(error);

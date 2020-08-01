@@ -93,9 +93,7 @@ export default async function getCurrentClassAndSection(req, res, next) {
       ],
     });
     const currentClasses = await timeSlot.getClasses({
-      where: {
-        weekDayId: TIME.getDay(),
-      },
+      where: { weekDayId: TIME.getDay() },
     });
 
     if (!currentClasses.length) return res.status(404).json({ error: 'No classes today!' });
@@ -103,21 +101,21 @@ export default async function getCurrentClassAndSection(req, res, next) {
       .find(({ sectionId }) => professorSections.map(({ id }) => id).includes(sectionId));
 
     if (!classNow) return res.status(404).json({ error: 'No class found!' });
-
+    console.log(week);
     let [currentClassItem] = await classNow.getClassItems({
       where: {
-        week: await time.getCurrentWeek(),
+        week,
         classItemStatusId: { [Op.ne]: FINISHED },
       },
       include: classItemInclude,
     });
+
     let currentSection = null;
     if (!currentClassItem) {
       /*
         So, by timetable there is no class for the current moment.
         Now we look for a valid makeup class if it exists
       */
-
       const makeups = await models.Makeup.findAll({
         where: {
           professorId: professor.id,
@@ -134,15 +132,15 @@ export default async function getCurrentClassAndSection(req, res, next) {
       const todayMakeups = makeups.filter(({ newDate }) => time.isToday(newDate));
       const currentMakeup = todayMakeups
         .find(({ timeSlots: t }) => t.map(({ id }) => id).includes(timeSlotId));
+
       if (!currentMakeup) {
         return res.status(406).json({ error: 'You have no planned classes for now' });
       }
       currentClassItem = await currentMakeup.getClassItem({
         include: classItemInclude,
-        where: {
-          classItemStatusId: { [Op.ne]: FINISHED },
-        },
+        where: { classItemStatusId: { [Op.ne]: FINISHED } },
       });
+
       if (!currentClassItem) {
         return res.status(406).json({ error: 'You have no planned classes for now' });
       }

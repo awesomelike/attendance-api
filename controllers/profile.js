@@ -20,9 +20,7 @@ export default {
               model: models.Permission,
               as: 'permissions',
               attributes: ['id', 'name'],
-              through: {
-                attributes: [],
-              },
+              through: { attributes: [] },
             },
           ],
         },
@@ -36,11 +34,10 @@ export default {
       const account = await Account.findByPk(req.account.id, options);
       res.status(200).json(account);
     } catch (error) {
-      res.status(502).json(error.toString());
+      res.status(502).json(error.message);
     }
   },
   getMakeups(req, res) {
-    console.log(req.account);
     models.Professor.findByPk(req.account.professorId, {
       include: [
         {

@@ -66,7 +66,7 @@ export default {
       res.status(200).json(createdAccount);
     } catch (error) {
       console.log(error);
-      res.status(502).json(error);
+      res.status(502).json(error.message);
     }
   },
   async update(req, res) {
