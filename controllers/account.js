@@ -1,4 +1,5 @@
 import models from '../models';
+import { ASSISTANT } from '../data/seed/roles';
 
 const { Account } = models;
 
@@ -11,6 +12,16 @@ const options = {
     {
       model: models.Role,
       as: 'role',
+    },
+    {
+      model: models.Assistant,
+      as: 'assistant',
+      include: [
+        {
+          model: models.Professor,
+          as: 'professor',
+        },
+      ],
     },
   ],
 };
@@ -38,11 +49,18 @@ export default {
       });
 
       if (req.newAccount.professorId) {
-        await models.Professor.update({
-          accountId: account.id,
-        }, {
-          where: { id: req.newAccount.professorId },
-        });
+        if (req.newAccount.roleId === ASSISTANT.id) {
+          await models.Assistant.create({
+            accountId: account.id,
+            professorId: req.newAccount.professorId,
+          });
+        } else {
+          await models.Professor.update({
+            accountId: account.id,
+          }, {
+            where: { id: req.newAccount.professorId },
+          });
+        }
       }
       const createdAccount = await Account.findByPk(account.id, options);
       res.status(200).json(createdAccount);
@@ -51,9 +69,24 @@ export default {
       res.status(502).json(error);
     }
   },
-  update(req, res) {
-    Account.update(req.newAccount, { where: { id: req.params.id } })
-      .then(() => res.sendStatus(200))
-      .catch((error) => res.status(502).json(error));
+  async update(req, res) {
+    try {
+      const accountId = req.params.id;
+      await Account.update(req.newAccount, { where: { id: req.params.id } });
+      if (req.newAccount.professorId) {
+        if (req.newAccount.roleId === ASSISTANT.id) {
+          await models.Assistant.update({ professorId: req.newAccount.professorId }, {
+            where: { accountId },
+          });
+        } else {
+          await models.Professor.update({ accountId }, {
+            where: { id: req.newAccount.professorId },
+          });
+        }
+      }
+      res.sendStatus(200);
+    } catch (error) {
+      res.status(502).json(error);
+    }
   },
 };

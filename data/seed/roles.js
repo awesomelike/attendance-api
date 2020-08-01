@@ -11,4 +11,8 @@ module.exports = {
     id: 3,
     name: 'Admin',
   },
+  ASSISTANT: {
+    id: 4,
+    name: 'Assistant',
+  },
 };

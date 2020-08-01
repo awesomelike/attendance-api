@@ -6,13 +6,17 @@ module.exports = {
       primaryKey: true,
       type: Sequelize.INTEGER,
     },
-    name: {
-      type: Sequelize.STRING,
-    },
     professorId: {
       type: Sequelize.INTEGER,
       references: {
         model: 'Professors',
+        key: 'id',
+      },
+    },
+    accountId: {
+      type: Sequelize.INTEGER,
+      references: {
+        model: 'Accounts',
         key: 'id',
       },
     },

@@ -24,6 +24,7 @@ function find(where, res, next) {
 export default {
   async getAll(req, res) {
     if (idOf(PROFESSOR) === req.account.roleId) {
+      console.log(req.account);
       const professorCourses = await Course.findAll({
         include: [
           {
