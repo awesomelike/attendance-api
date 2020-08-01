@@ -63,7 +63,12 @@ function insertDefaultRecords(classItemId, students) {
 export default {
   async getAll(req, res) {
     try {
-      const professors = await Professor.findAll(makeOptions(req, { include }));
+      const unassinged = req.query.unassigned;
+      const options = makeOptions(req, {
+        include: unassinged ? [] : include,
+        where: unassinged ? { accountId: null } : null,
+      });
+      const professors = await Professor.findAll(options);
       res.status(200).json(professors);
     } catch (error) {
       console.log(error);

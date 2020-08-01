@@ -69,9 +69,24 @@ export default {
       res.status(502).json(error);
     }
   },
-  update(req, res) {
-    Account.update(req.newAccount, { where: { id: req.params.id } })
-      .then(() => res.sendStatus(200))
-      .catch((error) => res.status(502).json(error));
+  async update(req, res) {
+    try {
+      const accountId = req.params.id;
+      await Account.update(req.newAccount, { where: { id: req.params.id } });
+      if (req.newAccount.professorId) {
+        if (req.newAccount.roleId === ASSISTANT.id) {
+          await models.Assistant.update({ professorId: req.newAccount.professorId }, {
+            where: { accountId },
+          });
+        } else {
+          await models.Professor.update({ accountId }, {
+            where: { id: req.newAccount.professorId },
+          });
+        }
+      }
+      res.sendStatus(200);
+    } catch (error) {
+      res.status(502).json(error);
+    }
   },
 };
