@@ -78,7 +78,7 @@ export default {
         }
         sendEmail(passwordReset(email, account.name, token))
           .then(() => res.status(200).json({ message: 'Check your email for the password reset link' }))
-          .catch((emailError) => res.status(502).json(emailError));
+          .catch((emailError) => { console.log(emailError); res.status(502).json(emailError); });
       });
   },
 };

@@ -1,13 +1,17 @@
 import { verify } from 'jsonwebtoken';
 import { hashSync, genSaltSync } from 'bcryptjs';
 
+require('dotenv').config();
+
+const { FRONT_URL } = process.env;
+
 export const confirmResetToken = (req, res, next) => {
   const { token } = req.params;
   verify(token, process.env.JWT_KEY, (error, decoded) => {
     if (error) {
       return res.sendStatus(401);
     }
-    res.redirect(`http://localhost:8080/#/reset/user/pwd/${token}`);
+    res.redirect(`${FRONT_URL}/#/reset/user/pwd/${token}`);
   });
 };
 

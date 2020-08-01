@@ -1,4 +1,5 @@
 import models from '../models';
+import { ASSISTANT } from '../data/seed/roles';
 
 const { Account } = models;
 
@@ -11,6 +12,16 @@ const options = {
     {
       model: models.Role,
       as: 'role',
+    },
+    {
+      model: models.Assistant,
+      as: 'assistant',
+      include: [
+        {
+          model: models.Professor,
+          as: 'professor',
+        },
+      ],
     },
   ],
 };
@@ -38,11 +49,18 @@ export default {
       });
 
       if (req.newAccount.professorId) {
-        await models.Professor.update({
-          accountId: account.id,
-        }, {
-          where: { id: req.newAccount.professorId },
-        });
+        if (req.newAccount.roleId === ASSISTANT.id) {
+          await models.Assistant.create({
+            accountId: account.id,
+            professorId: req.newAccount.professorId,
+          });
+        } else {
+          await models.Professor.update({
+            accountId: account.id,
+          }, {
+            where: { id: req.newAccount.professorId },
+          });
+        }
       }
       const createdAccount = await Account.findByPk(account.id, options);
       res.status(200).json(createdAccount);
