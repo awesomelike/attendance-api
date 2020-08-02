@@ -158,8 +158,11 @@ export default {
     }
   },
   async getLecturesReport(req, res) {
-    const planned = await getPlannedLectures();
-    const given = await getGivenLectures();
+    const { semesterId } = req;
+
+    const planned = await getPlannedLectures(semesterId);
+    const given = await getGivenLectures(semesterId);
+
     const result = [];
     planned.forEach(({
       // eslint-disable-next-line no-shadow

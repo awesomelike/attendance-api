@@ -2,6 +2,7 @@ import models from '../models';
 import executeMissedClasses from '../util/sql/missedClasses';
 import { idOf } from '../util/id';
 import { PROFESSOR, ASSISTANT } from '../data/seed/roles';
+import semester from './semester';
 
 const { Course } = models;
 
@@ -23,23 +24,23 @@ function find(where, res, next) {
 
 export default {
   async getAll(req, res) {
-    if (idOf(PROFESSOR) === req.account.roleId || idOf(ASSISTANT) === req.account.roleId) {
-      console.log(req.account);
-      const professorCourses = await Course.findAll({
-        include: [
-          {
-            model: models.Section,
-            as: 'sections',
-            where: {
-              professorId: req.account.professorId,
-            },
-          },
-        ],
-      });
-      res.status(200).json(professorCourses);
-    } else {
-      find(null, res, (courses) => res.status(200).json(courses));
+    const { roleId } = req.account;
+    const { semesterId } = req;
+    const where = { semesterId };
+    if (idOf(PROFESSOR) === roleId || idOf(ASSISTANT) === roleId) {
+      const { professorId } = req.account;
+      where.professorId = professorId;
     }
+    const professorCourses = await Course.findAll({
+      include: [
+        {
+          model: models.Section,
+          as: 'sections',
+          where,
+        },
+      ],
+    });
+    res.status(200).json(professorCourses);
   },
   get(req, res) {
     Course.findByPk(req.params.id, { include })
@@ -65,11 +66,12 @@ export default {
   },
   async getMissedClasses(req, res) {
     try {
-      const data = await executeMissedClasses(req.query.week, req.account.professorId);
+      const { semesterId } = req;
+      const data = await executeMissedClasses(req.query.week, req.account.professorId, semesterId);
       if (req.query.format === 'excel') return res.xls(`Report_Misses_Until_Week${req.params.week}.xlsx`, data);
       res.status(200).json(data);
     } catch (error) {
-      res.status(502).json(error);
+      res.status(502).json(error.message);
     }
   },
   async getSemesterReport(req, res) {
