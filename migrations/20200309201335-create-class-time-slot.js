@@ -20,6 +20,7 @@ module.exports = {
           model: 'Classes',
           key: 'id',
         },
+        onDelete: 'CASCADE',
       },
       semesterId: {
         type: Sequelize.INTEGER,
@@ -27,6 +28,7 @@ module.exports = {
           model: 'Semesters',
           key: 'id',
         },
+        onDelete: 'CASCADE',
       },
     });
     await queryInterface.addConstraint('ClassTimeSlots', ['timeSlotId', 'classId'], {

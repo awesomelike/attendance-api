@@ -12,6 +12,7 @@ import { checkTimetable, validateTimetable } from '../util/validation/timetable'
 const router = Router();
 
 router.get('/', auth, semester.getAll);
+router.get('/current', auth, semester.getCurrent);
 router.get('/:id', auth, semester.get);
 router.post('/:id/importTimetable', auth, checkTimetable, validateTimetable, storeStudents, storeTimetable);
 router.post('/:id/uploadFiles', auth, allowRoles([ADMIN, ACADEMIC_AFFAIRS]), filter, upload);

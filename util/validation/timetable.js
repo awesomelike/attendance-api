@@ -20,7 +20,6 @@ const referencePropsStudents = [
   'School Year',
   'Course No',
   'Class No',
-  'Classroom',
 ];
 
 const hasAll = (ref, obj) => {
@@ -42,7 +41,7 @@ export const checkTimetable = checkSchema({
         }
         return true;
       },
-      errorMessage: 'Column names do not match reference names',
+      errorMessage: 'Timetable file column names do not match reference names',
     },
   },
   students: {
@@ -54,7 +53,7 @@ export const checkTimetable = checkSchema({
         }
         return true;
       },
-      errorMessage: 'Column names do not match reference names',
+      errorMessage: 'Students file column names do not match reference names',
     },
   },
 });
@@ -62,9 +61,7 @@ export const checkTimetable = checkSchema({
 export function validateTimetable(req, res, next) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(403).json({
-      errors: errors.array(),
-    });
+    return res.status(403).json({ errors: errors.array() });
   }
   req.timetable = {
     timetable: req.body.timetable,

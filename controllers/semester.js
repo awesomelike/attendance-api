@@ -9,9 +9,15 @@ import versionAttr from '../util/versionAttr';
 const { Semester } = models;
 
 const setCache = async (callback) => {
-  const semester = await Semester.findOne({ where: { endDate: { [Op.gte]: Date.now() } }, attributes: ['id', 'startDate', 'endDate'], raw: true });
+  const semester = await Semester.findOne({ where: { endDate: { [Op.gte]: Date.now() } }, attributes: ['id', 'startDate', 'endDate', 'year', 'season'], raw: true });
   if (!semester) return callback(null);
-  const data = { id: semester.id, startDate: semester.startDate, endDate: semester.endDate };
+  const data = {
+    id: semester.id,
+    startDate: semester.startDate,
+    endDate: semester.endDate,
+    year: semester.year,
+    season: semester.season,
+  };
   cache.set('SEMESTER', data);
   callback(data);
 };
@@ -78,6 +84,14 @@ export default {
       }));
       semesters.forEach(setStatus);
       res.status(200).json(semesters);
+    } catch (error) {
+      res.status(502).json(error.message);
+    }
+  },
+  async getCurrent(req, res) {
+    try {
+      const semester = await getCurrentSemester();
+      res.status(200).json(semester);
     } catch (error) {
       res.status(502).json(error);
     }

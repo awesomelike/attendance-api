@@ -9,13 +9,16 @@ export const parseTime = (time) => ({
 
 export const getSemesterTimeOffset = (
   semesterStartDate, { weekDayId, timeSlots: ts }, week,
-) => moment(semesterStartDate)
-  .add(weekDayId - 1, 'days')
-  .add(parseTime(ts[0].startTime).hour, 'hours')
-  .add(parseTime(ts[0].startTime).minute, 'minutes')
-  .add(week - 1, 'weeks');
+) => {
+  const { hour, minute } = parseTime(ts[0].startTime);
+  return moment(semesterStartDate)
+    .add(weekDayId - 1, 'days')
+    .add(hour, 'hours')
+    .add(minute, 'minutes')
+    .add(week - 1, 'weeks');
+};
 
-export const TIME = new Date(2019, 8, 18, 10, 30, 0);
+export const TIME = new Date(2020, 1, 3, 9, 0, 0);
 // export const TIME = new Date(2019, 8, 27, 9, 0, 0);
 
 // export const TIME = new Date(2019, 8, 24, 16, 0, 0);

@@ -36,7 +36,7 @@ HAVING MissedClasses=3 OR MissedClasses=4 OR MissedClasses=7 OR MissedClasses=8`
   type: QueryTypes.SELECT,
 });
 
-export default (week, professorId) => models.sequelize.query('SELECT\n'
+export default (week, professorId, semesterId) => models.sequelize.query('SELECT\n'
   + 'courses.name AS CourseName,\n'
   + 'students.uid AS StudentID,\n'
   + 'students.name AS Name,\n'
@@ -55,13 +55,14 @@ export default (week, professorId) => models.sequelize.query('SELECT\n'
 + 'ON students.id=records.studentId\n'
 + 'LEFT JOIN professors\n'
 + 'ON professors.id=sections.professorId\n'
-+ 'WHERE records.isAttended=0 AND classitems.week <= :week\n'
++ 'WHERE records.isAttended=0 AND classitems.week <= :week AND sections.semesterId=:semesterId\n'
 + `${professorId ? 'AND professors.id=:professorId\n' : ''}`
 + 'GROUP BY\n'
 + 'records.studentId, courses.id\n', {
   replacements: {
     week: parseInt(week, 10),
     professorId,
+    semesterId,
   },
   type: QueryTypes.SELECT,
 });

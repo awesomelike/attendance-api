@@ -12,6 +12,7 @@ module.exports = {
         model: 'Makeups',
         key: 'id',
       },
+      onDelete: 'CASCADE',
     },
     timeSlotId: {
       type: Sequelize.INTEGER,
