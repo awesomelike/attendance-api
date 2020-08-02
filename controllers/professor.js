@@ -165,7 +165,8 @@ export default {
       // eslint-disable-next-line no-shadow
       id, Professor, Course, Planned,
     }) => {
-      const associatedGiven = given.find((givenObject) => givenObject.id === id);
+      const associatedGiven = given.find((givenObject) => givenObject.id === id
+        && givenObject.Course === Course);
       result.push({
         Professor,
         Course,
@@ -174,6 +175,7 @@ export default {
       });
     });
     if (req.query.format === 'excel') return res.xls('LecturesReport.xlsx', result);
+    console.log(result);
     res.status(200).json(result);
   },
   async getMakeups(req, res) {

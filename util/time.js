@@ -15,7 +15,7 @@ export const getSemesterTimeOffset = (
   .add(parseTime(ts[0].startTime).minute, 'minutes')
   .add(week - 1, 'weeks');
 
-export const TIME = new Date(2019, 8, 23, 10, 30, 0);
+export const TIME = new Date(2019, 8, 18, 10, 30, 0);
 // export const TIME = new Date(2019, 8, 27, 9, 0, 0);
 
 // export const TIME = new Date(2019, 8, 24, 16, 0, 0);
