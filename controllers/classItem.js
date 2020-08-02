@@ -54,6 +54,7 @@ export function isTaughtBy(classItemId, professorId) {
 function notifyStudents(students) {
   return new Promise((resolve, reject) => {
     const tasks = [];
+    console.log('students.length', students.length);
     students.forEach(({
       email, name, CourseName, MissedClasses,
     }) => {
@@ -68,7 +69,7 @@ function notifyStudents(students) {
     });
     Promise.all(tasks)
       .then((result) => resolve(result))
-      .catch((error) => reject(error));
+      .catch((error) => { console.log(error); reject(error); });
   });
 }
 
@@ -145,15 +146,11 @@ export default {
       });
       classItem.update({ classItemStatusId: FINISHED });
 
-      try {
-        console.log('classItem.class.section.course.name', classItem.class.section.course.name);
-        const dangerZoneStudents = await executeMissedAtDangerZone(
-          await time.getCurrentWeek(),
-          classItem.class.section.course.name,
-        );
+      const currentWeek = await time.getCurrentWeek();
+      const courseId = classItem.class.section.course.id;
+      const dangerZoneStudents = await executeMissedAtDangerZone(currentWeek, courseId);
+      if (dangerZoneStudents.length) {
         notifyStudents(dangerZoneStudents);
-      } catch (error) {
-        console.log('notifyStudents error');
       }
     } catch (error) {
       console.log(error.message);

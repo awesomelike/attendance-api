@@ -3,6 +3,7 @@ import models from '../models';
 import { PLANNED, GOING_ON } from '../constants/classItems';
 import { getPlannedLectures, getGivenLectures } from '../util/sql/lecturesReport';
 import makeOptions from '../util/queryOptions';
+import { getCurrentSemester } from './semester';
 
 const { Professor } = models;
 
@@ -31,12 +32,14 @@ const include = [{
   ],
 }];
 
-function insertDefaultRecords(classItemId, students) {
+async function insertDefaultRecords(classItemId, students) {
+  const { id: semesterId } = await getCurrentSemester();
   const recordsData = students.map(({ id }) => ({
     classItemId,
     studentId: id,
     isAttended: 0,
     isAdditional: 0,
+    semesterId,
   }));
   return new Promise((resolve, reject) => {
     models.Record.bulkCreate(recordsData)
@@ -141,7 +144,7 @@ export default {
           },
         ],
       });
-      res.status(200).json({ records });
+      res.status(200).json({ records, classItemStatusId: GOING_ON });
       next();
     } catch (error) {
       console.log(error);

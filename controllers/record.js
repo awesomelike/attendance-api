@@ -1,6 +1,7 @@
-
 import models from '../models';
 import makeOptions from '../util/queryOptions';
+import { FINISHED } from '../constants/classItems';
+import bot from '../bot/utils/sender';
 
 const { Record } = models;
 
@@ -43,17 +44,50 @@ export default {
       res.status(502).json(error.message);
     }
   },
-  attend(req, res) {
-    const recordId = parseInt(req.params.id, 10);
-    Record.update({ isAttended: true, attendedAt: Date.now(), rfid: null }, {
-      where: { id: recordId },
-    })
-      .then(() => res.status(200).json({ record: { id: recordId, attendedAt: Date.now() } }))
-      .catch((error) => res.sendStatus(502).json(error.message));
+  async attend(req, res) {
+    try {
+      const recordId = parseInt(req.params.id, 10);
+      const {
+        classItemStatusId, student, courseName, sectionNumber, week, plannedDate,
+      } = req.body;
+      await Record.update({
+        isAttended: true,
+        isAdditional: classItemStatusId === FINISHED,
+        attendedAt: Date.now(),
+        rfid: null,
+      }, {
+        where: { id: recordId },
+      });
+
+      res.status(200).json({ record: { id: recordId, attendedAt: Date.now() } });
+
+      const telegramAccount = await models.TelegramAccount.findOne({
+        where: { studentId: student.id },
+        attributes: ['chatId'],
+      });
+      if (telegramAccount) {
+        return bot.sendAttendanceMessage(
+          telegramAccount.chatId,
+          student.uid,
+          student.name,
+          courseName,
+          sectionNumber,
+          week,
+          plannedDate,
+        );
+      }
+    } catch (error) {
+      res.status(502).json(error.message);
+    }
   },
   unattend(req, res) {
     const recordId = parseInt(req.params.id, 10);
-    Record.update({ isAttended: false, attendedAt: null, rfid: null }, {
+    Record.update({
+      isAttended: false,
+      isAdditional: false,
+      attendedAt: null,
+      rfid: null,
+    }, {
       where: { id: recordId },
     })
       .then(() => res.status(200).json({ record: { id: recordId, attendedAt: null } }))
