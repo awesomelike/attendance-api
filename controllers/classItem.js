@@ -146,11 +146,11 @@ export default {
       classItem.update({ classItemStatusId: FINISHED });
 
       try {
+        console.log('classItem.class.section.course.name', classItem.class.section.course.name);
         const dangerZoneStudents = await executeMissedAtDangerZone(
-          time.getCurrentWeek(),
+          await time.getCurrentWeek(),
           classItem.class.section.course.name,
         );
-        console.log(classItem.class.section.course.name);
         notifyStudents(dangerZoneStudents);
       } catch (error) {
         console.log('notifyStudents error');

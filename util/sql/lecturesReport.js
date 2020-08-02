@@ -2,9 +2,8 @@
 import { QueryTypes } from 'sequelize';
 import models from '../../models';
 
-export const getPlannedLectures = () => new Promise((resolve, reject) => {
-  models.sequelize.query(`
-    SELECT professors.id AS id, professors.name AS Professor, courses.name as Course, COUNT(classitems.id) AS Planned
+export const getPlannedLectures = () => models.sequelize.query(`
+SELECT professors.id AS id, professors.name AS Professor, courses.name as Course, COUNT(classitems.id) AS Planned
 FROM sections
 LEFT JOIN professors
 ON professors.id=sections.professorId
@@ -15,14 +14,10 @@ ON sections.id=classes.sectionId
 LEFT JOIN classitems
 ON classes.id=classitems.classId
 GROUP BY professors.id, courses.id`, {
-    type: QueryTypes.SELECT,
-  })
-    .then((result) => resolve(result))
-    .catch((error) => reject(error));
+  type: QueryTypes.SELECT,
 });
 
-export const getGivenLectures = () => new Promise((resolve, reject) => {
-  models.sequelize.query(`
+export const getGivenLectures = () => models.sequelize.query(`
 SELECT professors.id AS id, professors.name AS Professor, courses.name as Course, COUNT(classitems.id) AS Given
 FROM sections
 LEFT JOIN professors
@@ -35,8 +30,5 @@ LEFT JOIN classitems
 ON classes.id=classitems.classId
 WHERE classitems.classItemStatusId=3
 GROUP BY professors.id, courses.id`, {
-    type: QueryTypes.SELECT,
-  })
-    .then((result) => resolve(result))
-    .catch((error) => reject(error));
+  type: QueryTypes.SELECT,
 });

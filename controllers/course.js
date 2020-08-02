@@ -72,55 +72,73 @@ export default {
       res.status(502).json(error);
     }
   },
-  getSemesterReport(req, res) {
-    Course.findOne({
-      where: { id: parseInt(req.query.courseId, 10) },
-      attributes: ['id', 'name', 'courseNumber'],
-      include: [
-        {
-          model: models.Section,
-          as: 'sections',
-          attributes: ['id', 'sectionNumber'],
-          where: { id: parseInt(req.query.sectionId, 10) },
-          include: [
-            {
-              model: models.Professor,
-              as: 'professor',
-              where: { id: parseInt(req.query.professorId, 10) },
-              attributes: { include: ['id', 'uid', 'name'] },
-            },
-            {
-              model: models.Student,
-              as: 'students',
-              attributes: ['id', 'uid', 'name', 'department', 'schoolYear'],
-              through: { attributes: [] },
-              include: [
-                {
-                  model: models.Record,
-                  as: 'records',
-                  attributes: { exclude: ['createdAt', 'updatedAt'] },
-                  include: [
-                    {
-                      model: models.ClassItem,
-                      as: 'classItem',
-                      attributes: { exclude: ['createdAt', 'updatedAt'] },
-                      include: [
-                        {
-                          model: models.Class,
-                          as: 'class',
-                          attributes: { exclude: ['createdAt', 'updatedAt'] },
-                        },
-                      ],
-                    },
-                  ],
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    })
-      .then((result) => res.status(200).json(result))
-      .catch((error) => res.status(502).json(error));
+  async getSemesterReport(req, res) {
+    try {
+      const data = await Course.findOne({
+        where: { id: parseInt(req.query.courseId, 10) },
+        attributes: ['id', 'name', 'courseNumber'],
+        order: [[
+          {
+            model: models.Section, as: 'sections',
+          },
+          {
+            model: models.Student, as: 'students',
+          },
+          {
+            model: models.Record, as: 'records',
+          },
+          {
+            model: models.ClassItem, as: 'classItem',
+          },
+          'week', 'ASC',
+        ]],
+        include: [
+          {
+            model: models.Section,
+            as: 'sections',
+            attributes: ['id', 'sectionNumber'],
+            where: { id: parseInt(req.query.sectionId, 10) },
+            include: [
+              {
+                model: models.Professor,
+                as: 'professor',
+                where: { id: parseInt(req.query.professorId, 10) },
+                attributes: { include: ['id', 'uid', 'name'] },
+              },
+              {
+                model: models.Student,
+                as: 'students',
+                attributes: ['id', 'uid', 'name', 'department', 'schoolYear'],
+                through: { attributes: [] },
+                include: [
+                  {
+                    model: models.Record,
+                    as: 'records',
+                    attributes: { exclude: ['createdAt', 'updatedAt'] },
+                    include: [
+                      {
+                        model: models.ClassItem,
+                        as: 'classItem',
+                        attributes: { exclude: ['createdAt', 'updatedAt'] },
+                        include: [
+                          {
+                            model: models.Class,
+                            as: 'class',
+                            attributes: { exclude: ['createdAt', 'updatedAt'] },
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      });
+      res.status(200).json(data);
+    } catch (error) {
+      res.status(502).json(error.message);
+    }
   },
 };
