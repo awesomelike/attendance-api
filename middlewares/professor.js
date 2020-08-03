@@ -61,6 +61,40 @@ export const sectionInclude = [
   },
 ];
 
+const getCourseSections = (
+  semesterId,
+  professorId,
+  courseId,
+  currentSectionId,
+  week,
+) => models.Section.findAll({
+  where: {
+    id: { [Op.ne]: currentSectionId },
+    semesterId,
+    professorId,
+    courseId,
+    '$classes.classItems.week$': week,
+    '$classes.classItems.plannedDate$': { [Op.lt]: TIME },
+  },
+  include: [
+    {
+      model: models.Class,
+      as: 'classes',
+      include: [
+        {
+          model: models.ClassItem,
+          as: 'classItems',
+          required: false,
+        },
+        {
+          model: models.WeekDay,
+          as: 'weekDay',
+        },
+      ],
+    },
+  ],
+});
+
 export default async function getCurrentClassAndSection(req, res, next) {
   try {
     const rfid = req.body.rfid || req.params.rfid;
@@ -72,6 +106,7 @@ export default async function getCurrentClassAndSection(req, res, next) {
     const timeSlotId = time.getCurrentTimeSlotId();
     if (!timeSlotId) return res.status(404).json({ error: 'You have no classes right now!' });
     const timeSlot = await models.TimeSlot.findByPk(timeSlotId);
+
     const professorSections = await professor.getSections({
       where: { semesterId },
       include: [
@@ -150,8 +185,13 @@ export default async function getCurrentClassAndSection(req, res, next) {
       currentClassItem.dataValues.isMakeup = false;
       currentSection = await classNow.getSection({ include: sectionInclude });
     }
-    const courseSections = professorSections
-      .filter(({ courseId }) => courseId === currentSection.courseId);
+    const courseSections = await getCourseSections(
+      semesterId,
+      professor.id,
+      currentSection.courseId,
+      currentSection.id,
+      week,
+    );
     req.classAndSection = {
       currentClassItem, currentSection, professor, courseSections,
     };

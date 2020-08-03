@@ -4,6 +4,7 @@ import models from '../../models';
 export const executeMissedAtDangerZone = (
   currentWeek,
   courseId,
+  semesterId,
 ) => models.sequelize.query(`SELECT
 courses.name AS CourseName,
 courses.id as CourseId,
@@ -25,13 +26,14 @@ JOIN students
 ON students.id=records.studentId
 JOIN professors
 ON professors.id=sections.professorId
-WHERE records.isAttended=0 AND classitems.week<=:week AND CourseId=:courseId
+WHERE records.isAttended=0 AND classitems.week<=:week AND CourseId=:courseId AND sections.semesterId=:semesterId
 GROUP BY
 records.studentId, courses.id
 HAVING MissedClasses=3 OR MissedClasses=4 OR MissedClasses=7 OR MissedClasses=8`, {
   replacements: {
     week: parseInt(currentWeek, 10),
     courseId: parseInt(courseId, 10),
+    semesterId,
   },
   type: QueryTypes.SELECT,
 });

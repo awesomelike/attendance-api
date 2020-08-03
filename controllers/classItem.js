@@ -5,6 +5,7 @@ import { executeMissedAtDangerZone } from '../util/sql/missedClasses';
 import { sendEmail, missedClassesNotification } from '../tasks/email';
 import time from '../util/time';
 import makeOptions from '../util/queryOptions';
+import { getCurrentSemester } from './semester';
 
 const { ClassItem } = models;
 
@@ -111,6 +112,7 @@ export default {
     try {
       const { rfid } = req;
       const classItemId = req.params.id;
+      const { id: semesterId } = await getCurrentSemester();
 
       const professor = await models.Professor.findOne({ where: { rfid } });
       if (!professor) return res.status(404).json({ error: 'No such professor' });
@@ -148,7 +150,7 @@ export default {
 
       const currentWeek = await time.getCurrentWeek();
       const courseId = classItem.class.section.course.id;
-      const dangerZoneStudents = await executeMissedAtDangerZone(currentWeek, courseId);
+      const dangerZoneStudents = await executeMissedAtDangerZone(currentWeek, courseId, semesterId);
       if (dangerZoneStudents.length) {
         notifyStudents(dangerZoneStudents);
       }
