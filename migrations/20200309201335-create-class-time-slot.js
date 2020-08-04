@@ -7,13 +7,6 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      timeSlotId: {
-        type: Sequelize.INTEGER,
-        references: {
-          model: 'TimeSlots',
-          key: 'id',
-        },
-      },
       classId: {
         type: Sequelize.INTEGER,
         references: {
@@ -21,6 +14,13 @@ module.exports = {
           key: 'id',
         },
         onDelete: 'CASCADE',
+      },
+      timeSlotId: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'TimeSlots',
+          key: 'id',
+        },
       },
       semesterId: {
         type: Sequelize.INTEGER,

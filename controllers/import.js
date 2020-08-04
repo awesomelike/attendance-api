@@ -1,8 +1,8 @@
 /* eslint-disable no-shadow */
 import { extname } from 'path';
 import moment from 'moment';
-import sequelize from 'sequelize';
-import models from '../models';
+// import sequelize from 'sequelize';
+import models, { sequelize } from '../models';
 import random from '../util/random';
 import { getSemesterTimeOffset } from '../util/time';
 import { setNames } from './semester';
@@ -23,7 +23,9 @@ export const storeStudents = async (req, res, next) => {
   try {
     const { students } = req.timetable;
     const uniqueStudents = unique(students, ['uid']);
-    await models.Student.bulkCreate(uniqueStudents, { returning: true, updateOnDuplicate: ['name', 'schoolYear'] });
+    await models.Student.bulkCreate(uniqueStudents, {
+      returning: true, updateOnDuplicate: ['name', 'schoolYear'],
+    });
     next();
   } catch (error) {
     res.status(502).json(error);
@@ -38,6 +40,8 @@ const storeStudentsSections = (
   courses,
   t,
 ) => new Promise((resolve, reject) => {
+  console.log('sections', sections.slice(0, 5));
+  console.log('courses', courses.slice(0, 5));
   const studentSections = [];
   for (let i = 0; i < students.length; i += 1) {
     const particularStudents = studentsTimetable
@@ -103,8 +107,8 @@ export const storeTimetable = async (req, res) => {
 
     await Promise.all(insertProfessorsCoursesRooms);
 
-    professors = await models.Professor.findAll({ attributes: ['id', 'uid'], raw: true });
-    courses = await models.Course.findAll({ raw: true });
+    professors = await models.Professor.findAll({ attributes: ['id', 'uid'], raw: true, transaction: t });
+    courses = await models.Course.findAll({ raw: true, transaction: t });
 
     for (let i = 0; i < courses.length; i += 1) {
       const course = courses[i];
@@ -145,12 +149,14 @@ export const storeTimetable = async (req, res) => {
         },
       ],
       raw: true,
+      transaction: t,
     });
 
-    const weekDays = await models.WeekDay.findAll({ raw: true });
-    rooms = await models.Room.findAll({ raw: true });
+    const weekDays = await models.WeekDay.findAll({ raw: true, transaction: t });
+    rooms = await models.Room.findAll({ raw: true, transaction: t });
 
     const classesToInsert = [];
+    let count = 1;
     for (let i = 0; i < uniqueSections.length; i += 1) {
       const { classes } = uniqueSections[i];
       const uniqueClasses = unique(classes, ['Course No.', 'Class No', 'Lecture day']);
@@ -164,11 +170,13 @@ export const storeTimetable = async (req, res) => {
             .find((weekDay) => weekDay.key === item['Lecture day']).id,
           roomId: rooms.find(({ label }) => label === item.Classroom).id,
           semesterId,
+          // eslint-disable-next-line no-plusplus
+          index: count++,
         });
       }
     }
     await models.Class.bulkCreate(classesToInsert, {
-      updateOnDuplicate: ['sectionId', 'roomId', 'weekDayId'],
+      updateOnDuplicate: ['roomId', 'weekDayId'],
       transaction: t,
     });
     const classInclude = [
@@ -190,9 +198,10 @@ export const storeTimetable = async (req, res) => {
     const dbClasses = await models.Class.findAll({
       include: classInclude,
       where: { semesterId },
+      transaction: t,
     });
 
-    const timeSlots = await models.TimeSlot.findAll({ raw: true });
+    const timeSlots = await models.TimeSlot.findAll({ raw: true, transaction: t });
     const classTimeSlots = [];
     for (let i = 0; i < uniqueSections.length; i += 1) {
       const { classes } = uniqueSections[i];
@@ -218,7 +227,7 @@ export const storeTimetable = async (req, res) => {
       transaction: t,
     });
 
-    const semester = await models.Semester.findByPk(semesterId);
+    const semester = await models.Semester.findByPk(semesterId, { transaction: t });
     const classItems = [];
     const classesWithTimeSlots = await models.Class.findAll({
       include: [
@@ -229,6 +238,7 @@ export const storeTimetable = async (req, res) => {
           through: { attributes: [] },
         },
       ],
+      transaction: t,
     });
 
     classesWithTimeSlots.forEach(({ id, weekDayId, timeSlots }) => {
@@ -250,7 +260,7 @@ export const storeTimetable = async (req, res) => {
       transaction: t,
     });
 
-    const students = await models.Student.findAll({ raw: true });
+    const students = await models.Student.findAll({ raw: true, transaction: t });
     await storeStudentsSections(semesterId, studentsTimetable, students, allSections, courses, t);
 
     // We reached here, so there is no error, we can safely commit the transaction
@@ -261,7 +271,7 @@ export const storeTimetable = async (req, res) => {
     // There is some error, so we rollback the transaction
     await t.rollback();
 
-    console.log(error.message);
+    console.log(error);
     res.status(502).json(error.message);
   }
 };
@@ -271,7 +281,6 @@ export const filter = (req, res, next) => {
   const { timetable, students } = req.files;
 
   const isValid = (mimetype) => mimetype === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || mimetype === 'application/vnd.ms-excel';
-
   if (timetable) {
     if (!isValid(timetable.mimetype)) return res.status(400).json({ error: 'Invalid mimetype!' });
   }
