@@ -1,3 +1,4 @@
+/* eslint-disable no-shadow */
 import { extname } from 'path';
 import moment from 'moment';
 import sequelize from 'sequelize';
@@ -108,7 +109,6 @@ export const storeTimetable = async (req, res) => {
     for (let i = 0; i < courses.length; i += 1) {
       const course = courses[i];
       const particularSections = timetable
-        // eslint-disable-next-line no-shadow
         .filter((t) => t['Course No.'] === course.courseNumber);
       for (let j = 0; j < particularSections.length; j += 1) {
         const particularSection = particularSections[j];
@@ -208,7 +208,6 @@ export const storeTimetable = async (req, res) => {
               && section.course.courseNumber === courseNumber
               && section.sectionNumber === sectionNumber).id;
         const timeSlotId = timeSlots
-          // eslint-disable-next-line no-shadow
           .find((t) => t.startTime === timeslot).id;
         classTimeSlots.push({ timeSlotId, classId, semesterId });
       });
@@ -232,7 +231,6 @@ export const storeTimetable = async (req, res) => {
       ],
     });
 
-    // eslint-disable-next-line no-shadow
     classesWithTimeSlots.forEach(({ id, weekDayId, timeSlots }) => {
       if (!timeSlots.length) console.log(id);
       for (let week = 1; week <= 16; week += 1) {
