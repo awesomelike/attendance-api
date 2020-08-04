@@ -18,7 +18,7 @@ export const getSemesterTimeOffset = (
     .add(week - 1, 'weeks');
 };
 
-export const TIME = new Date(2020, 1, 14, 13, 0, 0);
+export const TIME = new Date(2019, 8, 10, 10, 30, 0);
 // export const TIME = new Date(2019, 8, 27, 9, 0, 0);
 
 // export const TIME = new Date(2019, 8, 24, 16, 0, 0);

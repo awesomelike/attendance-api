@@ -4,7 +4,7 @@ module.exports = (sequelize, DataTypes) => {
     week: DataTypes.INTEGER,
     plannedDate: DataTypes.DATE,
     date: DataTypes.DATE,
-    // actualRoomId: DataTypes.INTEGER,
+    actualRoomId: DataTypes.INTEGER,
     classItemStatusId: DataTypes.INTEGER,
     semesterId: DataTypes.INTEGER,
   }, {});

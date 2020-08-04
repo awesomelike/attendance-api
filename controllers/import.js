@@ -1,7 +1,6 @@
 /* eslint-disable no-shadow */
 import { extname } from 'path';
 import moment from 'moment';
-// import sequelize from 'sequelize';
 import models, { sequelize } from '../models';
 import random from '../util/random';
 import { getSemesterTimeOffset } from '../util/time';
