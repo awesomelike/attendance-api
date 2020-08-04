@@ -1,5 +1,6 @@
 import { extname } from 'path';
 import moment from 'moment';
+import sequelize from 'sequelize';
 import models from '../models';
 import random from '../util/random';
 import { getSemesterTimeOffset } from '../util/time';
@@ -34,6 +35,7 @@ const storeStudentsSections = (
   students,
   sections,
   courses,
+  t,
 ) => new Promise((resolve, reject) => {
   const studentSections = [];
   for (let i = 0; i < students.length; i += 1) {
@@ -50,13 +52,17 @@ const storeStudentsSections = (
       });
     }
   }
-  models.StudentSection.destroy({ where: { semesterId } })
-    .then(() => models.StudentSection.bulkCreate(studentSections, { updateOnDuplicate: ['studentId', 'sectionId'] }))
+  models.StudentSection.destroy({ where: { semesterId }, transaction: t })
+    .then(() => models.StudentSection.bulkCreate(studentSections, {
+      updateOnDuplicate: ['studentId', 'sectionId'],
+      transaction: t,
+    }))
     .then(() => resolve(true))
     .catch((error) => reject(error));
 });
 
 export const storeTimetable = async (req, res) => {
+  const t = await sequelize.transaction();
   try {
     const { timetable, students: studentsTimetable } = req.timetable;
     console.log('timetable length: ', timetable.length);
@@ -89,9 +95,9 @@ export const storeTimetable = async (req, res) => {
     const uniqueRooms = unique(rooms, ['label']);
 
     const insertProfessorsCoursesRooms = [
-      models.Professor.bulkCreate(uniqueProfessors, { updateOnDuplicate: ['name'] }),
-      models.Course.bulkCreate(uniqueCourses, { updateOnDuplicate: ['name'] }),
-      models.Room.bulkCreate(uniqueRooms, { updateOnDuplicate: ['label'] }),
+      models.Professor.bulkCreate(uniqueProfessors, { updateOnDuplicate: ['name'], transaction: t }),
+      models.Course.bulkCreate(uniqueCourses, { updateOnDuplicate: ['name'], transaction: t }),
+      models.Room.bulkCreate(uniqueRooms, { updateOnDuplicate: ['label'], transaction: t }),
     ];
 
     await Promise.all(insertProfessorsCoursesRooms);
@@ -102,6 +108,7 @@ export const storeTimetable = async (req, res) => {
     for (let i = 0; i < courses.length; i += 1) {
       const course = courses[i];
       const particularSections = timetable
+        // eslint-disable-next-line no-shadow
         .filter((t) => t['Course No.'] === course.courseNumber);
       for (let j = 0; j < particularSections.length; j += 1) {
         const particularSection = particularSections[j];
@@ -123,7 +130,10 @@ export const storeTimetable = async (req, res) => {
     }) => ({
       courseId, sectionNumber, professorId, semesterId: semId,
     }));
-    await models.Section.bulkCreate(sectionsToInsert, { updateOnDuplicate: ['sectionNumber'] });
+    await models.Section.bulkCreate(sectionsToInsert, {
+      updateOnDuplicate: ['professorId'],
+      transaction: t,
+    });
     const allSections = await models.Section.findAll({
       where: { semesterId },
       attributes: ['id', 'sectionNumber', 'courseId'],
@@ -157,7 +167,10 @@ export const storeTimetable = async (req, res) => {
         });
       }
     }
-    await models.Class.bulkCreate(classesToInsert, { updateOnDuplicate: ['sectionId', 'roomId', 'weekDayId'] });
+    await models.Class.bulkCreate(classesToInsert, {
+      updateOnDuplicate: ['sectionId', 'roomId', 'weekDayId'],
+      transaction: t,
+    });
     const classInclude = [
       {
         model: models.Section,
@@ -195,13 +208,15 @@ export const storeTimetable = async (req, res) => {
               && section.course.courseNumber === courseNumber
               && section.sectionNumber === sectionNumber).id;
         const timeSlotId = timeSlots
+          // eslint-disable-next-line no-shadow
           .find((t) => t.startTime === timeslot).id;
         classTimeSlots.push({ timeSlotId, classId, semesterId });
       });
     }
-    await models.ClassTimeSlot.destroy({ where: { semesterId } });
+    await models.ClassTimeSlot.destroy({ where: { semesterId }, transaction: t });
     await models.ClassTimeSlot.bulkCreate(classTimeSlots, {
       updateOnDuplicate: ['timeSlotId', 'classId'],
+      transaction: t,
     });
 
     const semester = await models.Semester.findByPk(semesterId);
@@ -232,13 +247,22 @@ export const storeTimetable = async (req, res) => {
         }
       }
     });
-    await models.ClassItem.bulkCreate(classItems, { updateOnDuplicate: ['plannedDate', 'week'] }); // UPDATE_ON_DUPLICATE???
+    await models.ClassItem.bulkCreate(classItems, {
+      updateOnDuplicate: ['plannedDate', 'week'],
+      transaction: t,
+    });
 
     const students = await models.Student.findAll({ raw: true });
-    await storeStudentsSections(semesterId, studentsTimetable, students, allSections, courses);
+    await storeStudentsSections(semesterId, studentsTimetable, students, allSections, courses, t);
+
+    // We reached here, so there is no error, we can safely commit the transaction
+    await t.commit();
 
     res.sendStatus(200);
   } catch (error) {
+    // There is some error, so we rollback the transaction
+    await t.rollback();
+
     console.log(error.message);
     res.status(502).json(error.message);
   }
