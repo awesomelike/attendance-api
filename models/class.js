@@ -4,6 +4,7 @@ module.exports = (sequelize, DataTypes) => {
     weekDayId: DataTypes.INTEGER,
     roomId: DataTypes.INTEGER,
     semesterId: DataTypes.INTEGER,
+    index: DataTypes.INTEGER,
   }, {});
   Class.associate = (models) => {
     Class.belongsTo(models.Section, { as: 'section', foreignKey: 'sectionId' });

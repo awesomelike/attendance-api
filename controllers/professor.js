@@ -148,7 +148,7 @@ export default {
       next();
     } catch (error) {
       console.log(error);
-      res.status(502).json(error);
+      res.status(502).json(error.message);
     }
   },
   async getByRfid(req, res) {

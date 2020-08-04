@@ -23,6 +23,13 @@ module.exports = {
       date: {
         type: Sequelize.DATE,
       },
+      actualRoomId: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Rooms',
+          key: 'id',
+        },
+      },
       classItemStatusId: {
         type: Sequelize.INTEGER,
         references: {

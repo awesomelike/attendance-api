@@ -94,6 +94,7 @@ export default {
       } else {
         const allRooms = await Room.findAll({
           attributes: ['id', 'label'],
+          order: [['label', 'ASC']],
         });
         res.status(200).json(allRooms);
       }
