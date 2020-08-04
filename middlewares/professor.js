@@ -136,7 +136,7 @@ export default async function getCurrentClassAndSection(req, res, next) {
       .find(({ sectionId }) => professorSections.map(({ id }) => id).includes(sectionId));
 
     if (!classNow) return res.status(404).json({ error: 'No class found!' });
-    console.log(week);
+
     let [currentClassItem] = await classNow.getClassItems({
       where: {
         week,
@@ -193,7 +193,7 @@ export default async function getCurrentClassAndSection(req, res, next) {
       week,
     );
     req.classAndSection = {
-      currentClassItem, currentSection, professor, courseSections,
+      currentClassItem, classNow, currentSection, professor, courseSections,
     };
     next();
   } catch (error) {

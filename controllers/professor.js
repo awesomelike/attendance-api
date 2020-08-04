@@ -120,7 +120,7 @@ export default {
       });
   },
   async startAttendance(req, res, next) {
-    const { currentClassItem, currentSection } = req.classAndSection;
+    const { currentClassItem, currentSection, classNow: { roomId } } = req.classAndSection;
     try {
       let insertedRecords = null;
       if (currentClassItem.classItemStatusId === PLANNED
@@ -129,7 +129,11 @@ export default {
           currentClassItem.id,
           currentSection.students,
         );
-        await currentClassItem.update({ classItemStatusId: GOING_ON, date: Date.now() });
+        await currentClassItem.update({
+          actualRoomId: roomId,
+          classItemStatusId: GOING_ON,
+          date: Date.now(),
+        });
         await models.Student.update({ inClass: true }, {
           where: { id: currentSection.students.map(({ id }) => id) },
         });

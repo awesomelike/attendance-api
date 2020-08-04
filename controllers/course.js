@@ -2,7 +2,6 @@ import models from '../models';
 import executeMissedClasses from '../util/sql/missedClasses';
 import { idOf } from '../util/id';
 import { PROFESSOR, ASSISTANT } from '../data/seed/roles';
-import semester from './semester';
 
 const { Course } = models;
 
@@ -12,15 +11,6 @@ const include = [
     as: 'sections',
   },
 ];
-
-function find(where, res, next) {
-  Course.findAll({
-    where,
-    include,
-  })
-    .then((courses) => next(courses))
-    .catch((error) => res.status(502).json(error));
-}
 
 export default {
   async getAll(req, res) {
