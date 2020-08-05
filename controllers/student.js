@@ -53,6 +53,14 @@ const include = [
   },
 ];
 
+export const areStudentsFree = async (req, res) => {
+  const { busyStudents } = req;
+  res.status(200).json({
+    allAreFree: !busyStudents.length,
+    busyStudents,
+  });
+};
+
 export default {
   async get(req, res) {
     try {

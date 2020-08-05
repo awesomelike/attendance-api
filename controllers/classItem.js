@@ -52,7 +52,7 @@ export function isTaughtBy(classItemId, professorId) {
   });
 }
 
-function notifyStudents(students) {
+export function notifyStudents(students) {
   return new Promise((resolve, reject) => {
     const tasks = [];
     console.log('students.length', students.length);
@@ -146,6 +146,7 @@ export default {
       }, {
         where: { id: records.map(({ student: { id } }) => id) },
       });
+
       classItem.update({ classItemStatusId: FINISHED });
 
       const currentWeek = await time.getCurrentWeek();

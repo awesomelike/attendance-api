@@ -35,24 +35,14 @@ export const checkTimetable = checkSchema({
   timetable: {
     isArray: true,
     custom: {
-      options: (array) => {
-        for (let i = 0; i < array.length; i += 1) {
-          if (!hasAll(referencePropsTimetable, array[i])) return false;
-        }
-        return true;
-      },
+      options: (array) => array.every((object) => hasAll(referencePropsTimetable, object)),
       errorMessage: 'Timetable file column names do not match reference names',
     },
   },
   students: {
     isArray: true,
     custom: {
-      options: (array) => {
-        for (let i = 0; i < array.length; i += 1) {
-          if (!hasAll(referencePropsStudents, array[i])) return false;
-        }
-        return true;
-      },
+      options: (array) => array.every((object) => hasAll(referencePropsStudents, object)),
       errorMessage: 'Students file column names do not match reference names',
     },
   },
