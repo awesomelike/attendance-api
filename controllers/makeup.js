@@ -103,7 +103,10 @@ export default {
   },
   async create(req, res, next) {
     try {
-      const semesterId = await getCurrentSemester();
+      const semester = await getCurrentSemester();
+      if (!semester) return res.status(403).json({ error: 'No ongoing semester right now!' });
+      const { id: semesterId } = semester;
+
       const makeup = await Makeup.create({
         professorId: req.account.professorId,
         classItemId: req.makeup.classItemId,
@@ -117,6 +120,7 @@ export default {
       next();
       res.status(200).json(makeup);
     } catch (error) {
+      console.log(error);
       res.status(502).json(error);
     }
   },

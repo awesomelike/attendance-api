@@ -112,7 +112,9 @@ export default {
     try {
       const { rfid } = req;
       const classItemId = req.params.id;
-      const { id: semesterId } = await getCurrentSemester();
+      const semester = await getCurrentSemester();
+      if (!semester) return res.status(403).json({ error: 'No ongoing semester right now!' });
+      const { id: semesterId } = semester;
 
       const professor = await models.Professor.findOne({ where: { rfid } });
       if (!professor) return res.status(404).json({ error: 'No such professor' });

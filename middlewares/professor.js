@@ -101,7 +101,10 @@ export default async function getCurrentClassAndSection(req, res, next) {
     const professor = await getProfessorByRfid(rfid);
     if (!professor) return res.status(404).json({ error: 'No such professor!' });
 
-    const { id: semesterId } = await getCurrentSemester();
+    const semester = await getCurrentSemester();
+    if (!semester) return res.status(403).json({ error: 'No ongoing semester right now!' });
+    const { id: semesterId } = semester;
+
     const week = await time.getCurrentWeek();
     const timeSlotId = time.getCurrentTimeSlotId();
     if (!timeSlotId) return res.status(404).json({ error: 'You have no classes right now!' });

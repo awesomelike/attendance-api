@@ -33,7 +33,10 @@ const include = [{
 }];
 
 async function insertDefaultRecords(classItemId, students) {
-  const { id: semesterId } = await getCurrentSemester();
+  const semester = await getCurrentSemester();
+  if (!semester) throw new Error('No ongoing semester right now!');
+  const { id: semesterId } = semester;
+
   const recordsData = students.map(({ id }) => ({
     classItemId,
     studentId: id,

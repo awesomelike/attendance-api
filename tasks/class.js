@@ -103,6 +103,11 @@ const finishedClasses = (now) => {
 const ClassJob = new CronJob('* * * * *', async () => {
   try {
     console.log('ClassJob fired!');
+
+    const semester = await getCurrentSemester();
+    if (!semester) return;
+
+    const { id: semesterId } = semester;
     const now = moment(TIME).seconds(0).milliseconds(0);
 
     const finished = await finishedClasses(now);
@@ -115,7 +120,6 @@ const ClassJob = new CronJob('* * * * *', async () => {
 
     // Send emails
     const currentWeek = await time.getCurrentWeek();
-    const { id: semesterId } = await getCurrentSemester();
 
     const sendEmailTasks = [];
     finished.forEach((classItem) => {
