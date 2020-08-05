@@ -1,8 +1,12 @@
 import { CronJob } from 'cron';
 import moment from 'moment';
-import sequelize from 'sequelize';
+import sequelize, { Op } from 'sequelize';
 import models from '../models';
-import { parseTime, TIME } from '../util/time';
+import time, { parseTime, TIME } from '../util/time';
+import { GOING_ON, FINISHED } from '../constants/classItems';
+import { notifyStudents } from '../controllers/classItem';
+import { executeMissedAtDangerZone } from '../util/sql/missedClasses';
+import { getCurrentSemester } from '../controllers/semester';
 
 const { ClassItem, Student } = models;
 
@@ -38,7 +42,12 @@ const finishedClasses = (now) => {
   const date = clonedNow.startOf('day').format('YYYY-MM-DD');
   return new Promise((resolve) => {
     ClassItem.findAll({
-      where: sequelize.where(sequelize.fn('DATE', sequelize.col('plannedDate')), date),
+      where: {
+        classItemStatusId: GOING_ON,
+        [Op.and]: [
+          sequelize.where(sequelize.fn('DATE', sequelize.col('plannedDate')), date),
+        ],
+      },
       include: [
         {
           model: models.Class,
@@ -53,6 +62,11 @@ const finishedClasses = (now) => {
               as: 'section',
               attributes: ['id'],
               include: [
+                {
+                  model: models.Course,
+                  as: 'course',
+                  attributes: ['id'],
+                },
                 {
                   model: models.Student,
                   as: 'students',
@@ -86,7 +100,6 @@ const finishedClasses = (now) => {
   });
 };
 
-
 const ClassJob = new CronJob('* * * * *', async () => {
   try {
     console.log('ClassJob fired!');
@@ -94,6 +107,28 @@ const ClassJob = new CronJob('* * * * *', async () => {
 
     const finished = await finishedClasses(now);
     const started = await startedClasses(now);
+
+    // Update classItems' statuses
+    ClassItem.update({ classItemStatusId: FINISHED }, {
+      where: { id: finished.map(({ id }) => id) },
+    });
+
+    // Send emails
+    const currentWeek = await time.getCurrentWeek();
+    const { id: semesterId } = await getCurrentSemester();
+
+    const sendEmailTasks = [];
+    finished.forEach((classItem) => {
+      const courseId = classItem.class.section.course.id;
+      sendEmailTasks.push(executeMissedAtDangerZone(currentWeek, courseId, semesterId));
+    });
+
+    const dangerZoneStudents = (await Promise.all(sendEmailTasks))
+      .reduce((prev, curr) => prev.concat(curr), []);
+
+    if (dangerZoneStudents.length) {
+      notifyStudents(dangerZoneStudents);
+    }
 
     const flatten = (array) => array
       .map(({ class: { section: { students } } }) => students.map(({ id }) => id))

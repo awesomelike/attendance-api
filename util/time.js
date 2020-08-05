@@ -24,7 +24,7 @@ export const TIME = new Date(2019, 8, 10, 10, 30, 0);
 // export const TIME = new Date(2019, 8, 24, 16, 0, 0);
 // export const TIME = new Date(2019, 8, 24, 14, 0, 0);
 
-// export const TIME = new Date(2019, 8, 23, 12, 0, 0);
+// export const TIME = new Date(2019, 8, 17, 12, 0, 0);
 
 const dynamicGenerator = () => {
   // const timeNow = new Date();
