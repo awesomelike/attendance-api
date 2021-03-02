@@ -1,5 +1,5 @@
 import moment from 'moment';
-import models from '../models';
+import models, { sequelize } from '../models';
 import { GOING_ON, FINISHED } from '../constants/classItems';
 import { executeMissedAtDangerZone } from '../util/sql/missedClasses';
 import { sendEmail, missedClassesNotification } from '../tasks/email';
@@ -44,34 +44,21 @@ const includeWithCourse = [
   },
 ];
 
-export function isTaughtBy(classItemId, professorId) {
-  return new Promise((resolve, reject) => {
-    ClassItem.findByPk(classItemId, { include: includeWithCourse })
-      .then((classItem) => resolve(classItem.class.section.professorId === professorId))
-      .catch((error) => reject(error));
-  });
+export async function isTaughtBy(classItemId, professorId) {
+  const classItem = await ClassItem.findByPk(classItemId, { include: includeWithCourse });
+  return classItem.class.section.professorId === professorId;
 }
 
-export function notifyStudents(students) {
-  return new Promise((resolve, reject) => {
-    const tasks = [];
-    console.log('students.length', students.length);
-    students.forEach(({
-      email, name, CourseName, MissedClasses,
-    }) => {
-      tasks.push(
-        sendEmail(missedClassesNotification(
-          email,
-          name,
-          CourseName,
-          MissedClasses,
-        )),
-      );
-    });
-    Promise.all(tasks)
-      .then((result) => resolve(result))
-      .catch((error) => { console.log(error); reject(error); });
-  });
+export async function notifyStudents(students) {
+  const tasks = students.map(({
+    email, name, CourseName, MissedClasses,
+  }) => sendEmail(missedClassesNotification(
+    email,
+    name,
+    CourseName,
+    MissedClasses,
+  )));
+  await Promise.all(tasks);
 }
 
 export default {
@@ -109,12 +96,12 @@ export default {
     return res.xls(`ClassReport_${classItemWithRecords.id}.xlsx`, data);
   },
   async finishClass(req, res) {
+    let t;
     try {
       const { rfid } = req;
       const classItemId = req.params.id;
       const semester = await getCurrentSemester();
       if (!semester) return res.status(403).json({ error: 'No ongoing semester right now!' });
-      const { id: semesterId } = semester;
 
       const professor = await models.Professor.findOne({ where: { rfid } });
       if (!professor) return res.status(404).json({ error: 'No such professor' });
@@ -132,7 +119,9 @@ export default {
           error: 'This class is not taught by this professor',
         });
       }
-      res.sendStatus(200);
+
+      t = await sequelize.transaction();
+
       const records = await classItem.getRecords({
         attributes: ['id', 'studentId'],
         include: [
@@ -142,22 +131,39 @@ export default {
             attributes: ['id'],
           },
         ],
+        transaction: t,
       });
-      models.Student.update({
+
+      await models.Student.update({
         inClass: false,
       }, {
         where: { id: records.map(({ student: { id } }) => id) },
+        transaction: t,
       });
 
-      classItem.update({ classItemStatusId: FINISHED });
+      await classItem.update({ classItemStatusId: FINISHED }, { transaction: t });
 
-      const currentWeek = await time.getCurrentWeek();
-      const courseId = classItem.class.section.course.id;
-      const dangerZoneStudents = await executeMissedAtDangerZone(currentWeek, courseId, semesterId);
-      if (dangerZoneStudents.length) {
-        notifyStudents(dangerZoneStudents);
+      await t.commit();
+
+      res.sendStatus(200);
+
+      try {
+        const { id: semesterId } = semester;
+        const currentWeek = await time.getCurrentWeek();
+        const courseId = classItem.class.section.course.id;
+        const dangerZoneStudents = await executeMissedAtDangerZone(
+          currentWeek,
+          courseId,
+          semesterId,
+        );
+        if (dangerZoneStudents.length) {
+          notifyStudents(dangerZoneStudents);
+        }
+      } catch (error) {
+        console.log('Send danger zone notification error', error);
       }
     } catch (error) {
+      await t.rollback();
       console.log(error.message);
       res.status(502).json(error);
     }

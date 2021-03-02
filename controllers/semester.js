@@ -9,7 +9,11 @@ import versionAttr from '../util/versionAttr';
 const { Semester } = models;
 
 const setCache = async (callback) => {
-  const semester = await Semester.findOne({ where: { endDate: { [Op.gte]: Date.now() } }, attributes: ['id', 'startDate', 'endDate', 'year', 'season'], raw: true });
+  const semester = await Semester.findOne({
+    where: { endDate: { [Op.gte]: Date.now() } },
+    attributes: ['id', 'startDate', 'endDate', 'year', 'season'],
+    raw: true,
+  });
   if (!semester) return callback(null);
   const data = {
     id: semester.id,

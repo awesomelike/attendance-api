@@ -29,10 +29,13 @@ export default {
       res.status(502).json(error.message);
     }
   },
-  get(req, res) {
-    Class.findByPk(req.params.id)
-      .then((dbClass) => res.status(200).json(dbClass))
-      .catch((error) => res.status(502).json(error));
+  async get(req, res) {
+    try {
+      const dbClass = await Class.findByPk(req.params.id);
+      res.status(200).json(dbClass);
+    } catch (error) {
+      res.status(502).json(error);
+    }
   },
   async getClassItems(req, res) {
     try {
