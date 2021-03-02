@@ -5,7 +5,7 @@ require('dotenv').config();
 
 const { FRONT_URL } = process.env;
 
-export const confirmResetToken = (req, res, next) => {
+export const confirmResetToken = (req, res) => {
   const { token } = req.params;
   verify(token, process.env.JWT_KEY, (error, decoded) => {
     if (error) {

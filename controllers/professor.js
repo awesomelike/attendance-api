@@ -205,8 +205,12 @@ export default {
     res.status(200).json(result);
   },
   async getMakeups(req, res) {
-    Professor.findByPk(req.params.id, { include: [{ model: models.Makeup, as: 'makeups' }] })
-      .then((result) => res.status(200).json(result.makeups))
-      .catch((error) => res.status(502).json(error));
+    try {
+      const result = await Professor.findByPk(req.params.id, { include: [{ model: models.Makeup, as: 'makeups' }] });
+      res.status(200).json((result && result.makeups) || []);
+    } catch (error) {
+      console.log(error);
+      res.status(502).json(error);
+    }
   },
 };

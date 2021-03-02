@@ -15,14 +15,12 @@ const getSemesterId = async (req, res, next) => {
       if (semesters[0]) {
         semesterId = semesters[0].id;
         req.semesterId = semesterId;
-        next();
-      } else {
-        return res.status(404).json({ error: 'There is no semester yet!' });
+        return next();
       }
-    } else {
-      req.semesterId = semesterId;
-      next();
+      return res.status(404).json({ error: 'There is no semester yet!' });
     }
+    req.semesterId = semesterId;
+    next();
   } catch (error) {
     console.log(error);
   }

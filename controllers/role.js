@@ -9,30 +9,38 @@ const options = {
       model: models.Permission,
       as: 'permissions',
       attributes: ['id', 'name'],
-      through: {
-        attributes: [],
-      },
+      through: { attributes: [] },
     },
   ],
 };
 
 export default {
-  getAll(_, res) {
-    Role.findAll(options)
-      .then((roles) => res.status(200).json(roles))
-      .catch((error) => res.status(502).json(error));
+  async getAll(_, res) {
+    try {
+      const roles = await Role.findAll(options);
+      res.status(200).json(roles);
+    } catch (error) {
+      console.log(error);
+      res.status(502).json(error);
+    }
   },
-  get(req, res) {
-    Role.findByPk(req.params.id, options)
-      .then((role) => res.status(200).json(role))
-      .catch((error) => res.status(502).json(error));
+  async get(req, res) {
+    try {
+      const role = await Role.findByPk(req.params.id, options);
+      res.status(200).json(role);
+    } catch (error) {
+      console.log(error);
+      res.status(502).json(error);
+    }
   },
-  create(req, res) {
-    Role.create({
-      name: req.body.name,
-    })
-      .then((role) => res.status(200).json(role))
-      .catch((error) => res.status(502).json(error));
+  async create(req, res) {
+    try {
+      const role = await Role.create({ name: req.body.name });
+      res.status(200).json(role);
+    } catch (error) {
+      console.log(error);
+      res.status(502).json(error);
+    }
   },
   async update(req, res) {
     try {
