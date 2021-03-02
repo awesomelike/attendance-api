@@ -1,4 +1,4 @@
-import models from '../models';
+import models, { sequelize } from '../models';
 import { getAvailableRooms } from './room';
 import { ACCEPTED } from '../constants/makeups';
 import { getCurrentSemester } from './semester';
@@ -70,11 +70,10 @@ export const options = {
   ],
 };
 
-const isAlreadyResolved = (makeupId) => new Promise((resolve, reject) => {
-  models.Makeup.findByPk(makeupId)
-    .then((makeup) => resolve(makeup.resolvedById !== null))
-    .catch((error) => reject(error));
-});
+const isAlreadyResolved = async (makeupId) => {
+  const makeup = await models.Makeup.findByPk(makeupId);
+  return makeup.resolvedById !== null;
+};
 
 export default {
   async getAll(req, res) {
@@ -96,16 +95,22 @@ export default {
       res.status(502).json(error.message);
     }
   },
-  get(req, res) {
-    Makeup.findByPk(req.params.id, options)
-      .then((makeup) => res.status(200).json(makeup))
-      .catch((error) => res.status(502).json(error));
+  async get(req, res) {
+    try {
+      const makeup = await Makeup.findByPk(req.params.id, options);
+      res.status(200).json(makeup);
+    } catch (error) {
+      res.status(502).json(error);
+    }
   },
   async create(req, res, next) {
+    let t;
     try {
       const semester = await getCurrentSemester();
       if (!semester) return res.status(403).json({ error: 'No ongoing semester right now!' });
       const { id: semesterId } = semester;
+
+      t = await sequelize.transaction();
 
       const makeup = await Makeup.create({
         professorId: req.account.professorId,
@@ -113,21 +118,30 @@ export default {
         newDate: req.makeup.newDate,
         roomId: req.makeup.roomId,
         semesterId,
+      }, {
+        transaction: t,
       });
-      await makeup.setTimeSlots(req.makeup.timeSlots);
+      await makeup.setTimeSlots(req.makeup.timeSlots, { transaction: t });
+
+      await t.commit();
+
       const result = await Makeup.findByPk(makeup.id, options);
       req.event = { name: 'newMakeup', data: result };
       next();
       res.status(200).json(makeup);
     } catch (error) {
+      await t.rollback();
       console.log(error);
       res.status(502).json(error);
     }
   },
-  update(req, res) {
-    Makeup.update(req.makeup, { where: { id: req.params.id } })
-      .then(() => res.sendStatus(200))
-      .catch((error) => res.status(502).json(error));
+  async update(req, res) {
+    try {
+      await Makeup.update(req.makeup, { where: { id: req.params.id } });
+      res.sendStatus(200);
+    } catch (error) {
+      res.status(502).json(error);
+    }
   },
   async resolve(req, res) {
     try {

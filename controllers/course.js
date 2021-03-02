@@ -32,10 +32,13 @@ export default {
     });
     res.status(200).json(professorCourses);
   },
-  get(req, res) {
-    Course.findByPk(req.params.id, { include })
-      .then((course) => res.status(200).json(course))
-      .catch((error) => res.status(502).json(error));
+  async get(req, res) {
+    try {
+      const course = await Course.findByPk(req.params.id, { include });
+      res.status(200).json(course);
+    } catch (error) {
+      res.status(502).json(error);
+    }
   },
   async getSections(req, res) {
     try {
