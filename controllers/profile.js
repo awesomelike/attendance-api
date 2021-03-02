@@ -37,28 +37,38 @@ export default {
       res.status(502).json(error.message);
     }
   },
-  getMakeups(req, res) {
-    models.Professor.findByPk(req.account.professorId, {
-      include: [
-        {
-          model: models.Makeup,
-          as: 'makeups',
-          include: makeupOptions.include,
-        },
-      ],
-    })
-      .then((result) => res.status(200).json(result.makeups))
-      .catch((error) => { console.log(error); res.status(502).json(error.message); });
+  async getMakeups(req, res) {
+    try {
+      const result = await models.Professor.findByPk(req.account.professorId, {
+        include: [
+          {
+            model: models.Makeup,
+            as: 'makeups',
+            include: makeupOptions.include,
+          },
+        ],
+      });
+      res.status(200).json(result.makeups);
+    } catch (error) {
+      console.log(error);
+      res.status(502).json(error);
+    }
   },
-  updateProfile(req, res) {
-    Account.update(req.validatedAccount, { where: { id: req.account.id } })
-      .then(() => res.sendStatus(200))
-      .catch((error) => res.status(502).json(error));
+  async updateProfile(req, res) {
+    try {
+      await Account.update(req.validatedAccount, { where: { id: req.account.id } });
+      res.sendStatus(200);
+    } catch (error) {
+      res.status(502).json(error);
+    }
   },
-  updatePassword(req, res) {
-    Account.update(req.newPassword, { where: { id: req.account.id } })
-      .then(() => res.sendStatus(200))
-      .catch((error) => res.status(502).json(error));
+  async updatePassword(req, res) {
+    try {
+      await Account.update(req.newPassword, { where: { id: req.account.id } });
+      res.sendStatus(200);
+    } catch (error) {
+      res.status(502).json(error);
+    }
   },
   async sendPasswordResetEmail(req, res) {
     const { email } = req.body;
@@ -69,13 +79,17 @@ export default {
     sign({ accountId: account.id },
       process.env.JWT_KEY, {
         expiresIn: '10m',
-      }, (error, token) => {
+      }, async (error, token) => {
         if (error) {
           return res.sendStatus(500);
         }
-        sendEmail(passwordReset(email, account.name, token))
-          .then(() => res.status(200).json({ message: 'Check your email for the password reset link' }))
-          .catch((emailError) => { console.log(emailError); res.status(502).json(emailError); });
+        try {
+          await sendEmail(passwordReset(email, account.name, token));
+          res.status(200).json({ message: 'Check your email for the password reset link' });
+        } catch (emailError) {
+          console.log(emailError);
+          res.status(502).json(emailError);
+        }
       });
   },
 };

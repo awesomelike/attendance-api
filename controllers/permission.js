@@ -9,17 +9,18 @@ const options = {
       model: models.Role,
       as: 'roles',
       attributes: ['id', 'name'],
-      through: {
-        attributes: [],
-      },
+      through: { attributes: [] },
     },
   ],
 };
 
 export default {
-  getAll(_, res) {
-    Permission.findAll(options)
-      .then((permissions) => res.status(200).json(permissions))
-      .catch((error) => res.status(502).json(error));
+  async getAll(_, res) {
+    try {
+      const permissions = await Permission.findAll(options);
+      res.status(200).json(permissions);
+    } catch (error) {
+      res.status(502).json(error);
+    }
   },
 };

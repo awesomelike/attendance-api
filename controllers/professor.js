@@ -1,5 +1,5 @@
 import { sign } from 'jsonwebtoken';
-import models from '../models';
+import models, { sequelize } from '../models';
 import { PLANNED, GOING_ON } from '../constants/classItems';
 import { getPlannedLectures, getGivenLectures } from '../util/sql/lecturesReport';
 import makeOptions from '../util/queryOptions';
@@ -44,28 +44,24 @@ async function insertDefaultRecords(classItemId, students) {
     isAdditional: 0,
     semesterId,
   }));
-  return new Promise((resolve, reject) => {
-    models.Record.bulkCreate(recordsData)
-      .then(() => {
-        models.ClassItem.findByPk(classItemId, {
-          include: [
-            {
-              model: models.Record,
-              as: 'records',
-              include: [
-                {
-                  model: models.Student,
-                  as: 'student',
-                },
-              ],
-            },
-          ],
-        })
-          .then(({ records }) => resolve(records))
-          .catch((error) => { throw new Error(error); });
-      })
-      .catch((error) => reject(error));
+
+  await models.Record.bulkCreate(recordsData);
+
+  const { records } = await models.ClassItem.findByPk(classItemId, {
+    include: [
+      {
+        model: models.Record,
+        as: 'records',
+        include: [
+          {
+            model: models.Student,
+            as: 'student',
+          },
+        ],
+      },
+    ],
   });
+  return records;
 }
 
 export default {
@@ -84,10 +80,14 @@ export default {
       res.status(502).json(error.message);
     }
   },
-  get(req, res) {
-    Professor.findByPk(req.params.id, { include })
-      .then((professor) => res.status(200).json(professor))
-      .catch((error) => res.status(502).json(error.message));
+  async get(req, res) {
+    try {
+      const professor = await Professor.findByPk(req.params.id, { include });
+      res.status(200).json(professor);
+    } catch (error) {
+      console.log(error);
+      res.status(502).json(error.message);
+    }
   },
   async getSections(req, res) {
     const options = makeOptions(req, { include: [{ model: models.Course, as: 'course' }] });
@@ -124,6 +124,7 @@ export default {
   },
   async startAttendance(req, res, next) {
     const { currentClassItem, currentSection, classNow: { roomId } } = req.classAndSection;
+    let t;
     try {
       let insertedRecords = null;
       if (currentClassItem.classItemStatusId === PLANNED
@@ -132,15 +133,24 @@ export default {
           currentClassItem.id,
           currentSection.students,
         );
+
+        t = await sequelize.transaction();
+
         await currentClassItem.update({
           actualRoomId: roomId,
           classItemStatusId: GOING_ON,
           date: Date.now(),
+        }, {
+          transaction: t,
         });
         await models.Student.update({ inClass: true }, {
           where: { id: currentSection.students.map(({ id }) => id) },
+          transaction: t,
         });
+
+        await t.commit();
       }
+
       let records = insertedRecords || currentClassItem.records;
       records = await models.Record.findAll({
         where: { id: records.map(({ id }) => id) },
@@ -151,9 +161,12 @@ export default {
           },
         ],
       });
+
       res.status(200).json({ records, classItemStatusId: GOING_ON });
       next();
     } catch (error) {
+      if (t) await t.rollback();
+
       console.log(error);
       res.status(502).json(error.message);
     }
